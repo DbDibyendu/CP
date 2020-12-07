@@ -1,5 +1,5 @@
 # A Guide to Competitive Programming 
-> Solution of all codeforces problems which I solved 
+> Solution of some codeforces problems which I solved 
 
 ## Some Usefull tutorial Links for Cp :
 1. [CP for beginners](https://www.youtube.com/watch?v=xAeiXy8-9Y8&ab_channel=Errichto)
