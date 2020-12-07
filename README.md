@@ -16,6 +16,7 @@
 2. [Leetcode](https://leetcode.com/)
   - You can find some solutions of leetcode [here](https://github.com/shruti170901/Leetcode)
 3. [HackerRank](https://www.hackerrank.com/)
+  - You can find some solutions of HackerRank [here](https://github.com/adityabisoi/ds-algo-solutions)
 4. [CodeChef](https://www.codechef.com/)
 
 ### Some Cool templates in C++ STL
