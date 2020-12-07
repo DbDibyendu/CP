@@ -18,12 +18,6 @@ typedef vector<int>		vi;
 typedef vector<pii>     vpii;
 typedef vector<vi>		vvi;
 //=======================
-bool visited[N] = {false};
-vi adj[N];
-ll siz[N] = {0};
-void dfs(ll u);
-//=======================
-
 
 void solve() {
  
@@ -41,18 +35,4 @@ int main() {
     solve();
   }
   return 0;
-}
-
-
-//=======================
-void dfs(ll u)
-{
-  for (auto x : adj[u])
-  {
-  if (!visited[x])
-  {
-    visited[x] = true;
-    dfs(x);
-    }
-  }
 }
