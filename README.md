@@ -14,6 +14,7 @@
 
 1. [Codeforces](https://codeforces.com/)
 2. [Leetcode](https://leetcode.com/)
+  - You can find some solutions of leetcode [here](https://github.com/shruti170901/Leetcode)
 3. [HackerRank](https://www.hackerrank.com/)
 4. [CodeChef](https://www.codechef.com/)
 ### Some Cool templates 
