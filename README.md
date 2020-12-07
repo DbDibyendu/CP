@@ -1,4 +1,4 @@
-# Competitive Programming 
+# A Guide to Competitive Programming 
 > Solution of all codeforces problems which I solved 
 
 ## Some Usefull tutorial Links for Cp :
@@ -17,6 +17,7 @@
   - You can find some solutions of leetcode [here](https://github.com/shruti170901/Leetcode)
 3. [HackerRank](https://www.hackerrank.com/)
 4. [CodeChef](https://www.codechef.com/)
-### Some Cool templates 
+
+### Some Cool templates in C++ STL
 1. [Template1](https://github.com/DbDibyendu/CP/blob/main/STL/test.cpp)
 2. [Template2](https://github.com/DbDibyendu/CP/blob/main/STL/template.cpp)
