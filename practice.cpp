@@ -17,47 +17,23 @@ typedef vector<int> vi;
 class Solution
 {
 public:
-	vector<vector<int>> dp, visited;
-
-	int calc(int i, int j, string &s)
+	int lengthOfLIS(vector<int> &nums)
 	{
 
-		if (i == j)
-		{
-			return 1;
-		}
-
-		if(visited[i][j]){
-			return dp[i][j];
-		}
-		if (s[i] == s[j] && !visited[i][j])
-		{
-			visited[i][j]=1;
-			dp[i][j]=calc(i + 1, j - 1, s);
-			return dp[i][j];
-		}
-		else
-		{
-			visited[i][j]=1;
-			return 0;
-		}
-	}
-	int countSubstrings(string s)
-	{
-
-		int i, j;
-		int n = s.size();
-		int ans = 0;
-		vector<vector<int>> dp, visited;
-
+		vector<int> dp, visited;
+		int n = nums.size();
+		vector<int> dp(n + 1, 0), visited(n, 0);
+		int i, k;
 		for (i = 0; i < n; i++)
 		{
-			for (j = i; j < n; j++)
+			for (k = 0; k < i; k++)
 			{
-				ans += calc(i, j, s);
+				if (nums[i] < nums[k] && visited[k]==0)
+				{
+					dp[k] = max(dp[k], dp[i] + 1);
+					visited[k]=1;
+				}
 			}
 		}
-
-		return ans;
 	}
 };
