@@ -7,7 +7,7 @@
 3. [Best STL tutorial for beginners](https://www.youtube.com/watch?v=g-1Cn3ccwXY&t=1920s&ab_channel=RachitJain)
 4. [ DP tutorial for beginners](https://www.youtube.com/playlist?list=PLfBJlB6T2eOtMXgK3FLUTawHjzpIEySHF)
 5. [ Intro to Graphs](https://www.youtube.com/watch?v=xyJxCjweLKE&ab_channel=RachitJain)
-   * [ example 1](https://www.youtube.com/watch?v=EE_9U798nvQ&ab_channel=RachitJain)
+   * [ Problem 1](https://www.youtube.com/watch?v=EE_9U798nvQ&ab_channel=RachitJain)
 
 ### Books and Links for CP
 1. [CP Handbook](https://cses.fi/book/book.pdf)
