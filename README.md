@@ -13,7 +13,7 @@
 
 ### Books and Links for CP
 1. [CP Handbook](https://cses.fi/book/book.pdf)
-2. [CP Algorithms](https://cp-algorithms.com/)
+2. [CP Algorithms + practice prblms are given](https://cp-algorithms.com/)
 
 ### Platforms for CP
 
