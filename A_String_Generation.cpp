@@ -21,20 +21,30 @@ typedef vector<vi>		vvi;
 
 void solve() {
  
-  int i, j, n, m, k;
-  ll temp=0,flag=1;
-  cin >> n;
-   
+    int i, j, n, m, k;
+    ll temp=0,flag=1;
+    cin >> n>>k;
+
+    fo(i,0,k) cout<<'a';
+
+    for(j=0;j<n-k;j++){
+        if(j%3==0)
+        cout<<'b';
+        else if(j%3==1) cout<<"c";
+        else cout<<"a";
+    }
+    cout<<endl;
+
 }
 
 
 int main() {
-  int t = 1;
-  cin >> t;
-  while(t--) {
-    solve();
-  }
-  return 0;
+    int t = 1;
+    cin >> t;
+    while(t--) {
+        solve();
+    }
+    return 0;
 }
 
 

@@ -37,6 +37,7 @@ void dfs(ll u)
     }
 }
 
+// correct bfs code
 void bfs(ll u)
 {
     queue<int> q;
