@@ -13,11 +13,12 @@
 
 ### Books and Links for CP
 1. [CP Handbook](https://cses.fi/book/book.pdf)
-2. [CP Algorithms](https://cp-algorithms.com/)
+2. [CP Algorithms + practice prblms are given](https://cp-algorithms.com/)
 
 ### Platforms for CP
 
 1. [Codeforces](https://codeforces.com/)
+- To Improve your performance, online Judge [A2OJ](https://a2oj.com/ladders)
 2. [Leetcode](https://leetcode.com/)
   - You can find some solutions of leetcode [here](https://github.com/shruti170901/Leetcode)
 3. [HackerRank](https://www.hackerrank.com/)
