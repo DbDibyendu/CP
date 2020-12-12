@@ -27,5 +27,5 @@
 4. [CodeChef](https://www.codechef.com/)
 
 ### Some Cool templates in C++ STL
-1. [Template1](https://github.com/DbDibyendu/CP/blob/main/STL/test.cpp)
+1. [Template1](https://github.com/DbDibyendu/CP/blob/main/STL/MyTemplate.cpp)
 2. [Template2](https://github.com/DbDibyendu/CP/blob/main/STL/template.cpp)
