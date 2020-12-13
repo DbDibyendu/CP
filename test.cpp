@@ -23,38 +23,8 @@ void solve()
 
 	int i, j, n, m , k;
 	int temp = 0, flag = 1;
-	cin >> n >> k;
-	vi A(n);
-	fo(i, 0, n) cin >> A[i];
-	sort(A.begin(), A.end());
-
-	// Boundary conditions
-	
-	if (k == 0)
-	{
-		if(A[0]>1)
-		cout << A[0]-1 << endl;
-		else 
-		cout << -1<<endl;
-		return;
-	}
-	
-	if(n==k){
-		cout<<A[k-1]<<endl;
-		return;
-	}
-
-
-	temp = A[k - 1];
-	j = k - 1;
-
-	if (A[k] <= temp)
-	{
-		cout << -1 << endl;
-		return;
-	}
-	else
-		cout << temp << endl;
+	cin >> n;
+	cout<<(n&1);
 }
 
 int main()

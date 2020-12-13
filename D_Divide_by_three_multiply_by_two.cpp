@@ -17,59 +17,41 @@ typedef vector<int> vi;
 typedef vector<pii> vpii;
 typedef vector<vi> vvi;
 //=======================
-vector<bool> visited;
-vector<vector<int>> g;
 
-void edge(int a, int b);
-void dfs(ll u);
-void bfs(ll u);
+int calc(ll x){
+    
+    int temp=0;
+    while(x%3==0){
+        temp++;
+        x/=3;
+    }
+    return temp;
+}
 
 void solve()
 {
 
     int i, j, n, m, k;
-    ll temp1 = 0, temp2 = 0, flag = 1;
+    ll tempD = 0, temp2 = 0, flag = 1;
     cin >> n;
-    vector<long long int> A(n, 0);
-    // Important
-    visited.assign(n, false);
-    vector<bool> v(n, 0);
-    g.assign(n, vector<int>());
+    vector<pair<int,ll>> A(n);        /// notice integer to be first for sorting in lexicographical order
 
-    fo(i, 0, n) cin >> A[i];
-
-    fo(i, 0, n)
-    {
-        v[i] = true;
-        if (A[i] % 3 == 0)
-        {
-            fo(j, 0, n)
-            {
-
-                if (A[i] / 3 == A[j] && !v[j])
-                {
-                    v[j] = true;
-                    edge(i, j);
-                    deb2(i, j);
-                }
-            }
-        }
-        else
-        {
-            fo(j, 0, n)
-            {
-
-                if (A[j] == 2 * A[i] && !v[j])
-                {
-                    v[j] = true;
-                    edge(i, j);
-                    deb2(i, j);
-                }
-            }
-        }
+    fo(i,0,n){
+        cin>>A[i].second;
+        
+        A[i].first= -calc(A[i].second);
     }
 
+    sort(A.begin(),A.end());      // lexicographical order
+
+    fo(i,0,n){
+        cout<<A[i].second<<" ";
+    }
+    cout<<endl;
     
+    
+
+
 }
 
 int main()
@@ -84,47 +66,3 @@ int main()
 }
 
 //=======================
-
-void edge(int a, int b)
-{
-    //  undirected graph
-    g[a].pb(b);
-    g[b].pb(a);
-}
-
-void dfs(ll u)
-{
-    visited[u] = true;
-
-    for (auto x : g[u])
-    {
-        if (visited[x] == false)
-        {
-            cout << x << " ";
-            dfs(x);
-        }
-    }
-}
-
-void bfs(ll u)
-{
-    queue<int> q;
-
-    q.push(u);
-    visited[u] = true;
-    while (!q.empty())
-    {
-        int f = q.front();
-        q.pop();
-
-        for (auto x : g[f])
-        {
-            if (!visited[x])
-            {
-                q.push(x);
-                cout << x << " ";
-                visited[x] = true;
-            }
-        }
-    }
-}
