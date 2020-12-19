@@ -48,7 +48,7 @@ void solve()
     {
         if (count[j] + count[j + 1] + count[j + 2] >= 3)
         {
-            if (visited[j] && visited[j + 1])
+            if (visited[j] || visited[j + 1])
             {
                 temp += C(count[j] + count[j + 1] + count[j + 2], 3) - C(count[j] + count[j + 1], 3);
                 visited[j]++;
