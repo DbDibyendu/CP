@@ -13,6 +13,7 @@
    * [ Problem 1 (BFS) ](https://www.youtube.com/watch?v=EE_9U798nvQ&ab_channel=RachitJain)
 
 ### Books and Links for CP
+1. [CS21003 Algrorithms-I (IIT KGP) ](http://cse.iitkgp.ac.in/~palash/Courses/2021Algorithms1-Theory/algo1-2021.html)
 1. [CP Handbook](https://cses.fi/book/book.pdf)
 2. [CP Algorithms + practice prblms are given](https://cp-algorithms.com/)
 
