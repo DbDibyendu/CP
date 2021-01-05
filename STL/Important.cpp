@@ -28,6 +28,8 @@ int i, n, m, k;
  * directly add into your code
  * 
  */
+ll Max=LLONG_MAX;
+
 void Vectors()
 {
     vi A;
@@ -88,12 +90,22 @@ void Vectors()
     
 }
 
-void mapDemo()
-{
-    map<int,int> A;
-    
+void pairDemo(){
+
+    int a,b,i,j;
+    cin >> n;
+    vector<pair<int, int>> vect;
+    fo(i,n){
+        cin>>a>>b;
+        vect.push_back(make_pair(a,b));
+    }
+    // Using sort() function to sort by 1st  element 
+    // of pair 
+    sort(vect.begin(),vect.end());
 
 }
+
+
 
 
 

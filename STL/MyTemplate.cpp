@@ -1,7 +1,7 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 #define gc getchar_unlocked
-#define fo(i,a,n) for(i=a;i<n;i++)
+#define fo(i, a, n) for (i = a; i < n; i++)
 #define ll long long
 #define deb(x) cout << #x << '=' << x << endl
 #define deb2(x, y) cout << #x << '=' << x << ',' << #y << '=' << y << endl
@@ -10,32 +10,46 @@ using namespace std;
 #define sortall(x) sort(all(x))
 #define PI 3.1415926535897932384626
 #define pb push_back
-const int N = INT_MAX;
+const int MOD = 1'000'000'007;
+const int N = INT_MAX, M = N;
 //===========================
-typedef pair<int, int>	pii;
-typedef vector<int>		vi; 
-typedef vector<pii>     vpii;
-typedef vector<vi>		vvi;
+typedef pair<int, int> pii;
+typedef vector<int> vi;
+typedef vector<pii> vpii;
+typedef vector<vi> vvi;
 //=======================
 
+void solve()
+{
 
-void solve() {
- 
   int i, j, n, m, k;
-  ll temp=0,flag=1;
+  ll temp = 0, flag = 1;
   cin >> n;
-   
 }
 
-
-int main() {
+int main()
+{
   int t = 1;
   cin >> t;
-  while(t--) {
+  while (t--)
+  {
     solve();
   }
   return 0;
 }
 
-
 //=======================
+
+// calculate a^b in log(b) time
+ll bin_pow(ll x, ll y)
+{
+  ll res = 1;
+  while (y)
+  {
+    if (y % 2)
+      res = (res * x) % MOD;
+    x = (x * x) % MOD;
+    y /= 2;
+  }
+  return res;
+}
