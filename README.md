@@ -13,6 +13,7 @@
    * [ Problem 1 (BFS) ](https://www.youtube.com/watch?v=EE_9U798nvQ&ab_channel=RachitJain)
 
 ### Books and Links for CP
+1. [CS21003 Algrorithms-I (IIT KGP) ](http://cse.iitkgp.ac.in/~palash/Courses/2021Algorithms1-Theory/algo1-2021.html)
 1. [CP Handbook](https://cses.fi/book/book.pdf)
 2. [CP Algorithms + practice prblms are given](https://cp-algorithms.com/)
 
@@ -29,3 +30,15 @@
 ### Some Cool templates in C++ STL
 1. [Template1](https://github.com/DbDibyendu/CP/blob/main/STL/MyTemplate.cpp)
 2. [Template2](https://github.com/DbDibyendu/CP/blob/main/STL/template.cpp)
+
+### Common Time complexities in Codeforces
+Let n be the main variable in the problem.
+
+- If n ≤ 12, the time complexity can be O(n!).
+- If n ≤ 25, the time complexity can be O(2n).
+- If n ≤ 100, the time complexity can be O(n4).
+- If n ≤ 500, the time complexity can be O(n3).
+- If n ≤ 104, the time complexity can be O(n2).
+- If n ≤ 106, the time complexity can be O(n log n).
+- If n ≤ 108, the time complexity can be O(n).
+- If n > 108, the time complexity can be O(log n) or O(1).
