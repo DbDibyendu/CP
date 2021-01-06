@@ -27,9 +27,8 @@
   - You can find some solutions of HackerRank [here](https://github.com/adityabisoi/ds-algo-solutions)
 4. [CodeChef](https://www.codechef.com/)
 
-### Some Cool templates in C++ STL
+### Templates in C++ STL
 1. [Template1](https://github.com/DbDibyendu/CP/blob/main/STL/MyTemplate.cpp)
-2. [Template2](https://github.com/DbDibyendu/CP/blob/main/STL/template.cpp)
 
 ### Common Time complexities in Codeforces
 Let n be the main variable in the problem.
