@@ -13,11 +13,28 @@ using namespace std;
 const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //===========================
-typedef pair<int, int> pii;
 typedef vector<int> vi;
-typedef vector<pii> vpii;
-typedef vector<vi> vvi;
+typedef vector<ll> vl;
+typedef pair<ll, ll> pll;
+typedef vector<pll> vpll;
+typedef vector<vl> vvl;
 //=======================
+ll gcd(ll a, ll b) { return (b == 0) ? a : gcd(b, a % b); }
+
+// calculate a^b in log(b) time
+ll bin_pow(ll x, ll y)
+{
+  ll res = 1;
+  while (y)
+  {
+    if (y % 2)
+      res = (res * x) % MOD;
+    x = (x * x) % MOD;
+    y /= 2;
+  }
+  return res;
+}
+
 
 void solve()
 {
@@ -39,17 +56,3 @@ int main()
 }
 
 //=======================
-
-// calculate a^b in log(b) time
-ll bin_pow(ll x, ll y)
-{
-  ll res = 1;
-  while (y)
-  {
-    if (y % 2)
-      res = (res * x) % MOD;
-    x = (x * x) % MOD;
-    y /= 2;
-  }
-  return res;
-}

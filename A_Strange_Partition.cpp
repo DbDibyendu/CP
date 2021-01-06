@@ -19,44 +19,37 @@ const int N = INT_MAX, M = N;
 void solve()
 {
 
-    int i, j, n, m, k;
+    ll i, j, n, m, k, x;
     ll temp = 0, flag = 1;
-    cin >> n;
-    vector<pair<int, int>> frnd(n);
-
+    cin >> n >> x;
+    vl A(n);
+    ll min = 0, max = 0;
     fo(i, 0, n)
     {
-        cin >> frnd[i].first >> frnd[i].second;
+        cin >> A[i];
+        temp += A[i];
     }
-
-    for (i = 0; i < n; i++)
+    fo(i, 0, n)
     {
-        flag = 1;
-        for (j = 0; j < n; j++)
+        if (A[i] % x == 0)
         {
-            if (frnd[j].first < frnd[i].first && frnd[j].second < frnd[i].second)
-            {
-                //   cout << j + 1 << " ";
-                flag = 0;
-                temp = j + 1;
-            }
-            else if (frnd[j].second < frnd[i].first && frnd[j].first < frnd[i].second)
-            {
-                // cout << j + 1 << " ";
-                flag = 0;
-                temp = j + 1;
-            }
-        }
-        if (flag != 0)
-        {
-            cout << -1 << " ";
+            max += A[i] / x;
         }
         else
         {
-            cout << temp << " ";
+            max += A[i] / x + 1;
         }
     }
-    cout << endl;
+    if (temp % x == 0)
+    {
+        min = temp / x;
+    }
+    else
+    {
+        min = temp / x + 1;
+    }
+
+    cout << min << " " << max << endl;
 }
 
 int main()

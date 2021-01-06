@@ -16,43 +16,76 @@ const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
 
+// The tube can be bent...like L
 void solve()
 {
 
-    int i, j, n, m, k, l, t, init;
+    int i, j, n, m, k, rem = 0, cap;
     ll temp = 0, flag = 1;
     cin >> n >> m >> k;
-    init = n * m / k;
-    l = k;
-    i = 0;
-    while (l--)
+    int x = 1, y = 1;
+    int dir = -1;
+    k--;
+    cap = 2;
+    rem = (n * m) - (cap * k);
+    while (k--)
     {
-        cout << init << " ";
-        i++;
-        if (flag == 1)
+
+        cout << cap << " ";
+        if (y == 1 && dir == -1)
         {
-            for (j = 1; j <= m; j++)
-            {
-                cout << i << " " << j<<" ";
-            }
-            flag = 0;
+            dir *= -1;
         }
-        else
+        for (i = 0; i < cap; i++)
         {
-            for (j = m; j > 0; j--)
+            cout << x << " " << y << " ";
+            if (y == 1 && dir == -1)
             {
-                cout << i << " " << j<<" ";
+                dir *= -1;
+                x++;
             }
-            flag = 1;
+            else if (y == m && dir == 1)
+            {
+                dir *= -1;
+                x++;
+            }
+            else
+            {
+                y += dir;
+            }
         }
         cout << endl;
     }
+
+    cout << rem << " ";
+    if (y == 1 && dir == -1)
+    {
+        dir *= -1;
+    }
+    for (i = 0; i < rem; i++)
+    {
+        cout << x << " " << y << " ";
+        if (y == 1 && dir == -1)
+        {
+            dir *= -1;
+            x++;
+        }
+        else if (y == m && dir == 1)
+        {
+            dir *= -1;
+            x++;
+        }
+        else
+        {
+            y += dir;
+        }
+    }
+    cout << endl;
 }
 
 int main()
 {
     int t = 1;
-    // cin >> t;
     while (t--)
     {
         solve();

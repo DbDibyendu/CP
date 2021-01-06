@@ -28,7 +28,7 @@ int i, n, m, k;
  * directly add into your code
  * 
  */
-ll Max=LLONG_MAX;
+ll Max = LLONG_MAX;
 
 void Vectors()
 {
@@ -39,75 +39,75 @@ void Vectors()
 
     fo(i, 16) cout << A[i] << " ";
 
-    for (auto i = A.begin(); i != A.end(); i++)           // auto acts as an iterator
-    cout << *i << " "; 
+    for (auto i = A.begin(); i != A.end(); i++) // auto acts as an iterator
+        cout << *i << " ";
 
     sort(A.begin(), A.end()); // O(NlogN) sorting the vector A
-    
-     // prints the vector size 
+
+    sort(A.begin(), A.end(), greater<ll>()); //Sorting in decreasing order
+
+    // prints the vector size
     cout << "\nSize : " << A.size();
 
-    cout << "\nReference operator [g] : g1[2] = " << A[2]; 
-  
-    cout << "\nat : g1.at(4) = " << A.at(4); 
-  
-    cout << "\nfront() : g1.front() = " << A.front(); 
-  
-    cout << "\nback() : g1.back() = " << A.back();  
+    cout << "\nReference operator [g] : g1[2] = " << A[2];
 
-    cout << "\nOutput of begin and end: "; 
-    for (auto i = A.begin(); i != A.end(); i++){            // auto acts as an iterator
-    
-    cout << *i << " ";  // printing out the elements of the iterator using *
+    cout << "\nat : g1.at(4) = " << A.at(4);
 
-    if(i == A.end()-1) cout << endl;         // new line after the vector ends..... You can also end the loop here using break
+    cout << "\nfront() : g1.front() = " << A.front();
 
+    cout << "\nback() : g1.back() = " << A.back();
+
+    cout << "\nOutput of begin and end: ";
+    for (auto i = A.begin(); i != A.end(); i++)
+    { // auto acts as an iterator
+
+        cout << *i << " "; // printing out the elements of the iterator using *
+
+        if (i == A.end() - 1)
+            cout << endl; // new line after the vector ends..... You can also end the loop here using break
     }
-    int sum1 = accumulate(A.begin(), A.end(), 0); // to get the sum of all elements in vector     
+    int sum1 = accumulate(A.begin(), A.end(), 0); // to get the sum of all elements in vector
 
-    cout << "\nOutput of rbegin and rend: "; 
-    for (auto ir = A.rbegin(); ir != A.rend(); ++ir) 
-        cout << *ir << " "; 
-    cout<<endl;
+    cout << "\nOutput of rbegin and rend: ";
+    for (auto ir = A.rbegin(); ir != A.rend(); ++ir)
+        cout << *ir << " ";
+    cout << endl;
     deb(i);
 
-    bool present = binary_search(A.begin(), A.end(), 3);     // true
-    present = binary_search(A.begin(), A.end(), 45);         // false
+    bool present = binary_search(A.begin(), A.end(), 3); // true
+    present = binary_search(A.begin(), A.end(), 45);     // false
     deb(present);
-    fo(i,2) A.push_back(9);
-    
-    auto it = lower_bound(A.begin(),A.end(),9);
-    auto it2 = upper_bound(A.begin(),A.end(),9);
-    cout << *it<< " "<< *it2<<endl;
-    deb(it2-it);
+    fo(i, 2) A.push_back(9);
 
-    cout << it - A.begin()<<endl;  // to print the value of an iterator you have to do an arithmatic operation
+    auto it = lower_bound(A.begin(), A.end(), 9);
+    auto it2 = upper_bound(A.begin(), A.end(), 9);
+    cout << *it << " " << *it2 << endl;
+    deb(it2 - it);
 
-    for(int x:A){
-        cout << x <<" ";
+    cout << it - A.begin() << endl; // to print the value of an iterator you have to do an arithmatic operation
+
+    for (int x : A)
+    {
+        cout << x << " ";
     }
-    cout<<endl;
-    
+    cout << endl;
 }
 
-void pairDemo(){
+void pairDemo()
+{
 
-    int a,b,i,j;
+    int a, b, i, j;
     cin >> n;
     vector<pair<int, int>> vect;
-    fo(i,n){
-        cin>>a>>b;
-        vect.push_back(make_pair(a,b));
+    fo(i, n)
+    {
+        cin >> a >> b;
+        vect.push_back(make_pair(a, b));
     }
-    // Using sort() function to sort by 1st  element 
-    // of pair 
-    sort(vect.begin(),vect.end());
-
+    // Using sort() function to sort by 1st  element
+    // of pair
+    sort(vect.begin(), vect.end());
 }
-
-
-
-
 
 int main()
 {
@@ -115,7 +115,7 @@ int main()
     // cin >> t;
     while (t--)
     {
-      Vectors();
+        Vectors();
     }
 
     return 0;
