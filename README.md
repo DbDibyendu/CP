@@ -27,6 +27,7 @@
 - To Improve your performance, online Judge [A2OJ](https://a2oj.herokuapp.com/)
 2. [Leetcode](https://leetcode.com/)
   - You can find some solutions of leetcode [here](https://github.com/shruti170901/Leetcode)
+  - Here's 60 must do leetcode problems for interview [LINK](https://medium.com/@koheiarai94/60-leetcode-questions-to-prepare-for-coding-interview-8abbb6af589e)
 3. [HackerRank](https://www.hackerrank.com/)
   - You can find some solutions of HackerRank [here](https://github.com/adityabisoi/ds-algo-solutions)
 4. [CodeChef](https://www.codechef.com/)
