@@ -27,11 +27,15 @@
 - To Improve your performance, online Judge [A2OJ](https://a2oj.herokuapp.com/)
 2. [Leetcode](https://leetcode.com/)
   - You can find some solutions of leetcode [here](https://github.com/shruti170901/Leetcode)
-  - Here's 60 must do leetcode problems for interview [LINK](https://medium.com/@koheiarai94/60-leetcode-questions-to-prepare-for-coding-interview-8abbb6af589e)
+  - Here's a list of **60 leetcode problems** for interview [LINK](https://medium.com/@koheiarai94/60-leetcode-questions-to-prepare-for-coding-interview-8abbb6af589e)
+      - Clone them from [here](https://leetcode.com/list?selectedList=5w87ernh)
 3. [HackerRank](https://www.hackerrank.com/)
   - You can find some solutions of HackerRank [here](https://github.com/adityabisoi/ds-algo-solutions)
 4. [CodeChef](https://www.codechef.com/)
 
 ### Templates in C++ STL
 1. [Template1](https://github.com/DbDibyendu/CP/blob/main/STL/MyTemplate.cpp)
+
+
+You can clone this repo and give more suggestions, I'll be happy to merge them :)
 
