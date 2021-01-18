@@ -9,8 +9,10 @@ using namespace std;
 #define pb push_back
 //===========================
 typedef vector<int> vi;
-typedef vector<vi> vvi;
 typedef vector<ll> vl;
+typedef pair<ll, ll> pll;
+typedef vector<pll> vpll;
+typedef vector<vl> vvl;
 //=======================
 const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
@@ -19,38 +21,29 @@ const int N = INT_MAX, M = N;
 void solve()
 {
 
-    ll i, j, n, m, k;
-    ll temp = 0, flag = 1, prev = 0;
-    cin >> n;
-    vi A(n);
-    vi B(3, 0);
+    int i, j, n, m, k, d;
+    ll temp = 0, flag = 1;
+    cin >> n >> d;
+    vl A(n);
     fo(i, 0, n)
     {
         cin >> A[i];
-        temp += A[i];
-        {
-            B[A[i]]++;
-        }
     }
-    if (temp % 2 == 0)
-    {
-        if (n % 2 == 0)
-        {
-            cout << "YES" << endl;
-            return;
-        }
-        else
-        {
-            if (B[1] % 2 == 0 && B[1] != 0)
-            {
-                cout << "YES" << endl;
-                return;
-            }
-        }
-    }
+    sort(A.begin(), A.end());
 
-    cout << "NO" << endl;
-    return;
+    if (A[n - 1] <= d)
+    {
+        cout << "YES" << endl;
+    }
+    else if (A[0] + A[1] <= d)
+    {
+
+        cout << "YES" << endl;
+    }
+    else
+    {
+        cout << "NO" << endl;
+    }
 }
 
 int main()

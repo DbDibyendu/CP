@@ -9,54 +9,60 @@ using namespace std;
 #define pb push_back
 //===========================
 typedef vector<int> vi;
-typedef vector<vi> vvi;
 typedef vector<ll> vl;
+typedef pair<ll, ll> pll;
+typedef vector<pll> vpll;
+typedef vector<vl> vvl;
 //=======================
 const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
-
+ 
 void solve()
 {
-
-    ll i, j, n, m, k;
-    ll temp = 0, flag = 1, prev = 0;
+ 
+    int i, j, n, m, k;
+    ll temp = 0, flag = 1, cap = 0;
     cin >> n;
     vi A(n);
-    vi B(3, 0);
+    int El[101] = {};
+    int count[105] = {};
+ 
     fo(i, 0, n)
     {
         cin >> A[i];
-        temp += A[i];
-        {
-            B[A[i]]++;
-        }
+        El[A[i]]++;
     }
-    if (temp % 2 == 0)
+ 
+    sort(A.begin(), A.end());
+    i = 0;
+    k = 1;
+    while (n > 0)
     {
-        if (n % 2 == 0)
+        k = 1;
+        while (El[A[i]] > 0)
         {
-            cout << "YES" << endl;
-            return;
-        }
-        else
-        {
-            if (B[1] % 2 == 0 && B[1] != 0)
+            if (A[i] < count[k])
             {
-                cout << "YES" << endl;
-                return;
+                k++;
             }
+            count[k]++;
+            El[A[i]]--;
+            n--;
+        }
+        i++;
+        if (k > temp)
+        {
+            temp = k;
         }
     }
-
-    cout << "NO" << endl;
-    return;
+ 
+    cout << temp << endl;
 }
 
 int main()
 {
     int t = 1;
-    cin >> t;
     while (t--)
     {
         solve();

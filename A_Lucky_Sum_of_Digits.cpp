@@ -9,8 +9,10 @@ using namespace std;
 #define pb push_back
 //===========================
 typedef vector<int> vi;
-typedef vector<vi> vvi;
 typedef vector<ll> vl;
+typedef pair<ll, ll> pll;
+typedef vector<pll> vpll;
+typedef vector<vl> vvl;
 //=======================
 const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
@@ -19,44 +21,52 @@ const int N = INT_MAX, M = N;
 void solve()
 {
 
-    ll i, j, n, m, k;
-    ll temp = 0, flag = 1, prev = 0;
+    int i, j, n, m, k;
+    ll temp = 0, flag = 1;
     cin >> n;
-    vi A(n);
-    vi B(3, 0);
-    fo(i, 0, n)
+    m = n;
+    if (n < 4)
     {
-        cin >> A[i];
-        temp += A[i];
-        {
-            B[A[i]]++;
-        }
+        cout << -1 << endl;
+        return;
     }
-    if (temp % 2 == 0)
+    j = 0;
+    while (n > 0)
     {
-        if (n % 2 == 0)
+
+        if (n % 7 == 0)
         {
-            cout << "YES" << endl;
+            for (i = 0; i < j; i++)
+            {
+                cout << 4;
+            }
+            k = n / 7;
+            for (i = 0; i < k; i++)
+            {
+                cout << 7;
+            }
+            cout << endl;
             return;
         }
-        else
-        {
-            if (B[1] % 2 == 0 && B[1] != 0)
-            {
-                cout << "YES" << endl;
-                return;
-            }
-        }
+        n = n - 4;
+        j++;
     }
-
-    cout << "NO" << endl;
-    return;
+    if (m % 4 == 0)
+    {
+        j = m / 4;
+        for (i = 0; i < j; i++)
+        {
+            cout << 4;
+        }
+        cout<<endl;
+        return;
+    }
+    cout << -1 << endl;
 }
 
 int main()
 {
     int t = 1;
-    cin >> t;
     while (t--)
     {
         solve();

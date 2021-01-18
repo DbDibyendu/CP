@@ -21,6 +21,12 @@ typedef vector<vl> vvl;
 //=======================
 ll gcd(ll a, ll b) { return (b == 0) ? a : gcd(b, a % b); }
 
+// Function to return LCM of two numbers
+long long lcm(int a, int b)
+{
+  return (a / gcd(a, b)) * b;
+}
+
 // calculate a^b in log(b) time
 ll bin_pow(ll x, ll y)
 {
@@ -34,7 +40,6 @@ ll bin_pow(ll x, ll y)
   }
   return res;
 }
-
 
 void solve()
 {

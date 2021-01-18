@@ -1,3 +1,4 @@
+
 #include <bits/stdc++.h>
 using namespace std;
 #define fo(i, a, n) for (i = a; i < n; i++)
@@ -9,54 +10,56 @@ using namespace std;
 #define pb push_back
 //===========================
 typedef vector<int> vi;
-typedef vector<vi> vvi;
 typedef vector<ll> vl;
+typedef pair<ll, ll> pll;
+typedef vector<pll> vpll;
+typedef vector<vl> vvl;
 //=======================
 const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
-
+ 
 void solve()
 {
-
-    ll i, j, n, m, k;
-    ll temp = 0, flag = 1, prev = 0;
+    int i,j;
+    ll n;
     cin >> n;
-    vi A(n);
-    vi B(3, 0);
+    ll a[n][n];
+    vl d1(4 * n, 0), d2(4 * n, 0);
     fo(i, 0, n)
     {
-        cin >> A[i];
-        temp += A[i];
+        fo(j, 0, n)
         {
-            B[A[i]]++;
+            cin >> a[i][j];
+            d1[i - j + n] += a[i][j];
+            d2[i + j] += a[i][j];
         }
     }
-    if (temp % 2 == 0)
+    vl ans(2, -1);
+    std::vector<pll> res(2);
+    fo(i, 0, n)
     {
-        if (n % 2 == 0)
+        fo(j, 0, n)
         {
-            cout << "YES" << endl;
-            return;
-        }
-        else
-        {
-            if (B[1] % 2 == 0 && B[1] != 0)
+            int c = (i + j) % 2;
+            if (ans[c] < d1[i - j + n] + d2[i + j] - a[i][j])
             {
-                cout << "YES" << endl;
-                return;
+                ans[c] = d1[i - j + n] + d2[i + j] - a[i][j];
+                res[c].first = i + 1;
+                res[c].second = j + 1;
             }
         }
     }
-
-    cout << "NO" << endl;
-    return;
+    cout << ans[0] + ans[1] << '\n';
+    fo(i, 0, 2)
+    cout << res[i].first << ' ' << res[i].second << ' ';
+ 
+ 
 }
 
 int main()
 {
     int t = 1;
-    cin >> t;
     while (t--)
     {
         solve();

@@ -32,7 +32,8 @@ ll Max = LLONG_MAX;
 
 void Vectors()
 {
-    vi A;
+    int n=5;
+    vector <int> A(n, 2);
     A = {1, 6, 8, 3, 9, 5}; // declaring a set of elements to the vctor
 
     fo(i, 10) A.push_back(i); // to add elements
