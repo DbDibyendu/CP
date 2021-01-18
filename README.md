@@ -35,7 +35,7 @@
 
 ### Templates in C++ STL
 1. [Template1](https://github.com/DbDibyendu/CP/blob/main/STL/MyTemplate.cpp)
-
-
+            
+                   
 You can clone this repo and give more suggestions, I'll be happy to merge them :)
 
