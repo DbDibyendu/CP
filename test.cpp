@@ -18,39 +18,52 @@ const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
 
-int ans = 0;
-void calc(int x, int y, int m, int n);
-
-int throughDP(int m, int n)
-{
-	vector<vector<int>> dp(m, vector<int>(n, 1));
-	int i, j;
-	for (i = 1; i < m; i++)
-	{
-		for (j = 1; j < n; j++)
-		{
-			dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
-		}
-	}
-	return dp[m - 1][n - 1];
-}
 void solve()
 {
 
 	int i, j, n, m, k;
 	ll temp = 0, flag = 1;
-	cin >> m >> n;
-	ans = throughDP(m, n);
-	cout << ans << endl;
+	cin >> n;
+	vector<vector<int>> bomb(n, vector<int>(2, 0));
+
+	for (i = 0; i < n; i++)
+	{
+		cin >> bomb[i][0] >> bomb[i][1];
+
+		if (bomb[i][0] == 0 || bomb[i][1] == 0)
+		{
+			temp += 4;
+		}
+		else
+		{
+			temp += 6;
+		}
+	}
+	cout << temp << endl;
+	sort(bomb.begin(), bomb.end());
+	fo(i, 0, n)
+	{
+		if (abs(bomb[i][0]))
+			printf("1 %d %c\n", abs(bomb[i][0]), bomb[i][0] > 0 ? 'R' : 'L');
+		if (abs(bomb[i][1]))
+			printf("1 %d %c\n", abs(bomb[i][1]), bomb[i][1] > 0 ? 'U' : 'D');
+		printf("2\n");
+		if (abs(bomb[i][0]))
+			printf("1 %d %c\n", abs(bomb[i][0]), bomb[i][0] > 0 ? 'L' : 'R');
+		if (abs(bomb[i][1]))
+			printf("1 %d %c\n", abs(bomb[i][1]), bomb[i][1] > 0 ? 'D' : 'U');
+		printf("3\n");
+	}
 }
 
 int main()
 {
 	int t = 1;
-	//	cin >> t;
 	while (t--)
 	{
 		solve();
 	}
 	return 0;
 }
+
+//=======================

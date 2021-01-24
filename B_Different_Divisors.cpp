@@ -1,4 +1,3 @@
-
 #include <bits/stdc++.h>
 using namespace std;
 #define fo(i, a, n) for (i = a; i < n; i++)
@@ -18,48 +17,50 @@ typedef vector<vl> vvl;
 const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
- 
+
+ll isPrimeNumber(ll n)
+{
+    bool isPrime = true;
+
+    for (ll i = 2; i*i <= n; i++)
+    {
+        if (n % i == 0)
+        {
+            isPrime = false;
+            break;
+        }
+    }
+    return isPrime;
+}
+
 void solve()
 {
-    int i,j;
-    ll n;
-    cin >> n;
-    ll a[n][n];
-    vl d1(4 * n, 0), d2(4 * n, 0);
-    fo(i, 0, n)
+
+    ll i, j, n, m, k, d;
+    ll temp = 0, flag = 1;
+    cin >> d;
+    ll n1 = 1, n2 = 1;
+    for (i = d + 1;; i++)
     {
-        fo(j, 0, n)
+        if (isPrimeNumber(i))
         {
-            cin >> a[i][j];
-            d1[i - j + n] += a[i][j];
-            d2[i + j] += a[i][j];
+
+            temp++;
+            n1 *= i;
+            i += d - 1;
+        }
+        if (temp == 2)
+        {
+            break;
         }
     }
-    vl ans(2, -1);
-    vector<pll> res(2);
-    fo(i, 0, n)
-    {
-        fo(j, 0, n)
-        {
-            int c = (i + j) % 2;
-            if (ans[c] < d1[i - j + n] + d2[i + j] - a[i][j])
-            {
-                ans[c] = d1[i - j + n] + d2[i + j] - a[i][j];
-                res[c].first = i + 1;
-                res[c].second = j + 1;
-            }
-        }
-    }
-    cout << ans[0] + ans[1] << '\n';
-    fo(i, 0, 2)
-    cout << res[i].first << ' ' << res[i].second << ' ';
- 
- 
+    cout << n1 << endl;
 }
 
 int main()
 {
     int t = 1;
+    cin >> t;
     while (t--)
     {
         solve();
