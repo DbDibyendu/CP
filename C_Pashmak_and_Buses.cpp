@@ -74,6 +74,7 @@ void solve()
     }
 }
 
+// Good Problem : Implemented on my own
 void solve2()
 {
 

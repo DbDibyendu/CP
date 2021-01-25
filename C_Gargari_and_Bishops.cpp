@@ -18,43 +18,85 @@ typedef vector<vl> vvl;
 const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
- 
+
+const int NMAX = 2014;
+long long d1[2 * NMAX], d2[2 * NMAX], sol[2];
+pair<int, int> v[2];
+int a[NMAX][NMAX];
+
+
+// I don't know why, but I'm getting TLE error
 void solve()
 {
-    int i,j;
-    ll n;
+    int i, j;
+    int n;
     cin >> n;
-    ll a[n][n];
-    vl d1(4 * n, 0), d2(4 * n, 0);
-    fo(i, 0, n)
+    sol[0] = sol[1] = -1;
+
+    fo(i, 1, n + 1)
     {
-        fo(j, 0, n)
+        fo(j, 1, n + 1)
         {
             cin >> a[i][j];
             d1[i - j + n] += a[i][j];
             d2[i + j] += a[i][j];
         }
     }
-    vl ans(2, -1);
-    vector<pll> res(2);
-    fo(i, 0, n)
+
+    ll temp, c;
+    fo(i, 1, n + 1)
     {
-        fo(j, 0, n)
+        fo(j, 1, n + 1)
         {
-            int c = (i + j) % 2;
-            if (ans[c] < d1[i - j + n] + d2[i + j] - a[i][j])
+            c = (i + j) & 1;
+            temp = d1[i - j + n] + d2[i + j] - a[i][j];
+            if (sol[c] < temp)
             {
-                ans[c] = d1[i - j + n] + d2[i + j] - a[i][j];
-                res[c].first = i + 1;
-                res[c].second = j + 1;
+                sol[c] = temp;
+                v[c].first = i;
+                v[c].second = j;
             }
         }
     }
-    cout << ans[0] + ans[1] << '\n';
-    fo(i, 0, 2)
-    cout << res[i].first << ' ' << res[i].second << ' ';
- 
- 
+    cout << sol[0] + sol[1] << '\n';
+
+    cout << v[0].first << " " << v[0].second << " ";
+    cout << v[1].first << " " << v[1].second << " ";
+}
+
+inline void Update(const int c, const int i, const int j, const long long val)
+{
+    if (val > sol[c])
+    {
+        sol[c] = val;
+        v[c].first = i;
+        v[c].second = j;
+    }
+}
+int solve2()
+{
+
+    cin.sync_with_stdio(false);
+    int n;
+    cin >> n;
+    sol[0] = sol[1] = -1;
+    for (int i = 1; i <= n; ++i)
+        for (int j = 1; j <= n; ++j)
+        {
+            int x;
+            cin >> a[i][j];
+            d1[i + j] += a[i][j];
+            d2[i - j + n] += a[i][j];
+        }
+    for (int i = 1; i <= n; ++i)
+        for (int j = 1; j <= n; ++j)
+            Update((i + j) & 1, i, j, d1[i + j] + d2[i - j + n] - a[i][j]);
+    cout << sol[0] + sol[1] << "\n";
+    if (v[0] > v[1])
+        swap(v[0], v[1]);
+    cout << v[0].first << " " << v[0].second << " ";
+    cout << v[1].first << " " << v[1].second << "\n";
+    return 0;
 }
 
 int main()
@@ -62,7 +104,7 @@ int main()
     int t = 1;
     while (t--)
     {
-        solve();
+        solve2();
     }
     return 0;
 }
