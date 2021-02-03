@@ -10,13 +10,15 @@
    * [BFS Tutorial](https://www.youtube.com/watch?v=uQtX6dfbk0M&t=645s&ab_channel=CodingBlocks)
    * [Code for DFS BFS](https://github.com/DbDibyendu/CP/blob/main/STL/bfs_dfs.cpp)
    * [ Problem 1 (BFS) ](https://www.youtube.com/watch?v=EE_9U798nvQ&ab_channel=RachitJain)
+5. [More detailed solution on DP](https://www.youtube.com/playlist?list=PLrmLmBdmIlpsHaNTPP_jHHDx_os9ItYXr)
+6. [Bit Masking tutorial](https://www.youtube.com/watch?v=2iuktVuRRYY&t=4157s&ab_channel=CodingBlocks)
+    * Codeforces[Problem 1](https://codeforces.com/problemset/problem/550/B)
 
 ### Books and Sites for CP and Data Structures
 1. [CS21003 Algrorithms-I (IIT KGP) ](http://cse.iitkgp.ac.in/~palash/Courses/2021Algorithms1-Theory/algo1-2021.html)
 2. [Algorithms](https://www.youtube.com/playlist?list=PLDN4rrl48XKpZkf03iYFl-O29szjTrs_O) 
 3. [CP Handbook](https://cses.fi/book/book.pdf)
 3. [CP Algorithms + practice prblms are given](https://cp-algorithms.com/)
-4. [More detailed solution on DP](https://www.youtube.com/playlist?list=PLrmLmBdmIlpsHaNTPP_jHHDx_os9ItYXr)
 
 ### STL in C++
 3. [Best STL tutorial for beginners](https://www.youtube.com/playlist?list=PLfBJlB6T2eOvyt21CIX_PMmhOgWHiFVab)
