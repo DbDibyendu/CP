@@ -12,7 +12,7 @@
    * [ Problem 1 (BFS) ](https://www.youtube.com/watch?v=EE_9U798nvQ&ab_channel=RachitJain)
 5. [More detailed solution on DP](https://www.youtube.com/playlist?list=PLrmLmBdmIlpsHaNTPP_jHHDx_os9ItYXr)
 6. [Bit Masking tutorial](https://www.youtube.com/watch?v=2iuktVuRRYY&t=4157s&ab_channel=CodingBlocks)
-    * Codeforces[Problem 1](https://codeforces.com/problemset/problem/550/B)
+    * Codeforces [Problem 1](https://codeforces.com/problemset/problem/550/B)
 
 ### Books and Sites for CP and Data Structures
 1. [CS21003 Algrorithms-I (IIT KGP) ](http://cse.iitkgp.ac.in/~palash/Courses/2021Algorithms1-Theory/algo1-2021.html)
