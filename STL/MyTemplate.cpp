@@ -19,26 +19,94 @@ typedef pair<ll, ll> pll;
 typedef vector<pll> vpll;
 typedef vector<vl> vvl;
 //=======================
-ll gcd(ll a, ll b) { return (b == 0) ? a : gcd(b, a % b); }
 
+ll gcd(ll a, ll b) { return (b == 0) ? a : gcd(b, a % b); }
 // Function to return LCM of two numbers
-long long lcm(int a, int b)
+ll lcm(int a, int b)
 {
   return (a / gcd(a, b)) * b;
 }
-
 // calculate a^b in log(b) time
-ll bin_pow(ll x, ll y)
+int fast_pow(int a, int p)
 {
-  ll res = 1;
-  while (y)
+  int res = 1;
+  while (p)
   {
-    if (y % 2)
-      res = (res * x) % MOD;
-    x = (x * x) % MOD;
-    y /= 2;
+    if (p % 2 == 0)
+    {
+      a = a * 1ll * a % MOD;
+      p /= 2;
+    }
+    else
+    {
+      res = res * 1ll * a % MOD;
+      p--;
+    }
   }
   return res;
+}
+
+int factorial(int n)
+{
+  int res = 1;
+  for (int i = 1; i <= n; i++)
+  {
+    res = res * 1ll * i % MOD;
+  }
+  return res;
+}
+
+int C(int n, int k)
+{
+  if (k > n)
+  {
+    return 0;
+  }
+  else
+    return fact(n) * 1ll * fast_pow(fact(k), MOD - 2) % MOD * 1ll * fast_pow(fact(n - k), MOD - 2) % MOD;
+}
+
+bool isPrime(int n)
+{
+    int i;
+    if (n % 2 == 0 && n != 2)
+    {
+        return false;
+    }
+    for (i = 3; i * i <= n; i += 2)
+    {
+        if (n % i == 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+void primeFactors(int n)
+{
+  int flag = 0;
+  while (n % 2 == 0)
+  {
+    n = n / 2;
+    flag = 1;
+    cout << 2 << " ";
+  }
+
+  for (int i = 3; i * i <= n; i = i + 2)
+  {
+    // While i divides n, print i and divide n
+    while (n % i == 0)
+    {
+      cout << i << " ";
+      n = n / i;
+    }
+  }
+
+  if (n > 2)
+  {
+    cout << n << " ";
+  }
 }
 
 void solve()
@@ -56,6 +124,7 @@ int main()
   while (t--)
   {
     solve();
+    cout << gcd(45, 6);
   }
   return 0;
 }

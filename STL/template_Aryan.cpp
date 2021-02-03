@@ -1,5 +1,3 @@
-
-
 #include <bits/stdc++.h>
 #define ll long long int
 using namespace std;
@@ -14,9 +12,9 @@ vector<ll> v;
 
 void dfs(ll u)
 {
+	visited[u] = true;
 	for (auto x : adj[u])
 	{
-		visited[x] = true;
 		if (!visited[x])
 		{
 			v.push_back(x);
@@ -62,7 +60,6 @@ int main()
 	}
 }
 
-// calculate factorial
 int fast_pow(int a, int p)
 {
 	int res = 1;
@@ -101,4 +98,3 @@ int C(int n, int k)
 	else
 		return fact(n) * 1ll * fast_pow(fact(k), MOD - 2) % MOD * 1ll * fast_pow(fact(n - k), MOD - 2) % MOD;
 }
-//priority_queue,push_back,pop_back

@@ -21,53 +21,42 @@ const int N = INT_MAX, M = N;
 void solve()
 {
 
-	ll i, j, n, m, k;
-	ll temp = 0, flag = 0;
-	cin >> n >> k;
-	vl P(n);
-	vl Prefix(n, 0);
-	fo(i, 0, n)
-	{
-		cin >> P[i];
-		if (i > 0)
-			Prefix[i] = P[i] + Prefix[i - 1];
-		else
-		{
-			Prefix[i] = P[i];
-		}
-	}
-	temp = P[0];
-	ll ans = 0;
-	for (i = 1; i < n; i++)
-	{
-
-		//  deb2(temp, P[i] * 100 / temp);
-		if ((P[i] * 100) <= k * temp)
-		{
-			temp += P[i];
-		}
-		else
-		{
-
-			flag = (P[i] * 100 + k - 1) / k - temp;
-			ans = max(ans, flag);
-			temp += P[i];
-		}
-
-		// deb(temp);
-	}
-	cout << ans << endl;
+    int i, j, n, m, k;
+    int temp = 0, flag = 1;
+    cin >> n >> k;
+    if (k % n == 0)
+    {
+        cout << k / n << endl;
+    }
+    else
+    {
+        if (k / n > 0)
+        {
+            cout << k / n + 1 << endl;
+        }
+        else
+        {
+            if (n % k == 0)
+            {
+                cout << 1 << endl;
+            }
+            else
+            {
+                cout << 2 << endl;
+            }
+        }
+    }
 }
 
 int main()
 {
-	int t = 1;
-	cin >> t;
-	while (t--)
-	{
-		solve();
-	}
-	return 0;
+    int t = 1;
+    cin >> t;
+    while (t--)
+    {
+        solve();
+    }
+    return 0;
 }
 
 //=======================

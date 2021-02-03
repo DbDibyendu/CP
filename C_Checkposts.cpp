@@ -18,56 +18,39 @@ const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
 
+bool visited[1000020] = {};
+vector<ll> adj[1000020];
+
 void solve()
 {
 
-	ll i, j, n, m, k;
-	ll temp = 0, flag = 0;
-	cin >> n >> k;
-	vl P(n);
-	vl Prefix(n, 0);
-	fo(i, 0, n)
-	{
-		cin >> P[i];
-		if (i > 0)
-			Prefix[i] = P[i] + Prefix[i - 1];
-		else
-		{
-			Prefix[i] = P[i];
-		}
-	}
-	temp = P[0];
-	ll ans = 0;
-	for (i = 1; i < n; i++)
-	{
-
-		//  deb2(temp, P[i] * 100 / temp);
-		if ((P[i] * 100) <= k * temp)
-		{
-			temp += P[i];
-		}
-		else
-		{
-
-			flag = (P[i] * 100 + k - 1) / k - temp;
-			ans = max(ans, flag);
-			temp += P[i];
-		}
-
-		// deb(temp);
-	}
-	cout << ans << endl;
+    int i, j, n, m, k;
+    ll temp = 0, flag = 1;
+    cin >> n;
+    vl A(n);
+    fo(i, 0, n)
+    {
+        cin >> A[i];
+    }
+    cin >> m;
+    int x, y;
+    fo(i, 0, m)
+    {
+        cin >> x >> y;
+        adj[x].push_back(y);
+    }
+    
 }
 
 int main()
 {
-	int t = 1;
-	cin >> t;
-	while (t--)
-	{
-		solve();
-	}
-	return 0;
+    int t = 1;
+    // cin >> t;
+    while (t--)
+    {
+        solve();
+    }
+    return 0;
 }
 
 //=======================
