@@ -21,48 +21,108 @@ const int N = INT_MAX, M = N;
 void solve()
 {
 
-	ll i, j, n, m, k;
-	ll temp = 0, flag = 0;
-	cin >> n >> k;
-	vl P(n);
-	vl Prefix(n, 0);
-	fo(i, 0, n)
+	int i, j, n, m, k;
+	ll temp = 0, flag = 1;
+	cin >> n;
+	vi A(n + 2);
+	A[0] = A[n + 1] = N;
+	if (n < 3)
 	{
-		cin >> P[i];
-		if (i > 0)
-			Prefix[i] = P[i] + Prefix[i - 1];
-		else
+		if (n == 1)
 		{
-			Prefix[i] = P[i];
+			cout << "! " << 1 << endl;
+			return;
+		}
+		if (n == 2)
+		{
+			cout << "? " << 1;
+			cout << endl
+				 << flush;
+			fflush(stdout);
+			cin >> A[1];
+
+			cout << "? " << 2;
+			cout << endl
+				 << flush;
+			fflush(stdout);
+			cin >> A[2];
+
+			if (A[1] > A[2])
+			{
+				cout << "! " << 2 << endl;
+				return;
+			}
+			else
+			{
+				cout << "! " << 1 << endl;
+				return;
+			}
 		}
 	}
-	temp = P[0];
-	ll ans = 0;
-	for (i = 1; i < n; i++)
+	if (n >= 3)
 	{
-
-		//  deb2(temp, P[i] * 100 / temp);
-		if ((P[i] * 100) <= k * temp)
+		int l = 1, r = n;
+		while (l <= r)
 		{
-			temp += P[i];
-		}
-		else
-		{
+			int m = l + (r - l) / 2;
+			cout << "? " << m;
+			cout << endl
+				 << flush;
+			fflush(stdout);
+			cin >> A[m];
 
-			flag = (P[i] * 100 + k - 1) / k - temp;
-			ans = max(ans, flag);
-			temp += P[i];
-		}
+			cout << "? " << m - 1;
+			cout << endl
+				 << flush;
+			fflush(stdout);
+			cin >> A[m - 1];
 
-		// deb(temp);
+			cout << "? " << m - 2;
+			cout << endl
+				 << flush;
+			fflush(stdout);
+			cin >> A[m - 2];
+			// Check if x is present at mid
+			if (A[m] > A[m - 1] && A[m - 1] < A[m - 2])
+			{
+				cout << "! " << m - 1 << endl;
+				return;
+			}
+
+			// If x greater, ignore left half
+			if (A[m] < A[m - 1])
+				l = m + 1;
+
+			// If x is smaller, ignore right half
+			else
+				r = m - 1;
+		}
 	}
-	cout << ans << endl;
+
+	/*
+	for (i = 1; i <= n; i++)
+	{
+		cout << "? " << i;
+		cout << endl
+			 << flush;
+		fflush(stdout);
+		cin >> A[i];
+	}
+	for (i = 1; i <= n + 1; i++)
+	{
+		if (A[i] > A[i - 1] && A[i - 1] < A[i - 2])
+		{
+			cout << "! " << i - 1 << endl;
+			return;
+		}
+	}
+	*/
 }
 
 int main()
 {
 	int t = 1;
-	cin >> t;
+	// cin >> t;
 	while (t--)
 	{
 		solve();
