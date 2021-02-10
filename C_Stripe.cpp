@@ -14,40 +14,42 @@ typedef pair<ll, ll> pll;
 typedef vector<pll> vpll;
 typedef vector<vl> vvl;
 //=======================
+const int MOD = 1'000'000'007;
+const int N = INT_MAX, M = N;
+//=======================
+vl A(1000000);
+ll sum;
 
-void solve2()
+void solve()
 {
 
     int i, j, n, m, k;
     ll temp = 0, flag = 1;
-    string A;
-    cin >> A;
-    n = A.length();
-    vl first, second;
-
-    for (int i = 0; i < n; i++)
+    ll sumA = 0;
+    cin >> n;
+    fo(i, 0, n)
     {
-        if (A[i] == 'r')
+        cin >> A[i];
+        sum += A[i];
+    }
+    for (i = 0; i < n - 1; i++)
+    {
+        sumA += A[i];
+        if (sumA == sum - sumA)
         {
-            cout << i + 1 << '\n';
+            temp++;
         }
     }
-    for (int i = n - 1; i >= 0; i--)
-    {
-        if (A[i] == 'l')
-        {
-            cout << i + 1 << '\n';
-        }
-    }
+    cout << temp << endl;
 }
 
 int main()
 {
     int t = 1;
-    // cin >> t;
+    // //cin >> t;
     while (t--)
     {
-        solve2();
+        solve();
     }
     return 0;
 }

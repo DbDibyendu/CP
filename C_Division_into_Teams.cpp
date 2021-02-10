@@ -14,30 +14,47 @@ typedef pair<ll, ll> pll;
 typedef vector<pll> vpll;
 typedef vector<vl> vvl;
 //=======================
+const int MOD = 1'000'000'007;
+const int N = INT_MAX, M = N;
+//=======================
 
-void solve2()
+void solve()
 {
 
     int i, j, n, m, k;
     ll temp = 0, flag = 1;
-    string A;
-    cin >> A;
-    n = A.length();
-    vl first, second;
-
-    for (int i = 0; i < n; i++)
+    cin >> n;
+    vpll A;
+    fo(i, 0, n)
     {
-        if (A[i] == 'r')
+        cin >> m;
+        A.pb(make_pair(m, i + 1));
+    }
+    sort(A.begin(), A.end());
+    vl teamA, teamB;
+    fo(i, 0, n)
+    {
+        if (i & 1)
         {
-            cout << i + 1 << '\n';
+            teamB.pb(A[i].second);
+        }
+
+        else
+        {
+            teamA.pb(A[i].second);
         }
     }
-    for (int i = n - 1; i >= 0; i--)
+
+    cout << teamA.size() << endl;
+    for (auto x : teamA)
     {
-        if (A[i] == 'l')
-        {
-            cout << i + 1 << '\n';
-        }
+        cout << x << " ";
+    }
+    cout << endl
+         << teamB.size() << endl;
+    for (auto x : teamB)
+    {
+        cout << x << " ";
     }
 }
 
@@ -47,7 +64,7 @@ int main()
     // cin >> t;
     while (t--)
     {
-        solve2();
+        solve();
     }
     return 0;
 }
