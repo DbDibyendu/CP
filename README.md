@@ -15,6 +15,7 @@
 7. [Bit Masking tutorial](https://www.youtube.com/watch?v=2iuktVuRRYY&t=4157s&ab_channel=CodingBlocks)
     * Codeforces [Problem 1](https://codeforces.com/problemset/problem/550/B)
     * [Full playlist on Bit Masking](https://www.youtube.com/playlist?list=PLX0iyO9CrCF1-4je7G0JMSr_50I0J2K3Z)
+8. [Course By Codeforces](https://codeforces.com/edu/course/2)
 
 ### Books and Sites for CP and Data Structures
 1. [CS21003 Algrorithms-I (IIT KGP) ](http://cse.iitkgp.ac.in/~palash/Courses/2021Algorithms1-Theory/algo1-2021.html)
