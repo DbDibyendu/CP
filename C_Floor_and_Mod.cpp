@@ -18,17 +18,42 @@ const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
 
+// ! For every remainder we are finding the pairs.....As the remainder will be less than ROOT(x).
 void solve()
 {
 
-    int i, j, n, m, k;
+    ll i, j, n, m, k, x, y;
     ll temp = 0, flag = 1;
-    cin >> n;
-    double ans[n];
-    vl A(n);
-    fo(i, 0, n)
+    cin >> x >> y;
+    for (i = 1; i <= x; i++)
     {
+        if (i * (i + 1) > x)
+        {
+            j = i;
+            break;
+        }
     }
+    // ! Now we will iterate till j and find the pairs
+    for (i = 1; i <= j; i++)
+    {
+        flag = min((x - i) / i, y);
+        temp += max(flag - (i + 1) + 1, 0ll);
+    }
+    cout << temp << endl;
+}
+
+// ? Brute force Approach
+void bruteForce()
+{
+
+    ll i, j, n, m, k, x, y;
+    ll temp = 0, flag = 1;
+    cin >> x >> y;
+    for (i = 1; i <= x; i++)
+    {
+        temp += min(x / (i + 1), i - 1);
+    }
+    cout << temp << endl;
 }
 
 int main()
@@ -39,7 +64,6 @@ int main()
     {
         solve();
     }
+
     return 0;
 }
-
-//=======================

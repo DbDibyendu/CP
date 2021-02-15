@@ -18,23 +18,47 @@ const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
 
+int factorial(int n)
+{
+    int res = 1;
+    for (int i = 1; i <= n; i++)
+    {
+        res = res * 1ll * i % MOD;
+    }
+    return res;
+}
+
 void solve()
 {
 
     int i, j, n, m, k;
     ll temp = 0, flag = 1;
-    cin >> n;
-    double ans[n];
-    vl A(n);
+    cin >> n >> m;
+    ll t = 720720;
+    ll A[n][m], B[n][m];
     fo(i, 0, n)
     {
+        fo(j, 0, m)
+        {
+            cin >> A[i][j];
+            if ((i + j) & 1)
+            {
+                cout << t + pow(A[i][j], 4) << " ";
+            }
+            else
+            {
+                cout << t << " ";
+            }
+        }
+        cout << endl;
     }
+    // cout << (3 * 3 * 4 * 5 * 7 * 4 * 11 * 13);
 }
 
 int main()
 {
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while (t--)
     {
         solve();

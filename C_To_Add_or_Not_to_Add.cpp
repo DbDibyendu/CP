@@ -23,11 +23,19 @@ void solve()
 
     int i, j, n, m, k;
     ll temp = 0, flag = 1;
-    cin >> n;
-    double ans[n];
+    cin >> n >> k;
     vl A(n);
+    map<int, int> B;
     fo(i, 0, n)
     {
+        cin >> A[i];
+    }
+    sort(A.begin(), A.end());
+    vl C;
+    ll l = 0, r = n - 1, mid;
+    while (l <= r)
+    {
+        mid = (l + r) / 2;
     }
 }
 

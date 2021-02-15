@@ -21,14 +21,39 @@ const int N = INT_MAX, M = N;
 void solve()
 {
 
-    int i, j, n, m, k;
-    ll temp = 0, flag = 1;
-    cin >> n;
-    double ans[n];
-    vl A(n);
-    fo(i, 0, n)
+    ll i, j, n, m, k, a, b;
+    ll temp = MOD, flag = 1;
+    cin >> a >> b;
+    temp = a + 1;
+    m = a;
+    if (b > a)
     {
+        cout << 1 << endl;
     }
+    else if (b == a)
+    {
+        cout << 2 << endl;
+    }
+    else
+    {
+
+        for (i = b; i <= b + 10; i++)
+        {
+
+            for (j = 0; j <= 100; j++)
+            {
+                if (pow(i, j) > a)
+                {
+                    // deb(j);
+                    temp = min(i - b + j, temp);
+                }
+            }
+        }
+        cout << temp << endl;
+
+    } // ll l = b, r = a;
+
+    // cout << temp << endl;
 }
 
 int main()

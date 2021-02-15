@@ -21,20 +21,36 @@ const int N = INT_MAX, M = N;
 void solve()
 {
 
-    int i, j, n, m, k;
+    int i, j, n, m, k, q;
     ll temp = 0, flag = 1;
-    cin >> n;
-    double ans[n];
-    vl A(n);
-    fo(i, 0, n)
+    cin >> n >> q >> k;
+    vl A(n + 1), T(n + 1, 0);
+    fo(i, 1, n + 1)
     {
+        cin >> A[i];
+    }
+    fo(i, 0, q)
+    {
+        temp = 0;
+        ll l, r;
+        cin >> l >> r;
+        if (l == r)
+        {
+            cout << k - 1 << endl;
+        }
+        else
+        {
+            temp += A[l] - 1 + k - A[r];
+            temp += 2 * (A[r] - A[l]) - 2 * (r - l);
+            cout << temp << endl;
+        }
     }
 }
 
 int main()
 {
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while (t--)
     {
         solve();
