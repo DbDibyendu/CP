@@ -18,6 +18,7 @@
 8. [Course By Codeforces](https://codeforces.com/edu/course/2)
 
 ### Books and Sites for CP and Data Structures
+* [CheatSheet Of Data structures](https://github.com/gibsjose/cpp-cheat-sheet/blob/master/Data%20Structures%20and%20Algorithms.md)
 1. [CS21003 Algrorithms-I (IIT KGP) ](http://cse.iitkgp.ac.in/~palash/Courses/2021Algorithms1-Theory/algo1-2021.html)
 2. [Algorithms](https://www.youtube.com/playlist?list=PLDN4rrl48XKpZkf03iYFl-O29szjTrs_O) 
 3. [CP Handbook](https://cses.fi/book/book.pdf)
