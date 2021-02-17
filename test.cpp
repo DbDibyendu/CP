@@ -1,133 +1,84 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define fo(i, a, n) for (i = a; i < n; i++)
-#define ll long long
-#define deb(x) cout << #x << '=' << x << endl
-#define deb2(x, y) cout << #x << '=' << x << ',' << #y << '=' << y << endl
-#define clr(x) memset(x, 0, sizeof(x))
-#define PI 3.1415926535897932384626
-#define pb push_back
-//===========================
+
+typedef long long int ll;
 typedef vector<int> vi;
 typedef vector<ll> vl;
-typedef pair<ll, ll> pll;
+typedef pair<int,int> pii;
+typedef pair<ll,ll> pll;
+typedef vector<pii> vpii;
 typedef vector<pll> vpll;
-typedef vector<vl> vvl;
-//=======================
-const int MOD = 1'000'000'007;
-const int N = INT_MAX, M = N;
-//=======================
+typedef set<int> si;
+typedef map<string,int> msi;
+typedef map<int,int> mii;
+
+#define pb push_back
+#define mp make_pair
+#define ff first
+#define ss second
+#define FOR(i,a,b) for(ll i=int(a);i<ll(b);i++)
+#define TR(it,a) for(auto it=a.begin();it!=a.end();it++)
+#define REV(i,a,b) for(int i=a;i>=b;i--)
+#define debug(x) cout<< #x <<" = "<<x<<"\n"
+#define debug2(x,y) cout<< #x <<" = "<<x<<" , "<< #y <<" = "<<y<<"\n"
+#define all(x) x.begin(),x.end()
+#define sortall(x) (sort(all(x)))
+#define FAST_IO ios_base::sync_with_stdio(false);cin.tie(NULL);
+
+ll mpow(ll x,ll y);
+
+const int MOD=1e9+7,MAX=2e5+5;
+const ll INF=1e16;
 
 void solve()
 {
-
-	int i, j, n, m, k;
-	ll temp = 0, flag = 1;
-	cin >> n;
-	vi A(n + 2);
-	A[0] = A[n + 1] = N;
-	if (n < 3)
-	{
-		if (n == 1)
-		{
-			cout << "! " << 1 << endl;
-			return;
-		}
-		if (n == 2)
-		{
-			cout << "? " << 1;
-			cout << endl
-				 << flush;
-			fflush(stdout);
-			cin >> A[1];
-
-			cout << "? " << 2;
-			cout << endl
-				 << flush;
-			fflush(stdout);
-			cin >> A[2];
-
-			if (A[1] > A[2])
-			{
-				cout << "! " << 2 << endl;
-				return;
-			}
-			else
-			{
-				cout << "! " << 1 << endl;
-				return;
-			}
-		}
+	int n;
+	cin>>n;
+	vl a(n);
+	FOR(i,0,n)
+		cin>>a[i];
+	map<ll,int> ctr;
+	FOR(i,0,n)
+		ctr[a[i]]++;
+	vi c;
+	for(auto it:ctr)
+		c.pb(it.ss);
+	sortall(c);
+	ll sum=0,dec=0;
+	ll m=c.size();
+	FOR(i,0,m){
+		dec+=c[i]-c[0];
 	}
-	if (n >= 3)
-	{
-		int l = 1, r = n;
-		while (l <= r)
-		{
-			int m = l + (r - l) / 2;
-			cout << "? " << m;
-			cout << endl
-				 << flush;
-			fflush(stdout);
-			cin >> A[m];
+	ll ans=dec;
+	FOR(i,0,m-1){
+		sum+=c[i];
+		dec=dec-(c[i+1]-c[i])*(m-i-1);
+		//debug(dec);
+		ans=min(ans,dec+sum);
 
-			cout << "? " << m - 1;
-			cout << endl
-				 << flush;
-			fflush(stdout);
-			cin >> A[m - 1];
-
-			cout << "? " << m - 2;
-			cout << endl
-				 << flush;
-			fflush(stdout);
-			cin >> A[m - 2];
-			// Check if x is present at mid
-			if (A[m] > A[m - 1] && A[m - 1] < A[m - 2])
-			{
-				cout << "! " << m - 1 << endl;
-				return;
-			}
-
-			// If x greater, ignore left half
-			if (A[m] < A[m - 1])
-				l = m + 1;
-
-			// If x is smaller, ignore right half
-			else
-				r = m - 1;
-		}
 	}
-
-	/*
-	for (i = 1; i <= n; i++)
-	{
-		cout << "? " << i;
-		cout << endl
-			 << flush;
-		fflush(stdout);
-		cin >> A[i];
-	}
-	for (i = 1; i <= n + 1; i++)
-	{
-		if (A[i] > A[i - 1] && A[i - 1] < A[i - 2])
-		{
-			cout << "! " << i - 1 << endl;
-			return;
-		}
-	}
-	*/
+	cout<<ans<<"\n";
+	
 }
 
 int main()
 {
-	int t = 1;
-	// cin >> t;
-	while (t--)
-	{
+	FAST_IO;
+	int t=1,i=0;
+	cin>>t;
+	while(t--){
+		//cout<<"Case #"<<++i<<": ";
 		solve();
 	}
-	return 0;
 }
 
-//=======================
+ll mpow(ll x, ll y)
+{
+	if(y==0)
+		return 1;
+	if(y%2)
+		return (x*mpow(x,y-1))%MOD;
+	ll ans=mpow(x,y/2);
+	ans=(ans*ans)%MOD;
+	return ans;
+}
