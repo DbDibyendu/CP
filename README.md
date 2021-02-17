@@ -16,7 +16,7 @@
     * Codeforces [Problem 1](https://codeforces.com/problemset/problem/550/B)
     * [Full playlist on Bit Masking](https://www.youtube.com/playlist?list=PLX0iyO9CrCF1-4je7G0JMSr_50I0J2K3Z)
 8. [Course By Codeforces](https://codeforces.com/edu/course/2)
-
+9. [Segment Trees Playlist](https://www.youtube.com/watch?v=lAwpTSUHzy0&list=PL2q4fbVm1Ik6v2-emg_JGcC9v2v2YTbvq&index=2&ab_channel=CodeNCode_)
 ### Books and Sites for CP and Data Structures
 * [CheatSheet Of Data structures](https://github.com/gibsjose/cpp-cheat-sheet/blob/master/Data%20Structures%20and%20Algorithms.md)
 1. [CS21003 Algrorithms-I (IIT KGP) ](http://cse.iitkgp.ac.in/~palash/Courses/2021Algorithms1-Theory/algo1-2021.html)
