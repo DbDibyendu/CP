@@ -20,7 +20,7 @@ const int N = INT_MAX, M = N;
 
 // ! Time Limit exceeded on test 12
 // * Accepted
-// ! Do not use unhashedmap.... will result in TLE
+// ! Do not use UNORDERED MAP.... will result in TLE
 void solve()
 {
 
@@ -28,7 +28,7 @@ void solve()
     ll temp = MOD, flag = 1;
     cin >> n;
     vl A(n);
-    map<ll, int> Order;
+    map<ll, int> Order;  // ! ALways use map, in normal case
     set<int> unique;
     fo(i, 0, n)
     {

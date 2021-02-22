@@ -18,60 +18,49 @@ const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
 
+ll gcd(ll a, ll b) { return (b == 0) ? a : gcd(b, a % b); }
+// Function to return LCM of two numbers
+ll lcm(ll a, ll b)
+{
+    return (a / gcd(a, b)) * b;
+}
+
 void solve()
 {
 
-    int i, j, n, m, k;
+    ll i, j, n, m, k;
     ll temp = 0, flag = 1;
-    cin >> n >> k;
-    vl A(n);
-    fo(i, 0, n)
+    cin >> n;
+    if (n == 1)
     {
-        cin >> A[i];
+        cout << 1 << endl;
     }
-    sort(A.begin(), A.end());
-    vl prefix(n + 1);
-    ll l = 1, r = n, mid;
-    fo(i, 0, n + 1)
+    else if (n == 2)
     {
-        if (i > 1)
-            prefix[i] = A[i - 1] + prefix[i - 1];
-        else if (i == 1)
+        cout << 2 << endl;
+    }
+    else
+    {
+        if (n & 1)
         {
-            prefix[i] = A[i - 1];
+            cout << lcm(lcm(n, n - 1), n - 2);
         }
         else
         {
-            prefix[i] = 0;
-        }
-    }
-    ll ans = 1;
-    while (l <= r)
-    {
-        mid = (l + r) / 2;
-        flag = 0;
-        // deb(mid);
-        for (i = mid; i <= n; i++)
-        {
-            if (mid * A[i - 1] - (prefix[i] - prefix[i - mid]) <= k)
+            ll t;
+            flag = lcm(lcm(n - 1, n - 2), n - 3); // ! This line is important too
+            t = lcm(n, n - 1);
+            n--;
+            m=n;
+            while (n > m-5)
             {
-                flag = 1;
-                temp = A[i - 1];
+                n -= 2;
+                temp = max(temp, lcm(t, n));
                 // deb(temp);
-                ans = mid;
-                break;
             }
-        }
-        if (flag == 1)
-        {
-            l = mid + 1;
-        }
-        else
-        {
-            r = mid - 1;
+            cout << max(flag, temp) << endl;
         }
     }
-    cout << ans << " " << temp << endl;
 }
 
 int main()

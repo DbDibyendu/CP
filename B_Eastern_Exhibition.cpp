@@ -21,38 +21,34 @@ const int N = INT_MAX, M = N;
 void solve()
 {
 
-	int i, j, n, m, k;
-	ll temp = 0, flag = 0;
-	cin >> n >> k;
-	vl A(n);
-	fo(i, 0, n)
-	{
-		cin >> A[i];
-	}
-	sort(A.begin(), A.end());
-	fo(i, 0, n)
-	{
-		temp += A[i];
-		if (temp <= k)
-		{
-			flag++;
-		}
-	}
-	cout << flag << endl;
+    int i, j, n, m, k;
+    ll temp = 0, flag = 1;
+    cin >> n;
+    vl X, Y;
+    ll x, y;
+    fo(i, 0, n)
+    {
+        cin >> x >> y;
+        X.pb(x);
+        Y.pb(y);
+    }
+    sort(Y.begin(), Y.end());
+    sort(X.begin(), X.end());
+
+    flag *= (Y[n / 2] - Y[(n - 1) / 2] + 1);
+    flag *= (X[n / 2] - X[(n - 1) / 2] + 1);
+    cout << flag << endl;
 }
 
 int main()
 {
-	int t = 1;
-	cin >> t;
-	int k = 1;
-	while (t--)
-	{
-		cout << "Case #" << k << ": ";
-		solve();
-		k++;
-	}
-	return 0;
+    int t = 1;
+    cin >> t;
+    while (t--)
+    {
+        solve();
+    }
+    return 0;
 }
 
 //=======================

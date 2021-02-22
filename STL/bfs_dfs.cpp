@@ -34,7 +34,7 @@ void solve()
     ll temp = 0, flag = 1;
     cin >> n;
 
-    // Important
+    // ! Important
     visited.assign(n, false);
     g.assign(n, vector<int>());
 }

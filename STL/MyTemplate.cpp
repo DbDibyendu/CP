@@ -63,24 +63,24 @@ int C(int n, int k)
     return 0;
   }
   else
-    return fact(n) * 1ll * fast_pow(fact(k), MOD - 2) % MOD * 1ll * fast_pow(fact(n - k), MOD - 2) % MOD;
+    return factorial(n) * 1ll * fast_pow(factorial(k), MOD - 2) % MOD * 1ll * fast_pow(factorial(n - k), MOD - 2) % MOD;
 }
 
 bool isPrime(int n)
 {
-    int i;
-    if (n % 2 == 0 && n != 2)
+  int i;
+  if (n % 2 == 0 && n != 2)
+  {
+    return false;
+  }
+  for (i = 3; i * i <= n; i += 2)
+  {
+    if (n % i == 0)
     {
-        return false;
+      return false;
     }
-    for (i = 3; i * i <= n; i += 2)
-    {
-        if (n % i == 0)
-        {
-            return false;
-        }
-    }
-    return true;
+  }
+  return true;
 }
 
 void primeFactors(int n)

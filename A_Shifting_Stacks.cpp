@@ -23,61 +23,38 @@ void solve()
 
     int i, j, n, m, k;
     ll temp = 0, flag = 1;
-    cin >> n >> k;
-    vl A(n);
+    cin >> n;
+    vl H(n), Prefix(n + 1, 0);
     fo(i, 0, n)
     {
-        cin >> A[i];
-    }
-    sort(A.begin(), A.end());
-    vl prefix(n + 1);
-    ll l = 1, r = n, mid;
-    fo(i, 0, n + 1)
-    {
-        if (i > 1)
-            prefix[i] = A[i - 1] + prefix[i - 1];
-        else if (i == 1)
-        {
-            prefix[i] = A[i - 1];
-        }
+        cin >> H[i];
+        if (i > 0)
+            Prefix[i] = H[i] + Prefix[i - 1];
         else
         {
-            prefix[i] = 0;
+            Prefix[i] = H[0];
         }
-    }
-    ll ans = 1;
-    while (l <= r)
-    {
-        mid = (l + r) / 2;
-        flag = 0;
-        // deb(mid);
-        for (i = mid; i <= n; i++)
-        {
-            if (mid * A[i - 1] - (prefix[i] - prefix[i - mid]) <= k)
-            {
-                flag = 1;
-                temp = A[i - 1];
-                // deb(temp);
-                ans = mid;
-                break;
-            }
-        }
-        if (flag == 1)
-        {
-            l = mid + 1;
-        }
-        else
-        {
-            r = mid - 1;
-        }
-    }
-    cout << ans << " " << temp << endl;
-}
 
+        temp += H[i];
+    }
+    fo(i, 1, n + 1)
+    {
+        if (Prefix[i - 1] >= (i - 1) * i / 2)
+        {
+            continue;
+        }
+        else
+        {
+            cout << "NO" << endl;
+            return;
+        }
+    }
+    cout << "YES" << endl;
+}
 int main()
 {
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--)
     {
         solve();
