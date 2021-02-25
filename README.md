@@ -24,11 +24,12 @@
 1. [CS21003 Algrorithms-I (IIT KGP) ](http://cse.iitkgp.ac.in/~palash/Courses/2021Algorithms1-Theory/algo1-2021.html)
 2. [Algorithms](https://www.youtube.com/playlist?list=PLDN4rrl48XKpZkf03iYFl-O29szjTrs_O) 
 3. [CP Handbook](https://cses.fi/book/book.pdf)
-3. [CP Algorithms + practice prblms are given](https://cp-algorithms.com/)
+4. [CP Algorithms + practice prblms are given](https://cp-algorithms.com/)
 
 ### STL in C++
-3. [Best STL tutorial for beginners](https://www.youtube.com/playlist?list=PLfBJlB6T2eOvyt21CIX_PMmhOgWHiFVab)
+1. [Best STL tutorial for beginners](https://www.youtube.com/playlist?list=PLfBJlB6T2eOvyt21CIX_PMmhOgWHiFVab)
 2. [Full playlist on STL](https://www.youtube.com/playlist?list=PLk6CEY9XxSIA-xo3HRYC3M0Aitzdut7AA)
+3. [STL lib](https://www.hackerearth.com/practice/notes/standard-template-library/)
 ### Platforms for CP
 
 1. [Codeforces](https://codeforces.com/)
