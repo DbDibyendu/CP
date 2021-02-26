@@ -20,45 +20,10 @@ const int N = INT_MAX, M = N;
 
 void solve()
 {
-    ll i, j, n, m, k;
+
+    int i, j, n, m, k;
     ll temp = 0, flag = 1;
-    cin >> n;
-    ll A[n], P[5];
-    ll ans[5] = {0};
-    fo(i, 0, n)
-    {
-        cin >> A[i];
-    }
-    fo(i, 0, 5)
-    {
-        cin >> P[i];
-    }
-    fo(i, 0, n)
-    {
-        if (i)
-        {
-            A[i] += A[i - 1];
-        }
-        while (A[i] >= P[0])
-        {
-            for (j = 4; j >= 0; j--)
-            {
-                if (A[i] >= P[j])
-                {
-                    k = A[i] / P[j];
-                    A[i] = A[i] - k * P[j];
-                    ans[j]+=k;
-                }
-            }
-        }
-        // deb(A[i]);
-    }
-    for (auto x : ans)
-    {
-        cout << x << " ";
-    }
-    cout << endl
-         << A[n - 1] << endl;
+    cin >> n >> k;
 }
 
 int main()

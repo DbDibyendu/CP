@@ -40,13 +40,32 @@ void build(int si, int ss, int se)
 
 ll query(int si, int ss, int se, int qs, int qe)
 {
-    if (ss > qe || se < qs)     // !Completely Outside
-        return MOD; 
-    if (qs <= ss && qe >= se)    // ! Completely Inside
+    if (ss > qe || se < qs) // !Completely Outside
+        return MOD;
+    if (qs <= ss && qe >= se) // ! Completely Inside
         return stree[si];
 
     ll mid = (ss + se) / 2;
     return min(query(2 * si, ss, mid, qs, qe), query(2 * si + 1, mid + 1, se, qs, qe));
+}
+
+void update(int si, int ss, int se, int qi)
+{
+    if (ss == se)
+    {
+        stree[si] = A[ss];
+        return;
+    }
+
+    ll mid = (ss + se) / 2;
+
+    if (qi <= mid)
+        update(2 * si, ss, mid, qi);
+    else
+        update(2 * si + 1, mid + 1, se, qi);
+
+    stree[si] = min(stree[2 * si + 1], stree[2 * si]);
+    // deb2(stree[si], si);
 }
 
 void solve()

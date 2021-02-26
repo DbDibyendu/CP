@@ -18,47 +18,61 @@ const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
 
+// ! KMP algo
+
 void solve()
 {
+
     ll i, j, n, m, k;
     ll temp = 0, flag = 1;
-    cin >> n;
-    ll A[n], P[5];
-    ll ans[5] = {0};
-    fo(i, 0, n)
+    string A;
+    cin >> A;
+    n = A.length();
+    vl prefix(n, 0);
+    i = 1, j = 0;
+    while (i < n)
     {
-        cin >> A[i];
-    }
-    fo(i, 0, 5)
-    {
-        cin >> P[i];
-    }
-    fo(i, 0, n)
-    {
-        if (i)
+
+        if (A[i] == A[j])
         {
-            A[i] += A[i - 1];
+            j++;
+            prefix[i] = j;
+            i++;
         }
-        while (A[i] >= P[0])
+        else
         {
-            for (j = 4; j >= 0; j--)
+
+            if (j)
             {
-                if (A[i] >= P[j])
-                {
-                    k = A[i] / P[j];
-                    A[i] = A[i] - k * P[j];
-                    ans[j]+=k;
-                }
+                j = prefix[j - 1];
+            }
+            else
+            {
+                prefix[i] = j;
+                i++;
             }
         }
-        // deb(A[i]);
     }
+
+    vl ans;
+    m = n;
+    while (m)
+    {
+        ans.pb(m);
+        m = prefix[m - 1];
+    }
+    reverse(ans.begin(), ans.end());
+    vl cnt(n+1, 1);
+
+    for (i = n; i > 0; i--)
+    {
+        cnt[prefix[i - 1]] += cnt[i];
+    }
+    cout << ans.size() << endl;
     for (auto x : ans)
     {
-        cout << x << " ";
+        cout << x << " " << cnt[x] << endl;
     }
-    cout << endl
-         << A[n - 1] << endl;
 }
 
 int main()

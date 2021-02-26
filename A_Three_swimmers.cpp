@@ -20,51 +20,32 @@ const int N = INT_MAX, M = N;
 
 void solve()
 {
+
     ll i, j, n, m, k;
-    ll temp = 0, flag = 1;
-    cin >> n;
-    ll A[n], P[5];
-    ll ans[5] = {0};
-    fo(i, 0, n)
+    ll temp = LONG_LONG_MAX, flag = 1;
+    ll p, a, b, c;
+    ll A[3];
+    cin >> p >> A[0] >> A[1] >> A[2];
+    sort(A, A + 3);
+    fo(i, 0, 3)
     {
-        cin >> A[i];
-    }
-    fo(i, 0, 5)
-    {
-        cin >> P[i];
-    }
-    fo(i, 0, n)
-    {
-        if (i)
+        if (p > A[i])
         {
-            A[i] += A[i - 1];
+            k = (p + A[i] - 1) / A[i];
+            temp = min(A[i] * k - p, temp);
         }
-        while (A[i] >= P[0])
+        else
         {
-            for (j = 4; j >= 0; j--)
-            {
-                if (A[i] >= P[j])
-                {
-                    k = A[i] / P[j];
-                    A[i] = A[i] - k * P[j];
-                    ans[j]+=k;
-                }
-            }
+            temp = min(A[i] - p, temp);
         }
-        // deb(A[i]);
     }
-    for (auto x : ans)
-    {
-        cout << x << " ";
-    }
-    cout << endl
-         << A[n - 1] << endl;
+    cout << temp << endl;
 }
 
 int main()
 {
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--)
     {
         solve();

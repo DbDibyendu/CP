@@ -20,45 +20,41 @@ const int N = INT_MAX, M = N;
 
 void solve()
 {
-    ll i, j, n, m, k;
+
+    int i, j, n, m, k;
     ll temp = 0, flag = 1;
-    cin >> n;
-    ll A[n], P[5];
-    ll ans[5] = {0};
-    fo(i, 0, n)
+    cin >> n >> m;
+    string S, T;
+    cin >> S >> T;
+    ll mint[m], maxt[m];
+    j = 0;
+    // ! finding min edge of each t[i]
+    for (i = 0; i < m; i++)
     {
-        cin >> A[i];
-    }
-    fo(i, 0, 5)
-    {
-        cin >> P[i];
-    }
-    fo(i, 0, n)
-    {
-        if (i)
+        while (S[j] != T[i])
         {
-            A[i] += A[i - 1];
+            j++;
         }
-        while (A[i] >= P[0])
-        {
-            for (j = 4; j >= 0; j--)
-            {
-                if (A[i] >= P[j])
-                {
-                    k = A[i] / P[j];
-                    A[i] = A[i] - k * P[j];
-                    ans[j]+=k;
-                }
-            }
-        }
-        // deb(A[i]);
+        mint[i] = j;
+        j++;
     }
-    for (auto x : ans)
+    j = n - 1;
+    for (i = m - 1; i >= 0; i--)
     {
-        cout << x << " ";
+        while (S[j] != T[i])
+        {
+            j--;
+        }
+        maxt[i] = j;
+        // deb(j);
+        j--;
     }
-    cout << endl
-         << A[n - 1] << endl;
+    for (i = 1; i < m; i++)
+    {
+        temp = max(maxt[i] - mint[i - 1], temp);
+    }
+
+    cout << temp << endl;
 }
 
 int main()

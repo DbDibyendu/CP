@@ -20,51 +20,57 @@ const int N = INT_MAX, M = N;
 
 void solve()
 {
+
     ll i, j, n, m, k;
     ll temp = 0, flag = 1;
     cin >> n;
-    ll A[n], P[5];
-    ll ans[5] = {0};
+    vl A(n), B;
+    map<ll, ll> hash;
     fo(i, 0, n)
     {
         cin >> A[i];
     }
-    fo(i, 0, 5)
+    m = n;
+    for (i = n - 1; i >= 0; i--)
     {
-        cin >> P[i];
-    }
-    fo(i, 0, n)
-    {
-        if (i)
+        if (A[i] == m && hash[A[i]] == 0)
         {
-            A[i] += A[i - 1];
-        }
-        while (A[i] >= P[0])
-        {
-            for (j = 4; j >= 0; j--)
+            hash[m]++;
+            m--;
+            B.pb(A[i]);
+            while (hash[m] == 1)
             {
-                if (A[i] >= P[j])
-                {
-                    k = A[i] / P[j];
-                    A[i] = A[i] - k * P[j];
-                    ans[j]+=k;
-                }
+                m--;
             }
+            reverse(B.begin(), B.end());
+            for (auto x : B)
+            {
+                cout << x << " ";
+            }
+            B.clear();
         }
-        // deb(A[i]);
+        else
+        {
+            B.pb(A[i]);
+            hash[A[i]]++;
+        }
     }
-    for (auto x : ans)
+    if (!B.empty())
     {
-        cout << x << " ";
+        for (auto x : B)
+        {
+            cout << x << " ";
+        }
+        B.clear();
     }
-    cout << endl
-         << A[n - 1] << endl;
+
+    cout << endl;
 }
 
 int main()
 {
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--)
     {
         solve();
