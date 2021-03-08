@@ -15,32 +15,39 @@ typedef vector<pll> vpll;
 typedef vector<vl> vvl;
 //=======================
 const int MOD = 1'000'000'007;
-const int N = INT_MAX, M = N;
+const int N = 1e5;
 //=======================
+//! memory exceed with Segment Trees
 
-// ! DP approach, Time complexity(N*k*log(n))
+const int N = 10000000;
+int lp[N + 1]; 
+vector<int> pr;
+
+void sieve()
+{
+    for (int i = 2; i <= N; ++i)
+    {
+        if (lp[i] == 0)
+        {
+            lp[i] = i;
+            pr.push_back(i);
+        }
+        for (int j = 0; j < (int)pr.size() && pr[j] <= lp[i] && i * pr[j] <= N; ++j)
+            lp[i * pr[j]] = pr[j];
+    }
+}
+
+
 void solve()
 {
 
-    int i, j, n, m, k, l;
+    ll i, j, n, m, k, q;
     ll temp = 0, flag = 1;
-    cin >> n >> k;
-    vvl dp(2005, vector<ll>(2005, 1));
-
-    for (l = 1; l <= k; l++)
+    cin >> n >> q;
+    fo(i, 1, n + 1)
     {
-        for (i = 1; i <= n; i++)
-        {
-            for (j = i; j <= n; j += i)
-            {
-                dp[l][i] += dp[l - 1][j];
-            }
-            dp[l][i]--;
-            dp[l][i] %= MOD;
-            //  deb2(i,dp[l][i]);
-        }
+        cin >> A[i];
     }
-    cout << dp[k][1] % MOD << endl;
 }
 
 int main()

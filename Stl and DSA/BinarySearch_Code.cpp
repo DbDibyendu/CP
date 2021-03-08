@@ -18,29 +18,34 @@ const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
 
-// ! DP approach, Time complexity(N*k*log(n))
+//! Binary search 
 void solve()
 {
 
-    int i, j, n, m, k, l;
+    int i, j, n, m, k;
     ll temp = 0, flag = 1;
     cin >> n >> k;
-    vvl dp(2005, vector<ll>(2005, 1));
-
-    for (l = 1; l <= k; l++)
+    vl A(n + 1);
+    fo(i, 1, n + 1)
     {
-        for (i = 1; i <= n; i++)
+        cin >> A[i];
+    }
+    sort(A.begin(), A.end());
+
+    ll l = 1, r = n, mid;
+    while (l < r)
+    {
+        mid = (l + r) / 2;
+        if (k > A[mid])
         {
-            for (j = i; j <= n; j += i)
-            {
-                dp[l][i] += dp[l - 1][j];
-            }
-            dp[l][i]--;
-            dp[l][i] %= MOD;
-            //  deb2(i,dp[l][i]);
+            l = mid + 1;
+        }
+        else
+        {
+            r = mid;
         }
     }
-    cout << dp[k][1] % MOD << endl;
+    cout << l << endl;
 }
 
 int main()

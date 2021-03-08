@@ -23,34 +23,18 @@ void solve()
 
 	int i, j, n, m, k;
 	ll temp = 0, flag = 0;
-	cin >> n >> k;
-	vl A(n);
-	fo(i, 0, n)
-	{
-		cin >> A[i];
-	}
-	sort(A.begin(), A.end());
-	fo(i, 0, n)
-	{
-		temp += A[i];
-		if (temp <= k)
-		{
-			flag++;
-		}
-	}
-	cout << flag << endl;
+	n = (1 << 30);
+	cout << n << endl;
 }
 
 int main()
 {
 	int t = 1;
-	cin >> t;
+	// cin >> t;
 	int k = 1;
 	while (t--)
 	{
-		cout << "Case #" << k << ": ";
 		solve();
-		k++;
 	}
 	return 0;
 }

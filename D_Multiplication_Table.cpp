@@ -18,31 +18,45 @@ const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
 
-// ! DP approach, Time complexity(N*k*log(n))
+ll check(ll x, ll n, ll m)
+{
+    ll ans = 0, i;
+    for (i = 1; i <= n; i++)
+    {
+        ans += min(x / i, m);
+    }
+    // deb(ans);
+    return ans;
+}
 void solve()
 {
 
-    int i, j, n, m, k, l;
+    ll i, j, n, m, k;
     ll temp = 0, flag = 1;
-    cin >> n >> k;
-    vvl dp(2005, vector<ll>(2005, 1));
-
-    for (l = 1; l <= k; l++)
+    cin >> n >> m >> k;
+    if (m > n)
     {
-        for (i = 1; i <= n; i++)
+        swap(n, m);
+    }
+    vl A;
+    ll l = 1, r = n * m;
+    ll mid;
+    while (l < r)
+    {
+        mid = (l + r) / 2;
+        // deb(mid);
+        if (k > check(mid, n, m))
         {
-            for (j = i; j <= n; j += i)
-            {
-                dp[l][i] += dp[l - 1][j];
-            }
-            dp[l][i]--;
-            dp[l][i] %= MOD;
-            //  deb2(i,dp[l][i]);
+            l = mid + 1;
+        }
+        else
+        {
+
+            r = mid;
         }
     }
-    cout << dp[k][1] % MOD << endl;
+    cout << l << endl;
 }
-
 int main()
 {
     int t = 1;

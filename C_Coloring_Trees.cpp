@@ -15,38 +15,41 @@ typedef vector<pll> vpll;
 typedef vector<vl> vvl;
 //=======================
 const int MOD = 1'000'000'007;
-const int N = INT_MAX, M = N;
+const ll N = 1e18, M = N;
 //=======================
 
-// ! DP approach, Time complexity(N*k*log(n))
 void solve()
 {
 
-    int i, j, n, m, k, l;
+    int i, j, n, m, k;
     ll temp = 0, flag = 1;
-    cin >> n >> k;
-    vvl dp(2005, vector<ll>(2005, 1));
-
-    for (l = 1; l <= k; l++)
+    cin >> n >> m >> k;
+    ll P[n + 1][m + 1] = {0}, tree[n + 1] = {0};
+    fo(i, 1, n + 1)
     {
-        for (i = 1; i <= n; i++)
+        cin >> tree[i];
+    }
+    fo(i, 1, n + 1)
+    {
+        fo(j, 1, m + 1)
         {
-            for (j = i; j <= n; j += i)
-            {
-                dp[l][i] += dp[l - 1][j];
-            }
-            dp[l][i]--;
-            dp[l][i] %= MOD;
-            //  deb2(i,dp[l][i]);
+            cin >> P[i][j];
         }
     }
-    cout << dp[k][1] % MOD << endl;
+    ll t = 1;
+    ll dp[n + 1][m + 1] = {0};
+    fo(j, 1, m + 1)
+        dp[1][j] = P[1][j];
+    
+    fo(i, 1, n)
+    {
+    }
 }
 
 int main()
 {
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--)
     {
         solve();
