@@ -43,6 +43,7 @@ int calc(int n1, int n2, int k1, int k2)
 
     return dp[n1][n2][k1][k2] = ans % MOD;
 }
+
 void solve()
 {
 

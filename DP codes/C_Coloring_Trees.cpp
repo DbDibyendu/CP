@@ -41,11 +41,11 @@ void solve()
 
     ll dp[n + 1][m + 1][k + 1];
 
-    fo(i, 1, n + 1)
+    fo(i, 0, n + 1)
     {
-        fo(j, 1, m + 1)
+        fo(j, 0, m + 1)
         {
-            fo(i2, 1, k + 1)
+            fo(i2, 0, k + 1)
             {
                 dp[i][j][i2] = N;
             }
