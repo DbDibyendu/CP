@@ -18,56 +18,34 @@ const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
 
+//! Bit wise logic..... just needed to think a bit
 void solve()
 {
 
-    int i, j, n, m, k;
     ll temp = 0, flag = 1;
-    string T, P, S;
-    cin >> T >> P;
-    m = P.length();
-    S += P;
-    S += '$';
-    S += T;
-
-    n = S.length();
-    vl prefix(n, 0);
-
-    // ! KMP algo Implementation
-    j = 0;
-    i = 1;
-    while (i < n)
+    ll l, r;
+    cin >> l >> r;
+    ll i, j, k;
+    if (l == r)
     {
-        if (S[i] == S[j])
-        {
-            j++;
-            prefix[i] = j;
-            i++;
-        }
-        else
-        {
-            if (j > 0)
-            {
-                j = prefix[j - 1];
-            }
-            else
-            {
-                prefix[i] = 0;
-                i++;
-            }
-        }
+        cout << (l ^ r) << endl;
+        return;
     }
-
-    // ! Checking how many patterns are there
-    for (auto x : prefix)
+    i = 0;
+    while (l > 0 || r > 0)
     {
-        if (x == m)
+        if (l % 2 != r % 2)
         {
-            temp++;
+            k = i;
         }
+        i++;
+        l /= 2;
+        r /= 2;
     }
-
-    cout << temp << endl;
+    ll answer = pow(2, k + 1);
+    // deb(answer);
+    cout << answer - 1 << endl;
+    // deb(temp);
 }
 
 int main()
@@ -81,4 +59,10 @@ int main()
     return 0;
 }
 
-//=======================
+/*
+if ((i >> 1) % 2 == 1 && (j >> 1) % 2 == 1)
+{
+    i /= 2;
+    j /= 2;
+}
+*/

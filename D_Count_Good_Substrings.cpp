@@ -23,51 +23,31 @@ void solve()
 
     int i, j, n, m, k;
     ll temp = 0, flag = 1;
-    string T, P, S;
-    cin >> T >> P;
-    m = P.length();
-    S += P;
-    S += '$';
-    S += T;
+    string A;
+    cin >> A;
+    ll even = 0, odd = 0;
+    n = A.length();
+    ll E[2] = {0}, O[2] = {0};
 
-    n = S.length();
-    vl prefix(n, 0);
-
-    // ! KMP algo Implementation
-    j = 0;
-    i = 1;
-    while (i < n)
+    // ! I was able to find the initial concept, then had a look at tutorial
+    for (i = 0; i < n; i++)
     {
-        if (S[i] == S[j])
+        k = A[i] - 'a';
+        odd++;
+        if (i % 2 == 0)
         {
-            j++;
-            prefix[i] = j;
-            i++;
+            odd += E[k];
+            even += O[k];
+            E[k]++;
         }
-        else
+        else //! Current iterator is odd
         {
-            if (j > 0)
-            {
-                j = prefix[j - 1];
-            }
-            else
-            {
-                prefix[i] = 0;
-                i++;
-            }
+            odd += O[k];
+            even += E[k];
+            O[k]++;
         }
-    }
-
-    // ! Checking how many patterns are there
-    for (auto x : prefix)
-    {
-        if (x == m)
-        {
-            temp++;
         }
-    }
-
-    cout << temp << endl;
+    cout << even << " " << odd << endl;
 }
 
 int main()

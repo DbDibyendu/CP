@@ -21,59 +21,51 @@ const int N = INT_MAX, M = N;
 void solve()
 {
 
-    int i, j, n, m, k;
-    ll temp = 0, flag = 1;
-    string T, P, S;
-    cin >> T >> P;
-    m = P.length();
-    S += P;
-    S += '$';
-    S += T;
-
-    n = S.length();
-    vl prefix(n, 0);
-
-    // ! KMP algo Implementation
-    j = 0;
-    i = 1;
-    while (i < n)
+    ll i, j, n, m, k;
+    ll temp = -1, flag = 1;
+    cin >> n >> k;
+    vl A(n);
+    map<int, int> hash;
+    fo(i, 0, n)
     {
-        if (S[i] == S[j])
+        cin >> A[i];
+        temp = max(temp, A[i]);
+        hash[A[i]]++;
+    }
+    fo(i, 0, temp + 1)
+    {
+        if (hash[i] == 0)
         {
-            j++;
-            prefix[i] = j;
-            i++;
+            flag = 0;
+            j = i;
+            break;
         }
-        else
-        {
-            if (j > 0)
-            {
-                j = prefix[j - 1];
-            }
+    }
+    if (flag == 0)
+    {
+        // deb((j + temp + 1) / 2);
+        if (k)
+            if (hash[(j + temp + 1) / 2])
+                cout << n << endl;
             else
             {
-                prefix[i] = 0;
-                i++;
+                cout << n + 1 << endl;
             }
-        }
-    }
-
-    // ! Checking how many patterns are there
-    for (auto x : prefix)
-    {
-        if (x == m)
+        else
         {
-            temp++;
+            cout << n << endl;
         }
     }
-
-    cout << temp << endl;
+    else
+    {
+        cout << temp + 1 + k << endl;
+    }
 }
 
 int main()
 {
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--)
     {
         solve();

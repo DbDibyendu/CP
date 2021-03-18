@@ -21,59 +21,57 @@ const int N = INT_MAX, M = N;
 void solve()
 {
 
-    int i, j, n, m, k;
+    int i, j, n, m, k, t;
     ll temp = 0, flag = 1;
-    string T, P, S;
-    cin >> T >> P;
-    m = P.length();
-    S += P;
-    S += '$';
-    S += T;
-
-    n = S.length();
-    vl prefix(n, 0);
-
-    // ! KMP algo Implementation
-    j = 0;
-    i = 1;
-    while (i < n)
+    cin >> n >> m;
+    vl A(n);
+    fo(i, 0, n)
     {
-        if (S[i] == S[j])
+        cin >> A[i];
+    }
+    t = n;
+    map<int, int> hash;
+    fo(i, 0, n)
+    {
+        k = A[i] % m;
+        hash[k]++;
+        // deb(k);
+    }
+    for (i = 0; i <= m / 2; i++)
+    {
+        if (i == 0)
         {
-            j++;
-            prefix[i] = j;
-            i++;
+            if (hash[i])
+                temp++;
         }
-        else
+        else if (hash[i] || hash[m - i])
         {
-            if (j > 0)
+            // deb2(hash[i], i);
+            if (hash[i] > hash[m - i] + 1)
             {
-                j = prefix[j - 1];
+                temp += hash[i] - hash[m - i];
             }
             else
             {
-                prefix[i] = 0;
-                i++;
+                if (hash[m - i] > hash[i] + 1)
+                {
+                    temp += hash[m - i] - hash[i];
+                }
+                else
+                {
+                    temp++;
+                }
             }
         }
+        //  deb(temp);
     }
-
-    // ! Checking how many patterns are there
-    for (auto x : prefix)
-    {
-        if (x == m)
-        {
-            temp++;
-        }
-    }
-
     cout << temp << endl;
 }
 
 int main()
 {
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--)
     {
         solve();

@@ -18,55 +18,69 @@ const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
 
+// ! Simple concept, smart implementation
+
+bool isD(string a, string b)
+{
+    if (a.size() % b.size() != 0)
+    {
+        return false;
+    }
+    ll i;
+
+    for (i = 0; i < a.size(); i += b.size())
+    {
+
+        if (a.substr(i, b.size()) != b)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
 void solve()
 {
 
-    int i, j, n, m, k;
+    ll i, j, k;
     ll temp = 0, flag = 1;
-    string T, P, S;
-    cin >> T >> P;
-    m = P.length();
-    S += P;
-    S += '$';
-    S += T;
+    string a, b;
+    map<string, ll> hash;
+    cin >> a >> b;
 
-    n = S.length();
-    vl prefix(n, 0);
+    ll n = a.size();
+    ll m = b.size();
+    set<string> ans;
 
-    // ! KMP algo Implementation
-    j = 0;
-    i = 1;
-    while (i < n)
+    for (i = 1; i * i <= n; i++)
     {
-        if (S[i] == S[j])
+        if (n % i != 0)
         {
-            j++;
-            prefix[i] = j;
-            i++;
+            continue;
         }
         else
         {
-            if (j > 0)
+            string A = a.substr(0, i);
+            string B = a.substr(0, n / i);
+
+            if (isD(a, A))
             {
-                j = prefix[j - 1];
+                ans.insert(A);
             }
-            else
+            if (isD(a, B))
             {
-                prefix[i] = 0;
-                i++;
+                ans.insert(B);
             }
         }
     }
 
-    // ! Checking how many patterns are there
-    for (auto x : prefix)
+    for (auto x : ans)
     {
-        if (x == m)
+        if (isD(b, x))
         {
             temp++;
         }
     }
-
     cout << temp << endl;
 }
 

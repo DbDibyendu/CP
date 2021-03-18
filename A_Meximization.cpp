@@ -23,57 +23,39 @@ void solve()
 
     int i, j, n, m, k;
     ll temp = 0, flag = 1;
-    string T, P, S;
-    cin >> T >> P;
-    m = P.length();
-    S += P;
-    S += '$';
-    S += T;
-
-    n = S.length();
-    vl prefix(n, 0);
-
-    // ! KMP algo Implementation
-    j = 0;
-    i = 1;
-    while (i < n)
+    cin >> n;
+    vl A(n);
+    fo(i, 0, n)
     {
-        if (S[i] == S[j])
+        cin >> A[i];
+    }
+    vl B;
+    sort(A.begin(), A.end());
+
+    map<int, int> hash;
+    fo(i, 0, n)
+    {
+        if (hash[A[i]] == 0)
         {
-            j++;
-            prefix[i] = j;
-            i++;
+            cout << A[i] << " ";
+            hash[A[i]]++;
         }
         else
         {
-            if (j > 0)
-            {
-                j = prefix[j - 1];
-            }
-            else
-            {
-                prefix[i] = 0;
-                i++;
-            }
+            B.pb(A[i]);
         }
     }
-
-    // ! Checking how many patterns are there
-    for (auto x : prefix)
+    for (auto x : B)
     {
-        if (x == m)
-        {
-            temp++;
-        }
+        cout << x << " ";
     }
-
-    cout << temp << endl;
+    cout << endl;
 }
 
 int main()
 {
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--)
     {
         solve();

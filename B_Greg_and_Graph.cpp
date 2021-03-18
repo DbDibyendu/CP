@@ -18,56 +18,50 @@ const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
 
+// ! Implementation of floyd's algorthim
 void solve()
 {
 
     int i, j, n, m, k;
     ll temp = 0, flag = 1;
-    string T, P, S;
-    cin >> T >> P;
-    m = P.length();
-    S += P;
-    S += '$';
-    S += T;
-
-    n = S.length();
-    vl prefix(n, 0);
-
-    // ! KMP algo Implementation
-    j = 0;
-    i = 1;
-    while (i < n)
+    cin >> n;
+    ll A[n + 1][n + 1];
+    ll B[n + 1];
+    fo(i, 0, n)
     {
-        if (S[i] == S[j])
+        fo(j, 0, n)
         {
-            j++;
-            prefix[i] = j;
-            i++;
-        }
-        else
-        {
-            if (j > 0)
-            {
-                j = prefix[j - 1];
-            }
-            else
-            {
-                prefix[i] = 0;
-                i++;
-            }
+            cin >> A[i][j];
         }
     }
 
-    // ! Checking how many patterns are there
-    for (auto x : prefix)
+    fo(i, 0, n)
     {
-        if (x == m)
+        cin >> B[i];
+    }
+    ll t, q;
+    ll c[n + 1] = {0};
+    ll ans[n] = {0};
+
+    for (k = n - 1; k >= 0; k--)
+    {
+        t = B[k] - 1;
+        c[t]++;
+        ans[k] = 0;
+        for (i = 0; i < n; i++)
         {
-            temp++;
+            for (j = 0; j < n; j++)
+            {
+                A[i][j] = min(A[i][j], A[i][t] + A[t][j]);
+                if (c[i] && c[j])
+                    ans[k] += A[i][j];
+            }
         }
     }
-
-    cout << temp << endl;
+    fo(i, 0, n)
+    {
+        cout << ans[i] << " ";
+    }
 }
 
 int main()

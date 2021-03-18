@@ -23,57 +23,67 @@ void solve()
 
     int i, j, n, m, k;
     ll temp = 0, flag = 1;
-    string T, P, S;
-    cin >> T >> P;
-    m = P.length();
-    S += P;
-    S += '$';
-    S += T;
+    cin >> n >> k;
+    string A;
+    cin >> A;
 
-    n = S.length();
-    vl prefix(n, 0);
-
-    // ! KMP algo Implementation
-    j = 0;
-    i = 1;
-    while (i < n)
+    if (k == 0)
     {
-        if (S[i] == S[j])
+        cout << "YES" << endl;
+        return;
+    }
+    if (n % 2 == 0)
+    {
+        flag = 1;
+        if (k * 2 + 2 > n)
         {
-            j++;
-            prefix[i] = j;
-            i++;
+            cout << "NO" << endl;
+            return;
         }
+        for (i = 0; i < k; i++)
+        {
+            if (A[i] != A[n - i - 1])
+            {
+                flag = 0;
+                break;
+            }
+        }
+
+        if (flag)
+            cout << "YES" << endl;
         else
         {
-            if (j > 0)
-            {
-                j = prefix[j - 1];
-            }
-            else
-            {
-                prefix[i] = 0;
-                i++;
-            }
+            cout << "NO" << endl;
         }
+        return;
     }
 
-    // ! Checking how many patterns are there
-    for (auto x : prefix)
+    if (k * 2 + 1 > n)
     {
-        if (x == m)
-        {
-            temp++;
-        }
+        cout << "NO" << endl;
+        return;
     }
 
-    cout << temp << endl;
+    for (i = 0; i < k; i++)
+    {
+        if (A[i] != A[n - i - 1])
+        {
+            flag = 0;
+            break;
+        }
+    }
+    if (flag)
+        cout << "YES" << endl;
+    else
+    {
+        cout << "NO" << endl;
+    }
 }
 
 int main()
 {
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--)
     {
         solve();

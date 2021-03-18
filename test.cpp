@@ -22,16 +22,14 @@ void solve()
 {
 
 	int i, j, n, m, k;
-	ll temp = 0, flag = 0;
-	n = (1 << 30);
-	cout << n << endl;
+	ll temp = 0, flag = 1;
+	// cin >> n;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+	deb(argc);
 	int t = 1;
-	// cin >> t;
-	int k = 1;
 	while (t--)
 	{
 		solve();
