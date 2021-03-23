@@ -30,20 +30,20 @@ const int N = INT_MAX, M = N;
 void solve()
 {
 
-	int i, j, n, m, k;
-	ll temp = 0, flag = 1;
-	cin >> n;
+    int i, j, n, m, k;
+    ll temp = 0, flag = 1;
+    cin >> n;
 }
 
 int main()
 {
-	int t = 1;
-	cin >> t;
-	while (t--)
-	{
-		solve();
-	}
-	return 0;
+    int t = 1;
+    cin >> t;
+    while (t--)
+    {
+        solve();
+    }
+    return 0;
 }
 
 //=======================

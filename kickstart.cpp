@@ -24,24 +24,28 @@ typedef vector<pll> vpll;
 typedef vector<vl> vvl;
 //=======================
 const int MOD = 1'000'000'007;
-const int N = INT_MAX, M = N;
+const int N = 305, M = N;
 //=======================
 
 void solve()
 {
 
 	int i, j, n, m, k;
-	ll temp = 0, flag = 1;
-	cin >> n;
+	ll temp = 0, flag = 0;
+	ll r, c
+	// cout << endl;
 }
 
 int main()
 {
 	int t = 1;
 	cin >> t;
+	int k = 1;
 	while (t--)
 	{
+		cout << "Case #" << k << ": ";
 		solve();
+		k++;
 	}
 	return 0;
 }

@@ -24,26 +24,49 @@ typedef vector<pll> vpll;
 typedef vector<vl> vvl;
 //=======================
 const int MOD = 1'000'000'007;
-const int N = INT_MAX, M = N;
+const int N = 5e3 + 10, M = N;
 //=======================
 
+//! Simple DP appraoch , longest non decreasing subsequence
 void solve()
 {
 
-	int i, j, n, m, k;
-	ll temp = 0, flag = 1;
-	cin >> n;
+    int i, j, n, m, k;
+    ll temp = 0, flag = 1;
+    cin >> n >> m;
+    int A[n];
+    double d;
+    fo(i, 0, n)
+    {
+        cin >> A[i] >> d;
+    }
+
+    int dp[n + 1];
+    clr(dp);
+    int ans = 0;
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < i; j++)
+        {
+            if (A[j] <= A[i])
+                dp[i] = max(dp[i], dp[j] + 1);
+        }
+        ans = max(ans, dp[i]);
+        //     deb(dp[i]);
+    }
+
+    cout << n - ans - 1 << endl;
 }
 
 int main()
 {
-	int t = 1;
-	cin >> t;
-	while (t--)
-	{
-		solve();
-	}
-	return 0;
+    int t = 1;
+    // cin >> t;
+    while (t--)
+    {
+        solve();
+    }
+    return 0;
 }
 
 //=======================
