@@ -24,81 +24,67 @@ typedef vector<pll> vpll;
 typedef vector<vl> vvl;
 //=======================
 const int MOD = 1'000'000'007;
-const int N = 1e3, M = N;
+const int N = 5e3 + 2, M = N;
 //=======================
 
-int dp[N][N];
-string A, B;
-int result = 0;
-
-int recur(int n, int m)
-{
-	if (n == 0 || m == 0)
-	{
-		dp[n][m] = 0;
-		return dp[n][m];
-	}
-	if (dp[n][m] != 0)
-	{
-		return dp[n][m];
-	}
-	if (A[n - 1] == B[m - 1])
-	{
-		dp[n][m] = recur(n - 1, m - 1) + 1;
-		result = max(dp[n][m], result);
-	}
-	else
-	{
-		recur(n - 1, m);
-		recur(n, m - 1);
-		dp[n][m] = 0;
-	}
-	return dp[n][m];
-}
-
-
-int eshita(int n, int m)
-{
-	int ans = 0;
-	if (n == 0 || m == 0)
-	{
-		return 0;
-	}
-
-	if (A[n - 1] == B[m - 1])
-	{
-		ans = eshita(n - 1, m - 1) + 1;
-		result = max(ans, result);
-	}
-	else
-	{
-		ans = 0;
-		eshita(n - 1, m);
-		eshita(n, m - 1);
-	}
-	return ans;
-}
-
+//! Correct logic, TLE on test case 20
 void solve()
 {
 
-	int i, j, n, m, k;
-	ll temp = 0, flag = 1;
-	cin >> A >> B;
-	clr(dp);
-	eshita(A.length(), B.length());
-	cout << result << endl;
+    int i, j, n, m, k;
+    int temp = 0, flag = 1;
+    cin >> n >> m;
+    int A[N][N];
+    // clr(A);
+    string c;
+    int dp[N][N];
+    //! Good logic, tough implementation
+    // clr(dp);
+    fo(i, 0, n)
+    {
+        cin >> c;
+        fo(j, 0, m)
+        {
+            A[i][j] = c[j] - '0';
+        }
+
+        for (j = m - 1; j >= 0; j--)
+        {
+            if (A[i][j])
+                if (j < m - 1)
+                {
+
+                    dp[j][i] += dp[j + 1][i] + 1;
+                }
+                else
+                {
+                    dp[j][i] = A[i][j];
+                }
+        }
+    }
+
+    fo(j, 0, m)
+    {
+        sort(dp[j], dp[j] + n);
+        fo(i, 0, n)
+        {
+            temp = max(temp, (n - i) * dp[j][i]);
+        }
+        // deb(temp);
+        // cout << endl;
+    }
+    cout << temp << endl;
 }
 
 int main()
 {
-	int t = 1;
-	// cin >> t;
-	while (t--)
-	{
-		solve();
-	}
-	return 0;
+    int t = 1;
+
+    while (t--)
+    {
+        solve();
+    }
+    return 0;
 }
 
 //=======================

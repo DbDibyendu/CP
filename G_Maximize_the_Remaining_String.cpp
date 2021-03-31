@@ -24,81 +24,73 @@ typedef vector<pll> vpll;
 typedef vector<vl> vvl;
 //=======================
 const int MOD = 1'000'000'007;
-const int N = 1e3, M = N;
+const int N = INT_MAX, M = N;
 //=======================
 
-int dp[N][N];
-string A, B;
-int result = 0;
-
-int recur(int n, int m)
-{
-	if (n == 0 || m == 0)
-	{
-		dp[n][m] = 0;
-		return dp[n][m];
-	}
-	if (dp[n][m] != 0)
-	{
-		return dp[n][m];
-	}
-	if (A[n - 1] == B[m - 1])
-	{
-		dp[n][m] = recur(n - 1, m - 1) + 1;
-		result = max(dp[n][m], result);
-	}
-	else
-	{
-		recur(n - 1, m);
-		recur(n, m - 1);
-		dp[n][m] = 0;
-	}
-	return dp[n][m];
-}
-
-
-int eshita(int n, int m)
-{
-	int ans = 0;
-	if (n == 0 || m == 0)
-	{
-		return 0;
-	}
-
-	if (A[n - 1] == B[m - 1])
-	{
-		ans = eshita(n - 1, m - 1) + 1;
-		result = max(ans, result);
-	}
-	else
-	{
-		ans = 0;
-		eshita(n - 1, m);
-		eshita(n, m - 1);
-	}
-	return ans;
-}
-
+//! Greedy problem, tough implementation
 void solve()
 {
 
-	int i, j, n, m, k;
-	ll temp = 0, flag = 1;
-	cin >> A >> B;
-	clr(dp);
-	eshita(A.length(), B.length());
-	cout << result << endl;
-}
+    int i, j, n, m, k;
+    ll temp = 0, flag = 1;
+    string A;
+    cin >> A;
+    n = A.length();
+    int C[26];
+    clr(C);
+    fo(i, 0, n)
+    {
+        C[int(A[i] - 'a')]++;
+    }
+    string ans;
+    for (i = 0; i < n; i++)
+    {
+        if (C[A[i] - 'a'] == 0)
+            continue;
 
+        int pos = i;
+        int mx = A[i] - 'a';
+        int last = i;
+        for (j = i; j < n; j++)
+        {
+            if (C[A[j] - 'a'] == 0)
+                continue;
+
+            if (A[j] - 'a' > mx)
+            {
+                pos = j;
+                mx = A[j] - 'a';
+            }
+            if (C[A[j] - 'a'] == 1)
+            {
+                last = j;
+                break;
+            }
+            C[A[j] - 'a']--;
+        }
+        for (j = pos + 1; j < last; j++)
+        {
+            if (C[A[j] - 'a'] != 0)
+            {
+                C[A[j] - 'a']++;
+            }
+        }
+        // deb(pos);
+        C[A[pos] - 'a'] = 0;
+        ans.pb(A[pos]);
+        i = pos;
+    }
+    cout << ans << endl;
+}
 int main()
 {
-	int t = 1;
-	// cin >> t;
-	while (t--)
-	{
-		solve();
-	}
-	return 0;
+    int t = 1;
+    cin >> t;
+    while (t--)
+    {
+        solve();
+    }
+    return 0;
 }
 
 //=======================

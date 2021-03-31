@@ -1,1 +1,1 @@
-{"name":"Local: test","url":"/home/dibyendu/CP/test.cpp","tests":[{"id":1610025376761,"input":"Sachin Tendulkar","output":""}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"/home/dibyendu/CP/test.cpp","group":"local","local":true}
+{"name":"Local: test","url":"/home/dibyendu/CP/test.cpp","tests":[{"id":1610025376761,"input":"codeforcesert\nzzzzzzzzert","output":""},{"id":1616697551504,"input":"azaba\nabacaba","output":""}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"/home/dibyendu/CP/test.cpp","group":"local","local":true}

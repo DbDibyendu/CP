@@ -24,81 +24,66 @@ typedef vector<pll> vpll;
 typedef vector<vl> vvl;
 //=======================
 const int MOD = 1'000'000'007;
-const int N = 1e3, M = N;
+const int N = INT_MAX, M = N;
 //=======================
-
-int dp[N][N];
-string A, B;
-int result = 0;
-
-int recur(int n, int m)
-{
-	if (n == 0 || m == 0)
-	{
-		dp[n][m] = 0;
-		return dp[n][m];
-	}
-	if (dp[n][m] != 0)
-	{
-		return dp[n][m];
-	}
-	if (A[n - 1] == B[m - 1])
-	{
-		dp[n][m] = recur(n - 1, m - 1) + 1;
-		result = max(dp[n][m], result);
-	}
-	else
-	{
-		recur(n - 1, m);
-		recur(n, m - 1);
-		dp[n][m] = 0;
-	}
-	return dp[n][m];
-}
-
-
-int eshita(int n, int m)
-{
-	int ans = 0;
-	if (n == 0 || m == 0)
-	{
-		return 0;
-	}
-
-	if (A[n - 1] == B[m - 1])
-	{
-		ans = eshita(n - 1, m - 1) + 1;
-		result = max(ans, result);
-	}
-	else
-	{
-		ans = 0;
-		eshita(n - 1, m);
-		eshita(n, m - 1);
-	}
-	return ans;
-}
 
 void solve()
 {
 
-	int i, j, n, m, k;
-	ll temp = 0, flag = 1;
-	cin >> A >> B;
-	clr(dp);
-	eshita(A.length(), B.length());
-	cout << result << endl;
+    int i, j, c, n, m, k;
+    ll temp = 0, flag = 1;
+    cin >> n >> c;
+    if (c < n - 1)
+    {
+        cout << "IMPOSSIBLE" << endl;
+        return;
+    }
+    vl A;
+    c -= n - 1;
+    for (i = n - 1; i >= 1; i--)
+    {
+        if (c - i >= 0)
+        {
+            A.pb(i);
+            c -= i;
+        }
+    }
+    if (c)
+    {
+        cout << "IMPOSSIBLE" << endl;
+        return;
+    }
+    vi ans(n);
+    fo(i, 0, n)
+    {
+        ans[i] = i + 1;
+    }
+    reverse(A.begin(), A.end());
+    for (auto x : A)
+    {
+        // cout << x << " ";
+        reverse(ans.end() - x - 1, ans.end());
+    }
+    // cout << endl;
+    fo(i, 0, n)
+    {
+        cout << ans[i] << " ";
+    }
+    cout << endl;
 }
 
 int main()
 {
-	int t = 1;
-	// cin >> t;
-	while (t--)
-	{
-		solve();
-	}
-	return 0;
+    int t = 1;
+    cin >> t;
+    int k = 1;
+    while (t--)
+    {
+        cout << "Case #" << k << ": ";
+        solve();
+        k++;
+    }
+    return 0;
 }
 
 //=======================
