@@ -1,3 +1,12 @@
+//! ╭━━━╮╱╱╱╱╱╱╱╱╭╮╱╱╱╭━━━┳━━━╮
+//! ┃╭━╮┃╱╱╱╱╱╱╱╭╯╰╮╱╱┃╭━╮┃╭━╮┃
+//? ┃┃╱┃┣━┳┳━━┳━┻╮╭╋━━┫┃┃┃┣╯╭╯┃
+//? ┃╰━╯┃╭╋┫╭╮┃╭╮┃┃┃╭╮┃┃┃┃┃╱┃╭╯
+//? ┃╭━╮┃┃┃┃╰╯┃╭╮┃╰┫╰╯┃╰━╯┃╱┃┃
+//? ╰╯╱╰┻╯╰┻━╮┣╯╰┻━┻━━┻━━━╯╱╰╯
+//* ╱╱╱╱╱╱╱╭━╯┃
+//* ╱╱╱╱╱╱╱╰━━╯
+
 #include <bits/stdc++.h>
 using namespace std;
 #define fo(i, a, n) for (i = a; i < n; i++)
@@ -23,20 +32,16 @@ void solve()
 
     int i, j, n, m, k;
     ll temp = 0, flag = 1;
-    cin >> n;
-    vl A(n + 1);
-    map<int, int> hash;
-    for (i = 1; i <= n; i++)
+    string A;
+    cin >> A;
+    if (int(A[6] - '0') & 1)
     {
-        cin >> A[i];
-        if (hash[i] == 0 && hash[A[i]] == 0)
-        {
-            temp++;
-        }
-        hash[i]++;
-        hash[A[i]]++;
+        cout << 1 << endl;
     }
-    cout << temp << endl;
+    else
+    {
+        cout << 0 << endl;
+    }
 }
 
 int main()

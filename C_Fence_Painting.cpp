@@ -18,74 +18,83 @@ const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
 
+//! Data structures, needed good implementation skills
 void solve()
 {
 
     int i, j, n, m, k = -1, k2 = -1, k3, t;
     ll temp = 0, flag = 0;
     cin >> n >> m;
-    unordered_map<int, int> MAP;
-    vl A(n), B(n), C(m);
-    fo(i, 0, n) cin >> A[i];
+    int I[n];
+    int F[n];
+    int P[m];
     fo(i, 0, n)
     {
-        cin >> B[i];
-        MAP[B[i]]++;
+        cin >> I[i];
     }
-    fo(i, 0, m) cin >> C[i];
-
-    if (MAP[C[m - 1]] == 0)
+    vi needed[n + 1];
+    vi not_needed[n + 1];
+    fo(i, 0, n)
     {
-        cout << "NO" << endl;
-        return;
-    }
-
-    vl Ans;
-    fo(j, 0, n)
-    {
-        if (C[m - 1] == B[j])
+        cin >> F[i];
+        if (I[i] != F[i])
         {
-            k3 = j;
+            needed[F[i]].pb(i);
+        }
+        else
+        {
+            not_needed[F[i]].pb(i);
         }
     }
     fo(i, 0, m)
     {
-        flag = 0;
-        fo(j, 0, n)
+        cin >> P[i];
+    }
+    // deb2(needed[P[m - 1]].empty(), not_needed[P[m - 1]].empty());
+    if (needed[P[m - 1]].empty() && not_needed[P[m - 1]].empty())
+    {
+        cout << "NO" << endl;
+        return;
+    }
+    int waste = 0;
+    if (!needed[P[m - 1]].empty())
+    {
+        waste = needed[P[m - 1]].front();
+    }
+    else
+    {
+        waste = not_needed[P[m - 1]].front();
+    }
+    vi ans;
+    fo(i, 0, m)
+    {
+        if (!needed[P[i]].empty())
         {
-            if (C[i] == B[j] && j != k3)
-            {
-                if (A[j] != B[j])
-                {
-                    flag = 1;
-                    A[j] = B[j];
-                    Ans.pb(j + 1);
-                    break;
-                }
-            }
-            if (flag == 0 && j == n - 1)
-            {
-
-                A[k3] = C[i];
-                Ans.pb(k3 + 1);
-                break;
-            }
+            int t = needed[P[i]].back();
+            ans.pb(t);
+            needed[P[i]].pop_back();
+        }
+        else
+        {
+            ans.pb(waste);
         }
     }
-
     fo(i, 0, n)
     {
-        if (A[i] != B[i])
+        if (needed[F[i]].empty())
+        {
+            continue;
+        }
+        else
         {
             cout << "NO" << endl;
             return;
         }
     }
-
     cout << "YES" << endl;
-    for (auto x : Ans)
+    for (auto x : ans)
     {
-        cout << x << " ";
+        cout << x + 1 << " ";
     }
     cout << endl;
 }

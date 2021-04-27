@@ -20,56 +20,6 @@ const int N = INT_MAX, M = N;
 ll secmax, A = 0, prev_secmax;
 ll n;
 
-void ans(int l, int r, int dir)
-{
-    if (A)
-    {
-        return;
-    }
-    if (l == r)
-    {
-        return;
-    }
-    if (dir == -1)
-    {
-        cout << "? " << l << " " << r << "\n";
-        cin >> secmax;
-        if (r == secmax)
-        {
-            if (l + 1 == r)
-            {
-                A = l;
-                return;
-            }
-            ans(l, r - 1, -1);
-        }
-        else
-        {
-            ans(l, secmax, -1);
-            ans(secmax, r, 1);
-        }
-    }
-    else
-    {
-        cout << "? " << l << " " << r << "\n";
-        cin >> secmax;
-        if (l == secmax)
-        {
-            if (l + 1 == r)
-            {
-
-                A = r;
-                return;
-            }
-            ans(l + 1, r, 1);
-        }
-        else
-        {
-            ans(l, secmax, -1);
-            ans(secmax, r, 1);
-        }
-    }
-}
 void solve()
 {
 

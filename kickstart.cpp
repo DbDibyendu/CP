@@ -32,7 +32,7 @@ void solve()
 
 	int i, j, n, m, k;
 	ll temp = 0, flag = 0;
-	ll r, c
+	ll r, c;
 	// cout << endl;
 }
 
