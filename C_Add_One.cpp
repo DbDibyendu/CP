@@ -101,7 +101,7 @@ int main()
         ll res = 0;
         while (n)
         {
-            res += ans[m + n % 10];
+            res += ans[m + n % 10]; 
             n /= 10;
         }
         cout << res % MOD << endl;
