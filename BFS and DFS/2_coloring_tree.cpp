@@ -27,12 +27,14 @@ typedef pair<ll, ll> pll;
 typedef vector<pll> vpll;
 //=======================
 const int MOD = 1'000'000'007;
-const int N = 4e5, M = N;
+const int N = 2010, M = N;
 //=======================
-
 vector<bool> visited;
 vector<vector<int>> g;
+// ll A[N];
 
+//? 2 coloring tree
+//! was easy, I was doing quite similar
 void dfs(int u)
 {
     visited[u] = true;
@@ -40,38 +42,89 @@ void dfs(int u)
     {
         if (visited[x] == false)
         {
+            cout << u << " " << x << endl;
             dfs(x);
         }
     }
 }
 
+void call(int u, int n)
+{
+
+    cout << "? " << u << endl;
+    cout.flush();
+    int i;
+    vl A(n + 1);
+    fo(i, 1, n + 1)
+    {
+        cin >> A[i];
+    }
+    int j;
+
+    fo(i, 1, n + 1)
+    {
+        if (A[i] == 1)
+        {
+            g[i].push_back(u);
+            g[u].push_back(i);
+        }
+    }
+}
 void solve()
 {
+
     ll i, j, n, m, k;
     ll temp = 0, flag = 1;
     cin >> n;
-    vl A1(n), A2(n);
-    read(A1);
-    read(A2);
+    m = (n + 1) / 2;
     visited.assign(N, false);
     g.assign(n + 1, vector<int>());
-
-    fo(i, 0, n)
+    vl A(n + 1);
+    cout << "? " << 1 << endl;
+    fo(i, 1, n + 1)
     {
-        g[A1[i]].push_back(A2[i]);
-        g[A2[i]].push_back(A1[i]);
+        cin >> A[i];
     }
-
-    for (i = 0; i < n; i++)
+    ll even = 0, odd = 0;
+    fo(i, 2, n + 1)
     {
-        if (visited[A1[i]] == false)
+        if (A[i] == 1)
         {
-            dfs(A1[i]);
-            flag *= 2;
-            flag %= MOD;
+            g[i].push_back(1);
+            g[1].push_back(i);
+        }
+        if (A[i] & 1)
+        {
+            odd++;
+        }
+        else
+        {
+            even++;
         }
     }
-    cout << flag << endl;
+    // deb2(odd, even);
+    if (odd < even)
+    {
+        fo(i, 2, n + 1)
+        {
+            if (A[i] & 1)
+            {
+                call(i, n);
+            }
+        }
+    }
+    else
+    {
+        fo(i, 2, n + 1)
+        {
+            if (A[i] % 2 == 0)
+            {
+                call(i, n);
+            }
+        }
+    }
+    cout << '!' << endl;
+    dfs(1);
 }
 
 int main()
@@ -79,7 +132,7 @@ int main()
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while (t--)
     {
         solve();

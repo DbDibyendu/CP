@@ -184,7 +184,6 @@ bool dfs(int i, int last, int value)
     {
         if (j != last)
         {
-
             if (weights[j] - value > 0 && dfs(i + 1, j, weights[j] - value))
             {
                 ans.pb(weights[j]);
@@ -228,7 +227,7 @@ int main()
     int t = 1;
     while (t--)
     {
-        solve2();
+        solve();
     }
     return 0;
 }

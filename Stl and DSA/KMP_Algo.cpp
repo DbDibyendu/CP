@@ -44,8 +44,14 @@ void solve()
             prefix[i] = j;
             i++;
         }
+
         else
         {
+            if (j == m)
+            {
+                printf("Found pattern at index %d \n", i - j - m - 1);
+                j = prefix[j - 1];
+            }
             if (j > 0)
             {
                 j = prefix[j - 1];
@@ -57,8 +63,13 @@ void solve()
             }
         }
     }
-
+    if (j == m)
+    {
+        printf("Found pattern at index %d \n", i - j - m - 1);
+        j = prefix[j - 1];
+    }
     // ! Checking how many patterns are there
+    // i = 0;
     for (auto x : prefix)
     {
         if (x == m)
