@@ -1,65 +1,61 @@
 {
-	// Place your snippets for cpp here. 
-	//Each snippet is defined under a snippet name and has a prefix, body and 
-	// description. 
-	//The prefix is what is used to trigger the snippet
-	// the body will be expanded and inserted. 
-	//Possible variables are: $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. Placeholders with the 
-	// same ids are connected.
-	"Default cpp formate": {
-		"prefix": [
-			"default"
-		],
-		"body": [
-			"#include<bits/stdc++.h>",
-			"using namespace std;",
-			"#define fo(i,a,n) for(i=a;i<n;i++)",
-			"#define ll long long",
-			"#define deb(x) cout << #x << '=' << x << endl",
-			"#define deb2(x, y) cout << #x << '=' << x << ',' << #y << '=' << y << endl",
-			"#define clr(x) memset(x, 0, sizeof(x))",
-			"#define PI 3.1415926535897932384626",
-			"#define pb push_back",
-			"//===========================",
-			"typedef vector<int> vi; ", 
-			"typedef vector<ll> vl; ",
-			"typedef pair<ll, ll> pll; ",
-			"typedef vector<pll> vpll; ",
-			"typedef vector<vl> vvl; ",
-			"//=======================",
-			"const int MOD = 1'000'000'007;",
-			"const int N = INT_MAX, M = N;",
-			"//=======================",
-			"\n",
-			"void solve() {",
-			" ",
-			"	int i, j, n, m, k;",
-			"	ll temp=0,flag=1;"
-			"	cin >> n;",
-			"	$0 ",
-			"}",
-			"\n",
-			"int main() {",
-			
-			"	int t = 1;",
-			"	cin >> t;",
-			"	while(t--) {",
-			"		solve();",
-			"	}",
-			"	return 0;",
-			"}",
-			"\n",
-			"//=======================",
-		],
-		"description": "This is a c++ sniffpet",
-	},
-	"for loop": {
-		"prefix": "forl",
-		"body": [
-			"for($1 $2 = $3 ; $2 < $4 ; $2++)",
-			"{","	${0:/* code */}",
-			"}"
-		],
-		"description": "For Loop"
-	}
+   
+    "Default cpp formate": {
+        "prefix": [
+            "CP"
+        ],
+        "body": [
+            "#include<bits/stdc++.h>",
+            "using namespace std;",
+            "#define fo(i,a,n) for(i=a;i<n;i++)",
+            "#define ll long long",
+            "#define deb(x) cout << #x << '=' << x << endl",
+            "#define deb2(x, y) cout << #x << '=' << x << ',' << #y << '=' << y << endl",
+            "#define clr(x) memset(x, 0, sizeof(x))",
+            "#define PI 3.1415926535897932384626",
+            "#define display(A) for(auto &aa:A) cout <<aa<<' '; cout <<endl;  ",
+            "#define displayP(A) for(auto &aa:A) {display(aa);}  ",
+            "#define read(A) for(auto &aa:A) {cin>>aa;} ",
+            "//===========================",
+            "typedef vector<int> vi; ",
+            "typedef vector<ll> vl; ",
+            "typedef pair<ll, ll> pll; ",
+            "typedef vector<pll> vpll; ",
+            "//=======================",
+            "const int MOD = 1'000'000'007;",
+            "const int N = INT_MAX, M = N;",
+            "//=======================",
+            "\n",
+            "void solve() {",
+            " ",
+            "	ll i, j, n, m, k;",
+            "	ll temp=0,flag=1;",
+            "	cin >> n;",
+            "	$0 ",
+            "}",
+            "\n",
+            "int main() {",
+            "ios_base::sync_with_stdio(false);",
+            "cin.tie(NULL);",
+            "	int t = 1;",
+            "	cin >> t;",
+            "	while(t--) {",
+            "		solve();",
+            "	}",
+            "	return 0;",
+            "}",
+            "\n",
+            "//=======================",
+        ],
+        "description": "This is a c++ sniffpet",
+    },
+    "for loop": {
+        "prefix": "forl",
+        "body": [
+            "for($1 $2 = $3 ; $2 < $4 ; $2++)",
+            "{", "	${0:/* code */}",
+            "}"
+        ],
+        "description": "For Loop"
+    }
 }
