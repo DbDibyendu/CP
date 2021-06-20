@@ -23,46 +23,9 @@ const int N = INT_MAX, M = N;
 void solve() {
  
     ll i, j, n, m, k;
-    ll temp=0,flag=0;
-    cin >> n>>k;
-    string A;
-    cin>>A;
-    ll t=n;
-    for(i=1;i<=n;i++){
-
-        ll t3=0;
-        for(j=0;j<i;j++){
-            if(i+j>=n){
-                break;
-            }
-            // deb2(A[i+j],A[j]);
-            if(A[i+j]>A[j]){
-                t=i;
-                flag=1;
-                break;
-            }
-            else if(A[i+j]==A[j]){
-                // break;
-                t3++;
-                // t=i;
-                continue;
-            }
-            else{
-                break;
-            }
-        }
-        if(t3==i){
-            t=i;
-        }
-        if(flag){
-            break;
-        }
-    }
+    ll temp=0,flag=1;
+    cin >> n;
     
-    for(i=0;i<k;i++){
-        cout<<A[i%t];
-    }
-    cout<<endl;
 }
 
 
@@ -70,7 +33,7 @@ int main() {
 ios_base::sync_with_stdio(false);
 cin.tie(NULL);
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while(t--) {
         solve();
     }
