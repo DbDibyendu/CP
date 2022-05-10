@@ -44,7 +44,9 @@
 
 ### Templates in C++ STL
 1. [Template1](https://github.com/DbDibyendu/CP/blob/main/STL/MyTemplate.cpp)
-            
+
+### Dp Materials
+https://codeforces.com/blog/entry/90293
                    
 You can clone this repo and give more suggestions, I'll be happy to merge them :)
 
