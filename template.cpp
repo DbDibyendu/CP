@@ -1,3 +1,4 @@
+
 /*#include<bits/stdc++.h>*/
 #include <iostream>
 #ifndef _GLIBCXX_NO_ASSERT
@@ -44,54 +45,12 @@ const int MOD = 1000000007;
 const int N = INT_MAX, M = N;
 //=======================
 
-int CallMe(int i, vi &dp, vi &arr, string &s, int result, vi &visited) {
-
-  ll ans = 0;
-
-  if (dp[i] != -1) {
-    return dp[i];
-  }
-  if (visited[i] == 2) {
-    // to update each node
-    dp[i] = result;
-    visited[i] += 1;
-    CallMe(arr[i], dp, arr, s, result, visited);
-    return dp[i];
-  }
-  if (visited[i] == 3) {
-    // to just stop the infinite loop
-    return ans;
-  }
-  if (s[arr[i] - 1] == '0' && visited[i] == 0) {
-    ans += 1;
-  }
-
-  if (arr[i] != i) {
-    visited[i] += 1;
-    if (visited[i] == 1) {
-      result = CallMe(arr[i], dp, arr, s, result, visited) + ans;
-      CallMe(arr[i], dp, arr, s, result, visited);
-    }
-    return result;
-  }
-  dp[i] = ans;
-  return ans;
-}
-
 void solve() {
 
   ll i, j, n, m, k, start, count;
   ll temp = 0, flag = 1;
   cin >> n;
-  vi arr(n + 1), dp(n + 1, -1), visited(n + 1, 0);
-  fo(i, 0, n) { cin >> arr[i + 1]; }
-  string s;
-  cin >> s;
-  count = 0;
-  fo(i, 0, n) { dp[i + 1] = CallMe(i + 1, dp, arr, s, 0, visited); }
-
-  fo(i, 0, n) { cout << dp[i + 1] << " "; }
-  cout << endl;
+  cout << n << endl;
 }
 
 int main() {
