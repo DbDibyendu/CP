@@ -43,7 +43,7 @@
 4. [CodeChef](https://www.codechef.com/)
 
 ### Templates in C++ STL
-1. [Template1](https://github.com/DbDibyendu/CP/blob/main/STL/MyTemplate.cpp)
+1. [Template1](https://github.com/DbDibyendu/CP/template.cpp)
 
 ### Dp Materials
 https://codeforces.com/blog/entry/90293
