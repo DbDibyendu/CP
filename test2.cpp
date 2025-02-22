@@ -1,5 +1,6 @@
 /*#include<bits/stdc++.h>*/
 #include <iostream>
+#include <unordered_map>
 #ifndef _GLIBCXX_NO_ASSERT
 #include <algorithm>
 #include <cassert>
@@ -14,6 +15,7 @@
 #include <set>
 #include <stack>
 #include <string>
+#include <unordered_set>
 #include <vector>
 #endif
 using namespace std;
@@ -41,68 +43,57 @@ typedef vector<ll> vl;
 typedef pair<ll, ll> pll;
 //=======================
 const int MOD = 1000000007;
-const int N = INT_MAX, M = N;
+const int N = 5005, M = N;
 //=======================
 
-int CallMe(int i, vi &dp, vi &arr, string &s, int result, vi &visited) {
+ll dp[M][M];
+ll A[N];
 
-  ll ans = 0;
-
-  if (dp[i] != -1) {
-    return dp[i];
+ll recur(ll n, ll i, ll j) {
+  /*deb2(i, j);*/
+  /*deb(dp[i][j]);*/
+  if (dp[i][j] != -MOD) {
+    return dp[i][j];
   }
-  if (visited[i] == 2) {
-    // to update each node
-    dp[i] = result;
-    visited[i] += 1;
-    CallMe(arr[i], dp, arr, s, result, visited);
-    return dp[i];
+  if (i == j) {
+    /*deb(A[j]);*/
+    return dp[i][j] = A[j];
   }
-  if (visited[i] == 3) {
-    // to just stop the infinite loop
-    return ans;
-  }
-  if (s[arr[i] - 1] == '0' && visited[i] == 0) {
-    ans += 1;
+  if (i > j || j < 0 || i > n - 1) {
+    return dp[i][j] = MOD;
   }
 
-  if (arr[i] != i) {
-    visited[i] += 1;
-    if (visited[i] == 1) {
-      result = CallMe(arr[i], dp, arr, s, result, visited) + ans;
-      CallMe(arr[i], dp, arr, s, result, visited);
-    }
-    return result;
-  }
-  dp[i] = ans;
-  return ans;
+  dp[i][j] = max(A[i] - recur(n, i + 1, j), A[j] - recur(n, i, j - 1));
+  /*deb2(i, dp[i][j]);*/
+  return dp[i][j];
 }
-
 void solve() {
 
-  ll i, j, n, m, k, start, count;
-  ll temp = 0, flag = 1;
+  ll i, j, m, k, start, n, count;
   cin >> n;
-  vi arr(n + 1), dp(n + 1, -1), visited(n + 1, 0);
-  fo(i, 0, n) { cin >> arr[i + 1]; }
-  string s;
-  cin >> s;
-  count = 0;
-  fo(i, 0, n) { dp[i + 1] = CallMe(i + 1, dp, arr, s, 0, visited); }
+  for (i = 0; i < n; i++) {
+    cin >> A[i];
+  }
+  for (i = 0; i <= n; i++) {
+    for (j = 0; j <= n; j++) {
+      dp[i][j] = -MOD;
+    }
+  }
 
-  fo(i, 0, n) { cout << dp[i + 1] << " "; }
-  cout << endl;
+  recur(n, 0, n - 1);
+  ll temp = 0;
+  fo(i, 0, n) { temp += A[i]; }
+
+  cout << (dp[0][n - 1] + temp) / 2 << endl;
 }
 
 int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
   int t = 1;
-  cin >> t;
+  /*cin >> t;*/
   while (t--) {
     solve();
   }
   return 0;
 }
-
-//=======================
