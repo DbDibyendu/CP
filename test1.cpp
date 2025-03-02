@@ -47,19 +47,19 @@ int N = 200005;
 vector<ll> pre(2 * N);
 vector<ll> A(2 * N);
 
-ll recur(ll n, ll a) {
-  if (a <= 2 * n) {
-    return A[a];
-  }
+vector<vector<int>> g;
+vector<int> sol;
+vector<int> vis;
 
-  /*deb2(n, a);*/
+void dfs(ll u) {
+  vis[u] = true;
 
-  if ((a / 2) % 2 == 1) {
-    /*deb(pre[n]);*/
-    return pre[n];
+  for (auto x : g[u]) {
+    if (vis[x] == 0) {
+      dfs(x);
+    }
   }
-  /*deb2(pre[n], recur(n, a / 2));*/
-  return pre[n] ^ recur(n, a / 2);
+  sol.push_back(u);
 }
 
 void solve() {
@@ -67,35 +67,26 @@ void solve() {
   ll x, l, r;
   cin >> n >> l >> r;
 
-  /*deb(l);*/
-  for (i = 1; i <= n; i++) {
-    cin >> A[i];
-    if (i == 1) {
-      pre[i] = A[i];
-    } else {
-      pre[i] = pre[i - 1] ^ A[i];
-    }
-  }
+  g.assign(n + 1, vector<int>());
+  vis.assign(n + 1, 0);
+  sol.clear();
 
-  if (n % 2 == 0) {
-    n++;
-    A[n] = pre[n / 2];
-    pre[n] = pre[n - 1] ^ A[n];
-  }
+  ll a, b;
+  /*deb2(l, r);*/
+  fo(i, 0, n - 1) {
+    cin >> a >> b;
+    g[a].push_back(b);
+    g[b].push_back(a);
 
-  for (i = n + 1; i <= 2 * n; i++) {
-    A[i] = pre[i / 2];
+    /*deb2(a, b);*/
   }
-
-  for (j = l; j <= r; j++) {
-    if (l <= 2 * n) {
-      cout << A[l] << endl;
-      return;
-    }
-  }
-
+  dfs(r);
   /*deb2(n, l);*/
-  cout << recur(n, l) << endl;
+  for (auto x : sol) {
+
+    cout << x << " ";
+  }
+  cout << endl;
 }
 
 int main() {
