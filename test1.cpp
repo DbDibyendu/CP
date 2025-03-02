@@ -1,4 +1,4 @@
-/*#include<bits/stdc++.h>*/
+/*#include <bits/stdc++.h>*/
 #include <iostream>
 #include <unordered_map>
 #ifndef _GLIBCXX_NO_ASSERT
@@ -15,23 +15,22 @@
 #include <set>
 #include <stack>
 #include <string>
+#include <unordered_set>
 #include <vector>
 #endif
 using namespace std;
+
 #define fo(i, a, n) for (i = a; i < n; i++)
 #define ll long long
 #define deb(x) cout << #x << '=' << x << endl
 #define deb2(x, y) cout << #x << '=' << x << ',' << #y << '=' << y << endl
 #define clr(x) memset(x, 0, sizeof(x))
-#define PI 3.1415926535897932384626
+
 #define display(A)                                                             \
   for (auto &aa : A)                                                           \
     cout << aa << ' ';                                                         \
   cout << endl;
-#define displayP(A)                                                            \
-  for (auto &aa : A) {                                                         \
-    display(aa);                                                               \
-  }
+
 #define read(A)                                                                \
   for (auto &aa : A) {                                                         \
     cin >> aa;                                                                 \
@@ -41,66 +40,62 @@ typedef vector<int> vi;
 typedef vector<ll> vl;
 typedef pair<ll, ll> pll;
 //=======================
-const int MOD = 1000000007;
-const int N = 1000007, M = N;
-//=======================
+//
 
-ll findMSB(ll x) {
-  ll ans = 0;
-  while (x) {
-    x /= 2;
-    ans++;
+int N = 200005;
+
+vector<ll> pre(2 * N);
+vector<ll> A(2 * N);
+
+ll recur(ll n, ll a) {
+  if (a <= 2 * n) {
+    return A[a];
   }
-  return ans;
+
+  /*deb2(n, a);*/
+
+  if ((a / 2) % 2 == 1) {
+    /*deb(pre[n]);*/
+    return pre[n];
+  }
+  /*deb2(pre[n], recur(n, a / 2));*/
+  return pre[n] ^ recur(n, a / 2);
 }
 
 void solve() {
-
   ll i, j, m, k, start, n, count;
+  ll x, l, r;
+  cin >> n >> l >> r;
 
-  ll q;
-  cin >> n >> q;
-
-  vl A(n);
-  vl Q(q);
-
-  read(A);
-  read(Q);
-
-  ll preMSB[n+1][33];
-  vl preXOR(n, 0);
-
-  vl ans(j, 0);
-
-  preXOR[n - 1] = A[n - 1];
-  for (i = n - 2; i >= 0; i--) {
-    preXOR[i] = preXOR[i + 1] ^ A[i];
-  }
-
-  for (j = 0; j <= 32; j++) {
-    for (i = 0; i < n; i++) {
-
-      ll k = findMSB(A[i]);
-      if (k == j) {
-        preMSB[i][j] = i;
-      } else if (i == 0) {
-        preMSB[i][j] = MOD;
-      } else {
-        preMSB[i][j] = preMSB[i - 1][j];
-      }
+  /*deb(l);*/
+  for (i = 1; i <= n; i++) {
+    cin >> A[i];
+    if (i == 1) {
+      pre[i] = A[i];
+    } else {
+      pre[i] = pre[i - 1] ^ A[i];
     }
   }
 
-  for (j = 0; j < q; j++) {
-    ll k = findMSB(Q[j]);
-
-    deb(preMSB[n - 1][k]);
+  if (n % 2 == 0) {
+    n++;
+    A[n] = pre[n / 2];
+    pre[n] = pre[n - 1] ^ A[n];
   }
 
-  /*for (i = 0; i < q; i++) {*/
-  /*  cout << ans[i] << " ";*/
-  /*}*/
-  cout << endl;
+  for (i = n + 1; i <= 2 * n; i++) {
+    A[i] = pre[i / 2];
+  }
+
+  for (j = l; j <= r; j++) {
+    if (l <= 2 * n) {
+      cout << A[l] << endl;
+      return;
+    }
+  }
+
+  /*deb2(n, l);*/
+  cout << recur(n, l) << endl;
 }
 
 int main() {

@@ -1,1 +1,0 @@
-{"name":"Local: Sparse_table","url":"/home/dibyendu/CP/Stl and DSA/Sparse_table.cpp","tests":[{"id":1617608707108,"input":"10\n2 3 -3 59 1 2 54 5 67 9\n1 9","output":""}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"/home/dibyendu/CP/Stl and DSA/Sparse_table.cpp","group":"local","local":true}

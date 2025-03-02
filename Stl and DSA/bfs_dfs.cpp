@@ -20,75 +20,61 @@ typedef vector<vi> vvi;
 vector<bool> visited;
 vector<vector<int>> g;
 
-
 void edge(int a, int b);
 void dfs(ll u);
 void bfs(ll u);
 
+void solve() {
 
+  int i, j, n, m, k;
+  ll temp = 0, flag = 1;
+  cin >> n;
 
-void solve()
-{
-
-    int i, j, n, m, k;
-    ll temp = 0, flag = 1;
-    cin >> n;
-
-    // ! Important
-    visited.assign(n, false);
-    g.assign(n, vector<int>());
+  // ! Important
+  visited.assign(n, false);
+  g.assign(n, vector<int>());
 }
 
-int main()
-{
-    int t = 1;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
-    return 0;
+int main() {
+  int t = 1;
+  cin >> t;
+  while (t--) {
+    solve();
+  }
+  return 0;
 }
 
 //=======================
 
-void edge(int a, int b)
-{
-    //  undirected graph
-    g[a].pb(b);
-    g[b].pb(a);
+void edge(int a, int b) {
+  //  undirected graph
+  g[a].pb(b);
+  g[b].pb(a);
 }
 
-void dfs(ll u)
-{
-    visited[u] = true;
-    for (auto x : g[u])
-    {
-        if (visited[x] == false)
-        {
-            dfs(x);
-        }
+void dfs(ll u) {
+  visited[u] = true;
+  for (auto x : g[u]) {
+    if (visited[x] == false) {
+      dfs(x);
     }
+  }
 }
 
-void bfs(ll u)
-{
-    queue<int> q;
+void bfs(ll u) {
+  queue<int> q;
 
-    q.push(u);
-    visited[u] = true;
-    while (!q.empty())
-    {
-        int f = q.front();
-        q.pop();
+  q.push(u);
+  visited[u] = true;
+  while (!q.empty()) {
+    int f = q.front();
+    q.pop();
 
-        for (auto x : g[f])
-        {
-            if (!visited[x])
-            {
-                q.push(x);
-                visited[x] = true;
-            }
-        }
+    for (auto x : g[f]) {
+      if (!visited[x]) {
+        q.push(x);
+        visited[x] = true;
+      }
     }
+  }
 }

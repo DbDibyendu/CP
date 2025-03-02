@@ -58,74 +58,31 @@ void solve() {
 
   ll i, j, m, k, start, n, count;
 
-  ll q;
-  cin >> n >> q;
+  ll l, r;
+  cin >> n >> l >> r;
 
   vl A(n);
-  vl Q(q);
+  read(A);
 
-  for (i = 0; i < n; i++) {
-    cin >> A[i];
+  if (l <= n) {
+    cout << A[l - 1] << endl;
+    return;
+  }
+  ll sum = A[0];
+  for (i = 1; i < n; i++) {
+    sum ^= A[i];
   }
 
-  for (i = 0; i < q; i++) {
-    cin >> Q[i];
-  }
+  m = m / 2;
 
-  ll preMSB[n][33];
-  vl preXOR(n + 1, 0);
-
-  preXOR[n] = 0;
-  preXOR[n - 1] = A[n - 1];
-  for (i = n - 2; i >= 0; i--) {
-    preXOR[i] = preXOR[i + 1] ^ A[i];
-  }
-
-  for (i = 0; i < n; i++) {
-    for (k = 0; k <= 32; k++) {
-      preMSB[i][k] = -1;
+  m -= n;
+  if (sum == 0) {
+    if (m == n + 1) {
+      cout << 1 << endl;
+      return;
     }
+  } else {
   }
-
-  for (i = 0; i < n; i++) {
-    ll t = A[i];
-    ll bit = 0;
-
-    while (t) {
-      bit++;
-      t = t >> 1;
-    }
-    for (k = 32; k >= 0; k--) {
-      if (k < bit) {
-        preMSB[i][k] = i;
-      } else if (i > 0) {
-        preMSB[i][k] = preMSB[i - 1][k];
-      }
-    }
-  }
-
-  for (j = 0; j < q; j++) {
-
-    ll x = Q[j];
-    ll idx = n - 1;
-    ll resetEl = 0;
-    while (idx >= 0 && x > 0) {
-      int msb = findMSB(x);
-      int nxt = preMSB[idx][msb];
-      x = Q[j] ^ preXOR[nxt + 1];
-      idx = nxt;
-      if (nxt == -1 || A[nxt] > x)
-        break;
-      /*deb2(nxt, x);*/
-      x ^= A[nxt];
-      resetEl = A[nxt];
-      idx--;
-    }
-
-    cout << n - idx - 1 << " ";
-  }
-
-  cout << endl;
 }
 
 int main() {
