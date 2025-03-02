@@ -22,7 +22,6 @@
 3. [Leetcode](https://leetcode.com/)
 
 - Here's a list of **60 leetcode problems** for interview [LINK](https://medium.com/@koheiarai94/60-leetcode-questions-to-prepare-for-coding-interview-8abbb6af589e)
-  - Clone them from [here](https://leetcode.com/list?selectedList=5w87ernh)
 
 4. [CP Algorithms + practice prblms are given](https://cp-algorithms.com/)
 
@@ -40,10 +39,9 @@
 7. [Bit Masking tutorial](https://www.youtube.com/watch?v=2iuktVuRRYY&t=4157s&ab_channel=CodingBlocks)
    - Codeforces [Problem 1](https://codeforces.com/problemset/problem/550/B)
    - [Full playlist on Bit Masking](https://www.youtube.com/playlist?list=PLX0iyO9CrCF1-4je7G0JMSr_50I0J2K3Z)
-8. [Course By Codeforces](https://codeforces.com/edu/course/2)
-9. [Segment Trees Playlist](https://www.youtube.com/watch?v=lAwpTSUHzy0&list=PL2q4fbVm1Ik6v2-emg_JGcC9v2v2YTbvq&index=2&ab_channel=CodeNCode_)
+8. [Segment Trees Playlist](https://www.youtube.com/watch?v=lAwpTSUHzy0&list=PL2q4fbVm1Ik6v2-emg_JGcC9v2v2YTbvq&index=2&ab_channel=CodeNCode_)
    - [Stree Problem1](https://codeforces.com/problemset/problem/339/D)
-10. [KMP Algotithm](https://www.youtube.com/watch?v=GTJr8OvyEVQ&t=309s&ab_channel=TusharRoy-CodingMadeSimple)
+9. [KMP Algotithm](https://www.youtube.com/watch?v=GTJr8OvyEVQ&t=309s&ab_channel=TusharRoy-CodingMadeSimple)
 
 
 ### Dp Materials
