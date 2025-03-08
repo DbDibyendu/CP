@@ -41,66 +41,63 @@ typedef vector<ll> vl;
 typedef pair<ll, ll> pll;
 //=======================
 //
+const int MOD = 1000000007;
+const int N = 1000007, M = N;
+//=======================
 
-int N = 200005;
+vl ans;
+vl visited;
+vector<vector<int>> adj;
 
-int M = 100000009;
+void bfs(int x) {
+  queue<int> q;
 
-vector<ll> pre(2 * N);
-vector<ll> A(3 * N);
+  q.push(x);
+  visited[x] = 1;
+  while (!q.empty()) {
+    int k = q.front();
+    q.pop();
+    for (auto a : adj[k]) {
 
-string s;
-bool check(ll x, ll n, ll k) {
-  bool flag = 1;
-  ll ans = 0;
-  for (int i = 0; i < n; i++) {
-    /*deb2(s[i], A[i]);*/
-    /*deb(x);*/
-    if (s[i] == 'B' && A[i] > x) {
-      ans += flag;
-      flag = 0;
-    } else if (s[i] == 'R' && A[i] > x) {
-      flag = 1;
+      if (visited[a] == false) {
+        q.push(a);
+        visited[a] = 1;
+      }
     }
   }
-  /*deb(ans);*/
-  return ans <= k;
 }
 
 void solve() {
   ll i, j, m, k, start, n, count;
-  ll x, l, r;
-  cin >> n >> k;
-  cin >> s;
-  ll maX = 0;
-  for (i = 0; i < n; i++) {
-    cin >> A[i];
-    maX = max(A[i], maX);
+  cin >> n >> m;
+
+  ll x, y;
+  adj.assign(n + 1, vector<int>());
+  visited.assign(n + 1, 0);
+  fo(i, 0, m) {
+    cin >> x >> y;
+    adj[x].push_back(y);
+    adj[y].push_back(x);
   }
 
-  ll ans, mid;
+  for (i = 1; i <= n; i++) {
 
-  l = 0, r = maX;
-  while (l <= r) {
-    mid = (l + r) / 2;
-    /*deb(mid);*/
-    /*deb2(l, r);*/
-    if (check(mid, n, k)) {
-      ans = mid;
-      r = mid - 1;
-    } else {
-      l = mid + 1;
+    if (visited[i] == false) {
+      bfs(i);
+      ans.push_back(i);
     }
   }
-
-  cout << ans << endl;
+  cout << ans.size() - 1 << endl;
+  for (i = 1; i < ans.size(); i++) {
+    cout << ans[i] << " " << ans[i - 1] << endl;
+  }
 }
 
 int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
   int t = 1;
-  cin >> t;
+  /*cin >> t;*/
   while (t--) {
     solve();
   }

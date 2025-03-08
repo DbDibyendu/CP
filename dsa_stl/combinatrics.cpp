@@ -20,79 +20,65 @@ const int N = 1e6 + 100, M = N;
 
 long long fact[N];
 
-long long binpow(long long val, long long deg, long long mod)
-{
-    if (!deg)
-        return 1 % mod;
-    if (deg & 1)
-        return binpow(val, deg - 1, mod) * val % mod;
-    long long res = binpow(val, deg >> 1, mod);
-    return (res * res) % mod;
+long long binpow(long long val, long long deg, long long mod) {
+  if (!deg)
+    return 1 % mod;
+  if (deg & 1)
+    return binpow(val, deg - 1, mod) * val % mod;
+  long long res = binpow(val, deg >> 1, mod);
+  return (res * res) % mod;
 }
 
-void initfact()
-{
-    fact[0] = 1;
-    for (int i = 1; i < N; i++)
-    {
-        fact[i] = (fact[i - 1] * i);
-        fact[i] %= MOD;
+void initfact() {
+  fact[0] = 1;
+  for (int i = 1; i < N; i++) {
+    fact[i] = (fact[i - 1] * i);
+    fact[i] %= MOD;
+  }
+}
+
+long long C(ll n, ll i) {
+  long long res = fact[n];
+  long long div = fact[n - i] * fact[i];
+  div %= MOD;
+  div = binpow(div, MOD - 2, MOD);
+  return (res * div) % MOD;
+}
+
+bool isGood(ll n, int a, int b) {
+  ll k = n % MOD;
+  while (k) {
+    if (k % 10 == a || k % 10 == b) {
+      k /= 10;
+    } else {
+      return false;
     }
+  }
+  return true;
 }
 
-long long C(ll n, ll i)
-{
-    long long res = fact[n];
-    long long div = fact[n - i] * fact[i];
-    div %= MOD;
-    div = binpow(div, MOD - 2, MOD);
-    return (res * div) % MOD;
-}
+void solve() {
 
-bool isGood(ll n, int a, int b)
-{
-    ll k = n % MOD;
-    while (k)
-    {
-        if (k % 10 == a || k % 10 == b)
-        {
-            k /= 10;
-        }
-        else
-        {
-            return false;
-        }
+  ll a, b, n, i;
+  ll temp = 0, flag = 0;
+  cin >> a >> b >> n;
+  initfact();
+  fo(i, 0, n + 1) {
+    temp = a * i + b * (n - i);
+    if (isGood(temp, a, b)) {
+      flag += C(n, i) % MOD;
     }
-    return true;
+  }
+  cout << flag % MOD;
 }
 
-void solve()
-{
-
-    ll a, b, n, i;
-    ll temp = 0, flag = 0;
-    cin >> a >> b >> n;
-    initfact();
-    fo(i, 0, n + 1)
-    {
-        temp = a * i + b * (n - i);
-        if (isGood(temp, a, b))
-        {
-            flag += C(n, i) % MOD;
-        }
-    }
-    cout << flag % MOD;
-}
-
-int main()
-{
-    int t = 1;
-    // cin >> t;
-    while (t--)
-    {
-        solve();
-    }
-    return 0;
+int main() {
+  int t = 1;
+  // cin >> t;
+  while (t--) {
+    solve();
+  }
+  return 0;
 }
 
 //=======================
