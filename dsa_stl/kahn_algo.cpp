@@ -1,4 +1,3 @@
-/*#include <bits/stdc++.h>*/
 #include <iostream>
 #include <unordered_map>
 #ifndef _GLIBCXX_NO_ASSERT
@@ -57,10 +56,15 @@ void kahn(int x) {
   while (!q.empty()) {
     int k = q.front();
     q.pop();
+    /*deb(k);*/
     ans.push_back(k);
+
+    /*display(adj[k]);*/
     for (auto a : adj[k]) {
       indegree[a]--;
+      /*deb(indegree[a]);*/
       if (indegree[a] == 0) {
+        /*deb2(a, k);*/
         q.push(a);
       }
     }
@@ -80,12 +84,8 @@ void solve() {
     indegree[y]++;
   }
 
-  for (i = 1; i <= n; i++) {
-
-    if (indegree[i] == 0) {
-      kahn(i);
-    }
-  }
+  kahn(1);
+  display(ans);
 }
 
 int main() {
