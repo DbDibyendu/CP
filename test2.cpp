@@ -1,4 +1,5 @@
 /*#include <bits/stdc++.h>*/
+#include <climits>
 #include <iostream>
 #include <unordered_map>
 #ifndef _GLIBCXX_NO_ASSERT
@@ -44,60 +45,18 @@ typedef pair<ll, ll> pll;
 const int MOD = 1000000007;
 const int N = 1000007, M = N;
 //=======================
-
-vl ans;
-vl visited;
-vector<vector<int>> adj;
-
-void bfs(int x) {
-  queue<int> q;
-
-  q.push(x);
-  visited[x] = 1;
-  while (!q.empty()) {
-    int k = q.front();
-    q.pop();
-    for (auto a : adj[k]) {
-
-      if (visited[a] == false) {
-        q.push(a);
-        visited[a] = 1;
-      }
-    }
-  }
-}
-
+//
+//
 void solve() {
-  ll i, j, m, k, start, n, count;
-  cin >> n >> m;
-
-  ll x, y;
-  adj.assign(n + 1, vector<int>());
-  visited.assign(n + 1, 0);
-  fo(i, 0, m) {
-    cin >> x >> y;
-    adj[x].push_back(y);
-    adj[y].push_back(x);
-  }
-
-  for (i = 1; i <= n; i++) {
-
-    if (visited[i] == false) {
-      bfs(i);
-      ans.push_back(i);
-    }
-  }
-  cout << ans.size() - 1 << endl;
-  for (i = 1; i < ans.size(); i++) {
-    cout << ans[i] << " " << ans[i - 1] << endl;
-  }
+  ll n, i, j, m, k, start, q;
+  cin >> n;
 }
 
 int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
   int t = 1;
-  /*cin >> t;*/
+  cin >> t;
   while (t--) {
     solve();
   }

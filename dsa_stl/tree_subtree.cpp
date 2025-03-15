@@ -1,5 +1,4 @@
 /*#include <bits/stdc++.h>*/
-#include <climits>
 #include <iostream>
 #include <unordered_map>
 #ifndef _GLIBCXX_NO_ASSERT
@@ -10,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <deque>
 #include <iostream>
 #include <map>
 #include <queue>
@@ -45,18 +45,49 @@ typedef pair<ll, ll> pll;
 const int MOD = 1000000007;
 const int N = 1000007, M = N;
 //=======================
-//
-//
+
+ll ans = 0;
+vl visited;
+vl dist(N, 0);
+vl par(N, 0);
+vl subTreeSize(N, 0);
+vector<vector<int>> adj;
+
+// Find sorted path in Weighted Path.
+void dfs(int nn, int pp, int n) {
+
+  par[nn] = pp;
+
+  subTreeSize[nn] = 1;
+  for (auto x : adj[nn]) {
+    if (x != pp) {
+      dfs(x, nn, n);
+      subTreeSize[nn] += subTreeSize[x];
+    }
+  }
+}
+
 void solve() {
-  ll n, i, j, m, k, start, q;
-  cin >> n;
+  ll i, j, m, k, start, n, count;
+  cin >> n >> m;
+
+  ll x, y, z;
+  adj.assign(n + 1, vector<int>());
+  visited.assign(n + 1, 0);
+  fo(i, 0, m) {
+    cin >> x >> y >> z;
+    adj[x].push_back(y);
+    adj[y].push_back(x);
+  }
+
+  dfs(1, 0, n);
 }
 
 int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
   int t = 1;
-  cin >> t;
+  /*cin >> t;*/
   while (t--) {
     solve();
   }
