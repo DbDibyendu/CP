@@ -1,4 +1,4 @@
-/*#include <bits/stdc++.h>*/
+#include <climits>
 #include <iostream>
 #include <unordered_map>
 #ifndef _GLIBCXX_NO_ASSERT
@@ -9,7 +9,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <deque>
 #include <iostream>
 #include <map>
 #include <queue>
@@ -46,54 +45,76 @@ const int MOD = 1000000007;
 const int N = 1000007, M = N;
 //=======================
 
-vl ans;
-vl visited(N, 0);
-vl dist(N, 0);
-vector<vector<pll>> adj;
+// DSU or UnionFind
+// Finds total number of connected component in O(6);
+// Time Complexity: O(1) To find and merge
+//
+class DSU {
+  int n, set_size;
+  // rank is size of the graph here, instead of height.
+  vi parent, rank;
 
-// Find sorted path in Weighted Path.
-// dijkstra (SSSP)
-// Time Complexity (V+E)Log(V);
-void dijkstra(int x) {
-  priority_queue<pll> q;
-  q.push({0, x});
-
-  int i;
-  for (i = 0; i < N; i++) {
-    dist[i] = 1e18;
-  }
-
-  dist[x] = 0;
-  while (!q.empty()) {
-    pll k = q.top();
-    q.pop();
-    if (visited[k.second])
-      continue;
-    visited[k.second] = 1;
-    for (auto a : adj[k.second]) {
-      ll weigh = a.first;
-      if (dist[a.second] > dist[k.second] + weigh) {
-        dist[a.second] = dist[k.second] + weigh;
-        q.push({-dist[a.second], a.second});
-      }
+public:
+  DSU(int a) {
+    n = set_size = a;
+    parent.assign(n + 1, 0);
+    rank.assign(n + 1, 1);
+    for (int i = 0; i <= n; i++) {
+      parent[i] = i;
     }
   }
-}
 
-void solve() {
-  ll i, j, m, k, start, n, count;
-  cin >> n >> m;
-
-  ll x, y, z;
-  adj.assign(n + 1, vector<pll>());
-  visited.assign(n + 1, 0);
-  fo(i, 0, m) {
-    cin >> x >> y >> z;
-    adj[x].push_back({y, z});
-    adj[y].push_back({x, z});
+  int find(int x) {
+    if (x == parent[x]) {
+      return x;
+    }
+    return parent[x] = find(parent[x]);
   }
 
-  dijkstra(1);
+  void merge(int x, int y) {
+    int rootX, rootY;
+    rootX = find(x);
+    rootY = find(y);
+
+    if (rank[rootX] >= rank[rootY]) {
+      parent[rootY] = rootX;
+      rank[rootX] += rank[rootY];
+    } else {
+      parent[rootX] = rootY;
+      rank[rootY] += rank[rootX];
+    }
+    set_size--;
+  }
+};
+
+void solve() {
+  ll n, i, j, m, k, start, q;
+  cin >> n >> m;
+
+  DSU dsu1 = DSU(n);
+  vector<pair<int, pair<int, int>>> edge;
+  fo(i, 0, n) {
+    int a, b, c;
+    cin >> a >> b >> c;
+    edge.push_back({c, {a, b}});
+  }
+
+  sort(edge.begin(), edge.end());
+
+  int mst_val = 0, count = 0;
+  for (auto x : edge) {
+    int n1 = x.second.first;
+    int n2 = x.second.second;
+    if (dsu1.find(n1) != dsu1.find(n2)) {
+      mst_val += x.first;
+      dsu1.merge(n1, n2);
+      count++;
+    }
+  }
+  if (count != n - 1) {
+    cout << "NO solution" << endl;
+  }
+  cout << mst_val << endl;
 }
 
 int main() {

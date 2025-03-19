@@ -47,8 +47,11 @@ const int N = 1000007, M = N;
 vl ans;
 vl visited;
 vector<vector<int>> adj;
+// indegree means number of parents of a node
 vl indegree(N, 0);
 
+// Kahns algo
+//
 void kahn(int x) {
   queue<int> q;
   q.push(x);

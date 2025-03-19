@@ -53,7 +53,9 @@ vl par(N, 0);
 vl subTreeSize(N, 0);
 vector<vector<int>> adj;
 
-// Find sorted path in Weighted Path.
+// calculate subTree size using this method
+// Can be used to solve multiple prblms
+//
 void dfs(int nn, int pp, int n) {
 
   par[nn] = pp;

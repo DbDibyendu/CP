@@ -1,4 +1,26 @@
-#include <bits/stdc++.h>
+/*#include <bits/stdc++.h>*/
+#include <climits>
+#include <iostream>
+#include <unordered_map>
+#ifndef _GLIBCXX_NO_ASSERT
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <map>
+#include <queue>
+#include <set>
+#include <stack>
+#include <string>
+#include <unordered_set>
+#include <vector>
+#endif
+using namespace std;
+
 using namespace std;
 #define gc getchar_unlocked
 #define fo(i, a, n) for (i = a; i < n; i++)
@@ -22,23 +44,15 @@ typedef vector<vl> vvl;
 
 ll gcd(ll a, ll b) { return (b == 0) ? a : gcd(b, a % b); }
 // Function to return LCM of two numbers
-ll lcm(int a, int b)
-{
-  return (a / gcd(a, b)) * b;
-}
+ll lcm(int a, int b) { return (a / gcd(a, b)) * b; }
 // calculate a^b in log(b) time
-int fast_pow(int a, int p)
-{
+int fast_pow(int a, int p) {
   int res = 1;
-  while (p)
-  {
-    if (p % 2 == 0)
-    {
+  while (p) {
+    if (p % 2 == 0) {
       a = a * 1ll * a % MOD;
       p /= 2;
-    }
-    else
-    {
+    } else {
       res = res * 1ll * a % MOD;
       p--;
     }
@@ -46,83 +60,67 @@ int fast_pow(int a, int p)
   return res;
 }
 
-int factorial(int n)
-{
+int factorial(int n) {
   int res = 1;
-  for (int i = 1; i <= n; i++)
-  {
+  for (int i = 1; i <= n; i++) {
     res = res * 1ll * i % MOD;
   }
   return res;
 }
 
-int C(int n, int k)
-{
-  if (k > n)
-  {
+int C(int n, int k) {
+  if (k > n) {
     return 0;
-  }
-  else
-    return factorial(n) * 1ll * fast_pow(factorial(k), MOD - 2) % MOD * 1ll * fast_pow(factorial(n - k), MOD - 2) % MOD;
+  } else
+    return factorial(n) * 1ll * fast_pow(factorial(k), MOD - 2) % MOD * 1ll *
+           fast_pow(factorial(n - k), MOD - 2) % MOD;
 }
 
-bool isPrime(int n)
-{
+bool isPrime(int n) {
   int i;
-  if (n % 2 == 0 && n != 2)
-  {
+  if (n % 2 == 0 && n != 2) {
     return false;
   }
-  for (i = 3; i * i <= n; i += 2)
-  {
-    if (n % i == 0)
-    {
+  for (i = 3; i * i <= n; i += 2) {
+    if (n % i == 0) {
       return false;
     }
   }
   return true;
 }
 
-void primeFactors(int n)
-{
+void primeFactors(int n) {
   int flag = 0;
-  while (n % 2 == 0)
-  {
+  while (n % 2 == 0) {
     n = n / 2;
     flag = 1;
     cout << 2 << " ";
   }
 
-  for (int i = 3; i * i <= n; i = i + 2)
-  {
+  for (int i = 3; i * i <= n; i = i + 2) {
     // While i divides n, print i and divide n
-    while (n % i == 0)
-    {
+    while (n % i == 0) {
       cout << i << " ";
       n = n / i;
     }
   }
 
-  if (n > 2)
-  {
+  if (n > 2) {
     cout << n << " ";
   }
 }
 
-void solve()
-{
+void solve() {
 
   int i, j, n, m, k;
   ll temp = 0, flag = 1;
   cin >> n;
 }
 
-int main()
-{
+int main() {
   int t = 1;
   cin >> t;
-  while (t--)
-  {
+  while (t--) {
     solve();
     cout << gcd(45, 6);
   }

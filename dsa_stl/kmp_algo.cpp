@@ -1,95 +1,82 @@
-#include <bits/stdc++.h>
+/*#include <bits/stdc++.h>*/
+#include <climits>
+#include <iostream>
+#include <unordered_map>
+#ifndef _GLIBCXX_NO_ASSERT
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <map>
+#include <queue>
+#include <set>
+#include <stack>
+#include <string>
+#include <unordered_set>
+#include <vector>
+#endif
 using namespace std;
+
 #define fo(i, a, n) for (i = a; i < n; i++)
 #define ll long long
 #define deb(x) cout << #x << '=' << x << endl
 #define deb2(x, y) cout << #x << '=' << x << ',' << #y << '=' << y << endl
 #define clr(x) memset(x, 0, sizeof(x))
-#define PI 3.1415926535897932384626
-#define pb push_back
+
+#define display(A)                                                             \
+  for (auto &aa : A)                                                           \
+    cout << aa << ' ';                                                         \
+  cout << endl;
+
+#define read(A)                                                                \
+  for (auto &aa : A) {                                                         \
+    cin >> aa;                                                                 \
+  }
 //===========================
 typedef vector<int> vi;
 typedef vector<ll> vl;
 typedef pair<ll, ll> pll;
-typedef vector<pll> vpll;
-typedef vector<vl> vvl;
 //=======================
-const int MOD = 1'000'000'007;
-const int N = INT_MAX, M = N;
+//
+const int MOD = 1000000007;
+const int N = 1000007, M = N;
 //=======================
+//
+//
+// KMP Algorithm : O(n)
+// With the help of LPS (Longest common border)
+//
+void solve() {
+  ll n, i, j, m, k, start, q;
+  string s;
+  cin >> s;
+  n = s.length();
 
-void solve()
-{
+  vl lps(n + 1, 0);
 
-    int i, j, n, m, k;
-    ll temp = 0, flag = 1;
-    string T, P, S;
-    cin >> T >> P;
-    m = P.length();
-    S += P;
-    S += '$';
-    S += T;
-
-    n = S.length();
-    vl prefix(n, 0);
-
-    // ! KMP algo Implementation
-    j = 0;
-    i = 1;
-    while (i < n)
-    {
-        if (S[i] == S[j])
-        {
-            j++;
-            prefix[i] = j;
-            i++;
-        }
-
-        else
-        {
-            if (j == m)
-            {
-                printf("Found pattern at index %d \n", i - j - m - 1);
-                j = prefix[j - 1];
-            }
-            if (j > 0)
-            {
-                j = prefix[j - 1];
-            }
-            else
-            {
-                prefix[i] = 0;
-                i++;
-            }
-        }
-    }
-    if (j == m)
-    {
-        printf("Found pattern at index %d \n", i - j - m - 1);
-        j = prefix[j - 1];
-    }
-    // ! Checking how many patterns are there
-    // i = 0;
-    for (auto x : prefix)
-    {
-        if (x == m)
-        {
-            temp++;
-        }
-    }
-
-    cout << temp << endl;
+  // KMP algorithm
+  i = 0, j = -1, lps[0] = -1;
+  while (i < n) {
+    while (j != -1 && s[j] != s[i])
+      j = lps[j];
+    i++;
+    j++;
+    lps[i] = j;
+  }
+  display(lps);
 }
 
-int main()
-{
-    int t = 1;
-    // cin >> t;
-    while (t--)
-    {
-        solve();
-    }
-    return 0;
+int main() {
+  ios_base::sync_with_stdio(false);
+  cin.tie(NULL);
+  int t = 1;
+  /*cin >> t;*/
+  while (t--) {
+    solve();
+  }
+  return 0;
 }
-
-//=======================

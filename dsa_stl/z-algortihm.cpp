@@ -1,4 +1,26 @@
-#include <bits/stdc++.h>
+/*#include <bits/stdc++.h>*/
+#include <iostream>
+#include <unordered_map>
+#ifndef _GLIBCXX_NO_ASSERT
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <deque>
+#include <iostream>
+#include <map>
+#include <queue>
+#include <set>
+#include <stack>
+#include <string>
+#include <unordered_set>
+#include <vector>
+#endif
+using namespace std;
+
 using namespace std;
 #define fo(i, a, n) for (i = a; i < n; i++)
 #define ll long long

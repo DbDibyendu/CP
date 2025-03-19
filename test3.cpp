@@ -47,16 +47,66 @@ const int N = 1000007, M = N;
 //=======================
 //
 //
+vector<int> dist;
+vector<vector<int>> graph;
+vector<int> visited;
+
+void dfs(int x, int l) {
+  visited[x] = 1;
+
+  dist[x] = l;
+  for (auto a : graph[x]) {
+    if (visited[a] == 0) {
+      dfs(a, l + 1);
+    }
+  }
+}
 void solve() {
   ll n, i, j, m, k, start, q;
   cin >> n;
+
+  graph.assign(1e6, vector<int>());
+  visited.assign(n + 1, 0);
+  dist.assign(n + 1, 0);
+
+  ll a, b;
+  fo(i, 0, n - 1) {
+    cin >> a >> b;
+    graph[a].push_back(b);
+    graph[b].push_back(a);
+  }
+
+  dfs(1, 0);
+
+  int maxE = 0;
+  k = 1;
+  for (i = 1; i <= n; i++) {
+    if (dist[i] > maxE) {
+      maxE = dist[i];
+      k = i;
+    }
+  }
+  /*deb2(k, maxE);*/
+  visited.assign(n + 1, 0);
+  dist.assign(n + 1, 0);
+  dfs(k, 0);
+
+  maxE = 0;
+  for (i = 1; i <= n; i++) {
+    /*deb(dist[i]);*/
+    if (dist[i] > maxE) {
+      maxE = dist[i];
+    }
+  }
+
+  cout << maxE << endl;
 }
 
 int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
   int t = 1;
-  cin >> t;
+  /*cin >> t;*/
   while (t--) {
     solve();
   }

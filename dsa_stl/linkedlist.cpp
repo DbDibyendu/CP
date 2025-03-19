@@ -1,4 +1,26 @@
-#include <bits/stdc++.h>
+/*#include <bits/stdc++.h>*/
+#include <climits>
+#include <iostream>
+#include <unordered_map>
+#ifndef _GLIBCXX_NO_ASSERT
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <map>
+#include <queue>
+#include <set>
+#include <stack>
+#include <string>
+#include <unordered_set>
+#include <vector>
+#endif
+using namespace std;
+
 using namespace std;
 #define fo(i, a, n) for (i = a; i < n; i++)
 #define ll long long
@@ -6,20 +28,18 @@ using namespace std;
 #define deb2(x, y) cout << #x << '=' << x << ',' << #y << '=' << y << endl
 #define clr(x) memset(x, 0, sizeof(x))
 #define PI 3.1415926535897932384626
-#define display(A)         \
-    for (auto &aa : A)     \
-        cout << aa << ' '; \
-    cout << endl;
-#define displayP(A)    \
-    for (auto &aa : A) \
-    {                  \
-        display(aa);   \
-    }
-#define read(A)        \
-    for (auto &aa : A) \
-    {                  \
-        cin >> aa;     \
-    }
+#define display(A)                                                             \
+  for (auto &aa : A)                                                           \
+    cout << aa << ' ';                                                         \
+  cout << endl;
+#define displayP(A)                                                            \
+  for (auto &aa : A) {                                                         \
+    display(aa);                                                               \
+  }
+#define read(A)                                                                \
+  for (auto &aa : A) {                                                         \
+    cin >> aa;                                                                 \
+  }
 //===========================
 typedef vector<int> vi;
 typedef vector<ll> vl;
@@ -37,99 +57,87 @@ const int N = INT_MAX, M = N;
 //     Node *link;
 // };
 //! OR
-struct Node
-{
-    int data;
-    Node *link;
+struct Node {
+  int data;
+  Node *link;
 };
 
 //! Printing the linked list
-void PrintList(Node *p)
-{
-    while (p != NULL)
-    {
-        cout << p->data << " ";
-        p = p->link;
-    }
-    cout << endl;
+void PrintList(Node *p) {
+  while (p != NULL) {
+    cout << p->data << " ";
+    p = p->link;
+  }
+  cout << endl;
 }
 
 //! Code to reverse a linked list
-void ReverseList(Node *head)
-{
-    Node *prev, *current, *next;
-    int t = 0;
-    current = head;
-    prev = NULL;
-    while (current != NULL)
-    {
-        deb(current->data);
-        next = current->link;
-        current->link = prev;
-        prev = current;
-        current = next;
-    }
+void ReverseList(Node *head) {
+  Node *prev, *current, *next;
+  int t = 0;
+  current = head;
+  prev = NULL;
+  while (current != NULL) {
+    deb(current->data);
+    next = current->link;
+    current->link = prev;
+    prev = current;
+    current = next;
+  }
 
-    head = prev;
-    PrintList(head);
+  head = prev;
+  PrintList(head);
 }
 
-void solve()
-{
+void solve() {
 
-    ll i, j, n, m, k;
-    ll temp = 0, flag = 1;
-    cin >> n;
+  ll i, j, n, m, k;
+  ll temp = 0, flag = 1;
+  cin >> n;
 
-    //! Reading the Linked list
-    Node *head, *prev, *el;
-    head = NULL;
-    int t;
-    while (n--)
-    {
-        el = new Node();
-        cin >> t;
-        el->data = t;
+  //! Reading the Linked list
+  Node *head, *prev, *el;
+  head = NULL;
+  int t;
+  while (n--) {
+    el = new Node();
+    cin >> t;
+    el->data = t;
 
-        if (head == NULL)
-        {
-            head = el;
-        }   
-        else
-        {
-            prev->link = el;
-        }
-        prev = el;
+    if (head == NULL) {
+      head = el;
+    } else {
+      prev->link = el;
     }
-    Node *p = head;
-    while (p->data != 4)
-    {
-        // cout << p->data << " ";
-        p = p->link;
-    }
-    //! Adding a new element, in between
+    prev = el;
+  }
 
-    Node *p_new = new Node();
+  Node *p = head;
+  while (p->data != 4) {
+    // cout << p->data << " ";
+    p = p->link;
+  }
+  //! Adding a new element, in between
 
-    p_new->link = p->link;
-    p_new->data = 6;
-    p->link = p_new;
+  Node *p_new = new Node();
 
-    ReverseList(head);
-    // PrintList(head);
+  p_new->link = p->link;
+  p_new->data = 6;
+  p->link = p_new;
+
+  ReverseList(head);
+  // PrintList(head);
 }
 
-int main()
-{
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int t = 1;
-    // cin >> t;
-    while (t--)
-    {
-        solve();
-    }
-    return 0;
+int main() {
+  ios_base::sync_with_stdio(false);
+  cin.tie(NULL);
+  int t = 1;
+  // cin >> t;
+  while (t--) {
+    solve();
+  }
+  return 0;
 }
 
 //=======================
