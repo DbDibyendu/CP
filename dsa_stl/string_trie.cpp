@@ -1,6 +1,4 @@
 
-/*#include <bits/stdc++.h>*/
-#include <climits>
 #include <iostream>
 #include <unordered_map>
 #ifndef _GLIBCXX_NO_ASSERT
@@ -44,81 +42,70 @@ typedef pair<ll, ll> pll;
 //=======================
 //
 const int MOD = 1000000007;
-const int N = 3000007, M = N;
+const int N = 1000007, M = N;
 //=======================
-//
-//
 
-int n, i, j, m, k, start, q;
+vl ans;
 
-ll dist = 0;
-// Manachar's Algorithm
-// Longest Palindrome in O(n)
-//
-vector<int> manacher_odd(string s) {
-  int n = s.size();
-  vector<int> p(n + 2);
+// declare a trie node
+struct Node {
+  Node *child[26];
+  int prefix;
+  vector<string> wend;
 
-  // r and l are left and right boundaries
-  int l = 0, r = 1;
-
-  for (int i = 1; i <= n; i++) {
-
-    // update the p[i] either from mirror or from right or left boundary
-    p[i] = max(0, min(r - i, p[l + (r - i)]));
-
-    // update the values around center
-    while (s[i - p[i]] == s[i + p[i]]) {
-      p[i]++;
-    }
-    // if boundary goes out
-    if (i + p[i] > r) {
-      l = i - p[i], r = i + p[i];
+  Node() {
+    prefix = 0;
+    for (int i = 0; i < 26; i++) {
+      child[i] = NULL;
     }
   }
-  return p;
-}
+};
+
+// Trie logic
+// Time Complexity: O(s) where s is the length of the string
+class Trie {
+private:
+  Node *root;
+
+public:
+  Trie() { root = new Node(); }
+  // insert a string into the trie
+  void insert(string s) {
+    Node *node = root;
+    for (int i = 0; i < s.size(); i++) {
+      int x = s[i] - 'a';
+      if (node->child[x] == NULL) {
+        node->child[x] = new Node();
+      }
+      node->prefix++;
+      node = node->child[x];
+    }
+    node->wend.push_back(s);
+  }
+
+  void erase(string s) {
+    Node *node = root;
+    for (int i = 0; i < s.size(); i++) {
+      int x = s[i] - 'a';
+      if (node->child[x] == NULL) {
+        return;
+      }
+      node->prefix--;
+      node = node->child[x];
+    }
+  }
+};
 
 void solve() {
-  string s;
-  cin >> s;
-
-  int n = s.size();
-  if (n == 1) {
-    cout << s << endl;
-    return;
-  }
-
-  // print the string
-
-  string t;
-  for (auto c : s) {
-    t += string("#") + c;
-  }
-
-  t = "$" + t + "^";
-  auto p = manacher_odd(t);
-  int max_i = 0, max_p = 0;
-
-  for (i = 1; i < p.size() - 1; i++) {
-    if (max_p <= p[i]) {
-      max_i = i;
-      max_p = p[i];
-    }
-  }
-
-  for (i = max_i - max_p + 1; i < max_i + max_p; i++) {
-    if (t[i] != '#' && t[i] != '^') {
-      cout << t[i];
-    }
-  }
-  cout << endl;
+  ll i, j, m, k, start, n, count;
+  cin >> n >> m;
 }
 
 int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
   int t = 1;
+  /*cin >> t;*/
   while (t--) {
     solve();
   }

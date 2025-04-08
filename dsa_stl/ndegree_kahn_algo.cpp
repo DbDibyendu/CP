@@ -51,7 +51,7 @@ vector<vector<int>> adj;
 vl indegree(N, 0);
 
 // Kahns algo
-//
+// topological sorting
 void kahn(int x) {
   queue<int> q;
   q.push(x);

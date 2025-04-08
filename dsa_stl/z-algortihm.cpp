@@ -50,6 +50,31 @@ const int MOD = 1'000'000'007;
 const int N = INT_MAX, M = N;
 //=======================
 
+// z algorithm
+// O(n)
+// Z[i] = the length of the longest substring starting from i which is also a
+// prefix of s
+//
+
+vector<int> computeZArray(string s) {
+  int n = s.length();
+  vector<int> Z(n, 0);
+  int l = 0, r = 0;
+
+  for (int i = 1; i < n; i++) {
+    if (i <= r) {
+      Z[i] = min(r - i + 1, Z[i - l]);
+    }
+    while (i + Z[i] < n && s[Z[i]] == s[i + Z[i]]) {
+      Z[i]++;
+    }
+    if (i + Z[i] - 1 > r) {
+      l = i, r = i + Z[i] - 1;
+    }
+  }
+  return Z;
+}
+
 void solve() {
 
   ll i, j, n, m, k;
@@ -61,26 +86,9 @@ void solve() {
   string A = pat + "$" + str;
 
   n = A.length();
-  // Forming the Z array;
-  vl z(n, 0);
-  ll l = 0, r = 0;
-
-  for (i = 1; i < n; ++i) {
-    if (i <= r)
-      z[i] = min(r - i + 1, z[i - l]);
-    while (i + z[i] < n && A[z[i]] == A[i + z[i]])
-      ++z[i];
-    if (i + z[i] - 1 > r)
-      l = i, r = i + z[i] - 1;
-  }
-
-  for (i = m; i < n; i++) {
-    if (z[i] == m) {
-
-      // Positions of match
-      cout << i - m - 1 << endl;
-    }
-  }
+  vector<int> Z = computeZArray(A);
+  deb(A);
+  display(Z);
 }
 
 int main() {

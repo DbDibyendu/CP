@@ -44,75 +44,84 @@ typedef pair<ll, ll> pll;
 //=======================
 //
 const int MOD = 1000000007;
-const int N = 3000007, M = N;
+const int N = 1000007, M = N;
 //=======================
 //
 //
 
-int n, i, j, m, k, start, q;
+vector<vector<ll>> adj;
+vector<ll> vis;
+vector<ll> par;
 
-ll dist = 0;
-// Manachar's Algorithm
-// Longest Palindrome in O(n)
-//
-vector<int> manacher_odd(string s) {
-  int n = s.size();
-  vector<int> p(n + 2);
+vector<ll> fans;
+ll n, i, j, m, k, start, q;
 
-  // r and l are left and right boundaries
-  int l = 0, r = 1;
+ll cycle = 0;
 
-  for (int i = 1; i <= n; i++) {
+ll dfs(ll x, map<ll, ll> &rec_s) {
+  vis[x] = 1;
+  ll ans = 0;
 
-    // update the p[i] either from mirror or from right or left boundary
-    p[i] = max(0, min(r - i, p[l + (r - i)]));
-
-    // update the values around center
-    while (s[i - p[i]] == s[i + p[i]]) {
-      p[i]++;
+  rec_s[x] = 1;
+  for (auto a : adj[x]) {
+    if (rec_s[a] == 1) {
+      par[a] = x;
+      return a;
     }
-    // if boundary goes out
-    if (i + p[i] > r) {
-      l = i - p[i], r = i + p[i];
+
+    if (!vis[a]) {
+      par[a] = x;
+      ans = dfs(a, rec_s);
+      if (ans) {
+        return ans;
+      }
     }
   }
-  return p;
+
+  rec_s[x] = 0;
+  return 0;
 }
 
 void solve() {
-  string s;
-  cin >> s;
+  cin >> n >> m;
+  vis.assign(n + 1, 0);
+  par.assign(n + 1, 0);
+  adj.assign(n + 1, vector<ll>());
 
-  int n = s.size();
-  if (n == 1) {
-    cout << s << endl;
+  map<ll, ll> rec_s;
+  fo(i, 0, m) {
+    ll a, b;
+    cin >> a >> b;
+    adj[a].push_back(b);
+  }
+
+  ll cyc_st = 0;
+  for (i = 1; i <= n; i++) {
+
+    if (vis[i] == 0) {
+      cyc_st = dfs(i, rec_s);
+      if (cyc_st)
+        break;
+    }
+  }
+
+  if (cyc_st == 0) {
+    cout << "IMPOSSIBLE" << endl;
     return;
   }
 
-  // print the string
+  fans.push_back(cyc_st);
+  ll t = par[cyc_st];
 
-  string t;
-  for (auto c : s) {
-    t += string("#") + c;
+  while (t != cyc_st) {
+    fans.push_back(t);
+    t = par[t];
   }
 
-  t = "$" + t + "^";
-  auto p = manacher_odd(t);
-  int max_i = 0, max_p = 0;
-
-  for (i = 1; i < p.size() - 1; i++) {
-    if (max_p <= p[i]) {
-      max_i = i;
-      max_p = p[i];
-    }
-  }
-
-  for (i = max_i - max_p + 1; i < max_i + max_p; i++) {
-    if (t[i] != '#' && t[i] != '^') {
-      cout << t[i];
-    }
-  }
-  cout << endl;
+  fans.push_back(cyc_st);
+  cout << fans.size() << endl;
+  reverse(fans.begin(), fans.end());
+  display(fans);
 }
 
 int main() {

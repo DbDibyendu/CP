@@ -49,6 +49,9 @@ const int N = 1000007, M = N;
 //
 // KMP Algorithm : O(n)
 // With the help of LPS (Longest common border)
+// LPS[i] = the length of the longest proper prefix of s[0..i] which is also a
+// suffix of s[0..i]
+//
 //
 void solve() {
   ll n, i, j, m, k, start, q;
