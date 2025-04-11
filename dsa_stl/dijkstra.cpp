@@ -51,7 +51,7 @@ vl visited(N, 0);
 vl dist(N, 0);
 vector<vector<pll>> adj;
 
-// Find sorted path in Weighted Path.
+// Find shortest path in Weighted Path.
 // dijkstra (SSSP)
 // Time Complexity (V+E)Log(V);
 void dijkstra(int x) {
