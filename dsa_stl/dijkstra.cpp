@@ -67,6 +67,7 @@ void dijkstra(int x) {
   while (!q.empty()) {
     pll k = q.top();
     q.pop();
+    // Add visited logic to avoid TLE
     if (visited[k.second])
       continue;
     visited[k.second] = 1;

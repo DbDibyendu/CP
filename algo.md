@@ -12,6 +12,7 @@
   - Boyer-Moore Algorithm
 - Longest Common Substring & Subsequence
 - Manacher’s Algorithm (Longest Palindromic Substring)
+- Trie: String matching
 
 ## 2. Linked List
 

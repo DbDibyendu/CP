@@ -73,10 +73,22 @@ vector<int> computeZArray(string s) {
 }
 
 void solve() {
-  ll i, j, n, m, k;
   ll temp = 0, flag = 1;
   string s;
   cin >> s;
+  int n = 9;
+
+  int t = n;
+  int cnt = 0;
+  while (t) {
+    t /= 2;
+    cnt++;
+  }
+
+  int ans = (1 << cnt) - 1;
+  ans++;
+
+  deb(ans);
 }
 
 int main() {
