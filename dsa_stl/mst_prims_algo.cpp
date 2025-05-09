@@ -1,3 +1,4 @@
+#include <climits>
 #include <iostream>
 #include <unordered_map>
 #ifndef _GLIBCXX_NO_ASSERT
@@ -8,7 +9,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
 #include <map>
 #include <queue>
 #include <set>
@@ -29,66 +29,87 @@ using namespace std;
   for (auto &aa : A)                                                           \
     cout << aa << ' ';                                                         \
   cout << endl;
-
 #define read(A)                                                                \
   for (auto &aa : A) {                                                         \
     cin >> aa;                                                                 \
   }
+
 //===========================
 typedef vector<int> vi;
 typedef vector<ll> vl;
 typedef pair<ll, ll> pll;
 //=======================
-//
 const int MOD = 1000000007;
 const int N = 1000007, M = N;
 //=======================
 
-vl ans;
-vl visited;
-vector<vector<int>> adj;
-// indegree means number of parents of a node
-vl indegree(N, 0);
+/*
+Prim's Algorithm:
 
-// Kahns algo
-// topological sorting
-void kahn(int x) {
-  queue<int> q;
-  q.push(x);
+- Purpose: Find the Minimum Spanning Tree (MST) of a graph.
+- Strategy: Start from any node, grow the MST by adding the smallest edge
+  connecting to an unvisited node.
 
-  while (!q.empty()) {
-    int k = q.front();
-    q.pop();
-    /*deb(k);*/
-    ans.push_back(k);
+Steps:
+1. Use a priority queue (min-heap) to always pick the smallest available edge.
+2. Start from any node (say node 1).
+3. Keep visiting new nodes and adding their edges into the heap.
+4. Only add edges to unvisited nodes to avoid cycles.
+5. Repeat until all nodes are visited.
 
-    /*display(adj[k]);*/
-    for (auto a : adj[k]) {
-      indegree[a]--;
-      /*deb(indegree[a]);*/
-      if (indegree[a] == 0) {
-        /*deb2(a, k);*/
-        q.push(a);
+Time Complexity:
+- Pushing/Popping edges: O((m + n) log n)
+=> Overall: O(m log n)
+
+Space Complexity:
+- Priority queue + visited array + adjacency list: O(m + n)
+*/
+
+void solve() {
+  ll n, m;
+  cin >> n >> m;
+
+  vector<vector<pair<int, int>>> adj(n + 1); // {node, weight}
+
+  for (int i = 0; i < m; i++) {
+    int u, v, wt;
+    cin >> u >> v >> wt;
+    adj[u].push_back({v, wt});
+    adj[v].push_back({u, wt});
+  }
+
+  priority_queue<pair<int, int>, vector<pair<int, int>>,
+                 greater<pair<int, int>>>
+      pq;
+  vector<bool> visited(n + 1, false);
+
+  pq.push({0, 1}); // {weight, node}
+
+  int mst_val = 0, count = 0;
+
+  while (!pq.empty()) {
+    auto [wt, u] = pq.top();
+    pq.pop();
+
+    if (visited[u])
+      continue;
+
+    visited[u] = true;
+    mst_val += wt;
+    count++;
+
+    for (auto [v, w] : adj[u]) {
+      if (!visited[v]) {
+        pq.push({w, v});
       }
     }
   }
-}
 
-void solve() {
-  ll i, j, m, k, start, n, count;
-  cin >> n >> m;
-
-  ll x, y;
-  adj.assign(n + 1, vector<int>());
-  visited.assign(n + 1, 0);
-  fo(i, 0, m) {
-    cin >> x >> y;
-    adj[x].push_back(y);
-    indegree[y]++;
+  if (count != n) {
+    cout << "NO solution" << endl;
+    return;
   }
-
-  kahn(1);
-  display(ans);
+  cout << mst_val << endl;
 }
 
 int main() {

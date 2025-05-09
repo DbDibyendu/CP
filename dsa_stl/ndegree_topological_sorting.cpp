@@ -1,4 +1,3 @@
-#include <climits>
 #include <iostream>
 #include <unordered_map>
 #ifndef _GLIBCXX_NO_ASSERT
@@ -45,55 +44,52 @@ const int MOD = 1000000007;
 const int N = 1000007, M = N;
 //=======================
 
-// DSU or UnionFind
-// Finds total number of connected component in O(6);
-// Time Complexity: O(1) To find and merge
-//
-class DSU {
-  int n, set_size;
-  // rank is size of the graph here, instead of height.
-  vi parent, rank;
+vl ans;
+vl visited;
+vector<vector<int>> adj;
+// indegree means number of parents of a node
+vl indegree(N, 0);
 
-public:
-  DSU(int a) {
-    n = set_size = a;
-    parent.assign(n + 1, 0);
-    rank.assign(n + 1, 1);
-    for (int i = 0; i <= n; i++) {
-      parent[i] = i;
+// Kahns algo
+// topological sorting
+// BFS Based algorithm
+void kahn(int x) {
+  queue<int> q;
+  q.push(x);
+
+  while (!q.empty()) {
+    int k = q.front();
+    q.pop();
+    /*deb(k);*/
+    ans.push_back(k);
+
+    /*display(adj[k]);*/
+    for (auto a : adj[k]) {
+      indegree[a]--;
+      /*deb(indegree[a]);*/
+      if (indegree[a] == 0) {
+        /*deb2(a, k);*/
+        q.push(a);
+      }
     }
   }
-
-  int find(int x) {
-    if (x == parent[x]) {
-      return x;
-    }
-    // path compression
-    return parent[x] = find(parent[x]);
-  }
-
-  void merge(int x, int y) {
-    int rootX, rootY;
-    rootX = find(x);
-    rootY = find(y);
-
-    if (rank[rootX] >= rank[rootY]) {
-      parent[rootY] = rootX;
-      rank[rootX] += rank[rootY];
-    } else {
-      parent[rootX] = rootY;
-      rank[rootY] += rank[rootX];
-    }
-    set_size--;
-  }
-};
+}
 
 void solve() {
-  ll n, i, j, m, k, start, count, q;
-  cin >> n >> m >> q;
+  ll i, j, m, k, start, n, count;
+  cin >> n >> m;
 
-  DSU dsu1 = DSU(10);
-  deb(dsu1.find(1));
+  ll x, y;
+  adj.assign(n + 1, vector<int>());
+  visited.assign(n + 1, 0);
+  fo(i, 0, m) {
+    cin >> x >> y;
+    adj[x].push_back(y);
+    indegree[y]++;
+  }
+
+  kahn(1);
+  display(ans);
 }
 
 int main() {

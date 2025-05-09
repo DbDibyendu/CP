@@ -15,7 +15,9 @@ struct TreeNode {
   }
 };
 
-// Insert into binary tree in level order
+// Insert into binary tree in level order, important to use queue for Level
+// Reason being, Level order works like BFS. Hence we need to use a queue
+// Order Traversal NOTE: it's not BST
 TreeNode *insert(TreeNode *root, int val) {
   if (root == nullptr)
     return new TreeNode(val);

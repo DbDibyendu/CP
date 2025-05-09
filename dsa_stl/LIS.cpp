@@ -97,4 +97,8 @@ int main() {
   vector<int> nums = {10, 9, 2, 5, 3, 7, 101, 18};
 
   cout << "LIS Length (DP): " << lengthOfLIS_DP(nums) << endl;
-  cout << "L
+  cout << "LIS Length (Binary Search): " << lengthOfLIS_BinarySearch(nums)
+       << endl;
+
+  return 0;
+}

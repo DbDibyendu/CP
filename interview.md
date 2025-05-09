@@ -15,11 +15,13 @@ Ans:
 I'm looking to make a switch because I’m at a point in my career where I want to take on broader
 technical ownership and solve more meaningful, end-to-end problems. While I’ve gained strong experience
 in performance tuning, payment flows, and handling large-scale feature rollouts, my current work in the
-Payments and Subscriptions domain tends to impact the user experience in more indirect ways. What
-excites me about the opportunity at GetSetYo is the chance to build user-facing features that directly
-impact People: how people plan, book, and experience travel.
+Payments and Subscriptions domain tends to impact the user experience in more indirect ways.
 
-3. **What are ur strengths?**
+What excites me about the opportunity at Plotline is the interesting idea where
+users can design, deploy, and test in-app experiences in minutes — without any coding.
+I believe here my contributions can be more direct and impactful.
+
+**What are ur strengths?**
 
 I break down problems into sub problems, and try to solve each part as optimally. I incooprorate
 feedback very well and try to work on them and improve. These are some things that my manager informed

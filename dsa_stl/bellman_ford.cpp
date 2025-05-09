@@ -52,27 +52,38 @@ vector<vector<pll>> adj(N, vector<pll>());
 vl dist(N, 0);
 ll neg_cycle = 0;
 vl par(N, -1);
+// Bellman-Ford Algorithm
+// Purpose: Detect negative weight cycles and find shortest paths from a source
+// Time Complexity: O(V * E), where V is the number of vertices and E is the
+// number of edges
 
-// bellman ford algo
-// Used to detect negative cycle in a graph, by relaxing the edges
-// Time complexity O(V^3)
 void bellmanFord() {
-
   ll i, j;
-  dist[1] = 0;
-  for (i = 0; i < n; i++) {
+  dist[1] = 0; // Initialize distance to source (vertex 1) as 0
+
+  // Run the algorithm for (V - 1) times
+  // If we still find a shorter path in the Vth iteration, a negative cycle
+  // exists
+  for (i = 1; i <= n; i++) { // O(V) iterations
+
+    // Iterate over all vertices
     for (j = 1; j <= n; j++) {
+
+      // Iterate through all adjacent edges of vertex j
       for (auto a : adj[j]) {
+        int v = a.first;   // target vertex of the edge
+        int wt = a.second; // weight of the edge
 
-        // relaxing the edges
-        if (dist[a.first] > dist[j] + a.second) {
+        // Relaxation step: if the path through j to v is shorter, update it
+        if (dist[v] > dist[j] + wt) {
+          dist[v] = dist[j] + wt;
+          par[v] = j; // Update parent to reconstruct path if needed
 
-          // important to update parent here, as we don't need all the branches;
-          par[a.first] = j;
-          dist[a.first] = dist[j] + a.second;
+          // If we're still able to relax edges in the Vth iteration,
+          // that means a negative cycle is reachable
           if (i == n - 1) {
-            neg_cycle = a.first;
-            return;
+            neg_cycle = v; // Store a vertex involved in the negative cycle
+            return;        // Exit early upon detecting the cycle
           }
         }
       }

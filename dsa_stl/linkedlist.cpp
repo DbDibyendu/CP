@@ -79,10 +79,10 @@ void ReverseList(Node *head) {
   prev = NULL;
   while (current != NULL) {
     deb(current->data);
-    next = current->link;
-    current->link = prev;
-    prev = current;
-    current = next;
+    next = current->link; // store next
+    current->link = prev; // reverse link
+    prev = current;       // update prev
+    current = next;       // update current
   }
 
   head = prev;

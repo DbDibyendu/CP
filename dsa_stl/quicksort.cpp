@@ -19,7 +19,6 @@
 #include <unordered_set>
 #include <vector>
 #endif
-using namespace std;
 
 using namespace std;
 #define fo(i, a, n) for (i = a; i < n; i++)
@@ -52,26 +51,45 @@ const int N = 1e5, M = N;
 
 int A[N];
 
-//! 2 pointer logic
+//! 2 pointer logic: QuickSort
+
+// Partition function that places the pivot element in its correct position
 int partition(int l, int r) {
-  int el = A[r];
-  int i = l - 1, j;
+  int el = A[r]; // Pivot element is the last element
+  // Pointer to track the position of smaller elements than the pivot
+  int i = l - 1;
+  int j;
+
+  // Traverse the array from left to right
   for (j = l; j < r; j++) {
+    // If current element is smaller than the pivot
     if (A[j] < el) {
-      i++;
-      swap(A[i], A[j]);
+      i++;              // Move the pointer for smaller elements
+      swap(A[i], A[j]); // Swap the smaller element with the current element
     }
   }
-  swap(A[i + 1], A[r]);
-  return i + 1;
+
+  // Place the pivot element in its correct position
+  swap(A[i + 1], A[r]); // Pivot goes to the position i + 1
+  return i + 1;         // Return the pivot's index
 }
+
+// QuickSort function that uses the partition function to recursively sort the
+// array
 void quicksort(int l, int r) {
   if (l < r) {
+    // Base condition: Continue if there is more than one element to sort
+    // Partition the array and get the pivot index
     int p = partition(l, r);
+
+    // Sort the left part (elements smaller than the pivot)
     quicksort(l, p - 1);
+
+    // Sort the right part (elements greater than the pivot)
     quicksort(p + 1, r);
   }
 }
+
 void solve() {
 
   ll i, j, n, m, k;

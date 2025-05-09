@@ -9,7 +9,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
 #include <map>
 #include <queue>
 #include <set>
@@ -30,28 +29,23 @@ using namespace std;
   for (auto &aa : A)                                                           \
     cout << aa << ' ';                                                         \
   cout << endl;
-
 #define read(A)                                                                \
   for (auto &aa : A) {                                                         \
     cin >> aa;                                                                 \
   }
+
 //===========================
 typedef vector<int> vi;
 typedef vector<ll> vl;
 typedef pair<ll, ll> pll;
 //=======================
-//
 const int MOD = 1000000007;
 const int N = 1000007, M = N;
 //=======================
 
 // DSU or UnionFind
-// Finds total number of connected component in O(6);
-// Time Complexity: O(1) To find and merge
-//
 class DSU {
   int n, set_size;
-  // rank is size of the graph here, instead of height.
   vi parent, rank;
 
 public:
@@ -65,17 +59,16 @@ public:
   }
 
   int find(int x) {
-    if (x == parent[x]) {
+    if (x == parent[x])
       return x;
-    }
     return parent[x] = find(parent[x]);
   }
 
   void merge(int x, int y) {
-    int rootX, rootY;
-    rootX = find(x);
-    rootY = find(y);
-
+    int rootX = find(x);
+    int rootY = find(y);
+    if (rootX == rootY)
+      return;
     if (rank[rootX] >= rank[rootY]) {
       parent[rootY] = rootX;
       rank[rootX] += rank[rootY];
@@ -87,22 +80,53 @@ public:
   }
 };
 
+/*
+Kruskal's Algorithm:
+
+- Purpose: Find the Minimum Spanning Tree (MST) of a graph.
+- Strategy: Greedily pick the smallest available edge that connects two
+different components.
+- Ensures no cycles are formed while connecting all nodes with minimal total
+cost.
+
+Steps:
+1. Sort all edges based on weight.
+2. Use DSU (Disjoint Set Union) to track connected components.
+3. For each edge:
+   - If it connects two different components, add it to MST and merge the
+components.
+   - Otherwise, skip (to avoid cycles).
+4. If MST has (n - 1) edges, output its total weight; else, "NO solution" (graph
+is disconnected).
+
+Time Complexity:
+- Sorting edges: O(m log m)
+- DSU operations (find/merge): almost O(1) with path compression
+- Processing edges: O(m)
+=> Overall: O(m log m)
+
+Space Complexity:
+- DSU arrays (parent, rank): O(n)
+- Edge list storage: O(m)
+=> Overall: O(n + m)
+*/
+
 void solve() {
-  ll n, i, j, m, k, start, q;
+  ll n, m;
   cin >> n >> m;
 
-  DSU dsu1 = DSU(n);
-  vector<pair<int, pair<int, int>>> edge;
-  fo(i, 0, n) {
+  DSU dsu1(n);
+  vector<pair<int, pair<int, int>>> edges;
+  for (int i = 0; i < m; i++) {
     int a, b, c;
     cin >> a >> b >> c;
-    edge.push_back({c, {a, b}});
+    edges.push_back({c, {a, b}});
   }
 
-  sort(edge.begin(), edge.end());
+  sort(edges.begin(), edges.end());
 
   int mst_val = 0, count = 0;
-  for (auto x : edge) {
+  for (auto x : edges) {
     int n1 = x.second.first;
     int n2 = x.second.second;
     if (dsu1.find(n1) != dsu1.find(n2)) {
@@ -111,8 +135,10 @@ void solve() {
       count++;
     }
   }
+
   if (count != n - 1) {
     cout << "NO solution" << endl;
+    return;
   }
   cout << mst_val << endl;
 }
