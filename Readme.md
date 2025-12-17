@@ -1,5 +1,10 @@
 # A Guide to Competitive Programming
 
+## To run code in terminal, run the script
+```
+ ./run_cpp.sh test1.cpp
+ ```
+
 ## Getting started with CP and DSA
 
 1. Full A-Z Course: [ALGOZENITH](https://iitkgpacin-my.sharepoint.com/:f:/g/personal/pulkitchauhan03_iitkgp_ac_in/EvTCj7T3zD1Jt8EZe521NXgBSATHkpzUBe-YibuUywTAaA?e=1QEZbJ)
