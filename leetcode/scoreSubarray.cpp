@@ -1,3 +1,4 @@
+
 /*#include <bits/stdc++.h>*/
 #include <iostream>
 #include <unordered_map>
@@ -48,54 +49,48 @@ typedef vector<pll> vpll;
 const int MOD = 1'000'000'007;
 //=======================
 
-const int N = 1e6 + 100, M = N;
-//=======================
 
-long long fact[N];
+int solve(int n, vector<int> nums, int K) {
+    if (n < 2) return -1;
 
-long long binpow(long long val, long long deg, long long mod) {
-  if (!deg)
-    return 1 % mod;
-  if (deg & 1)
-    return binpow(val, deg - 1, mod) * val % mod;
-  long long res = binpow(val, deg >> 1, mod);
-  return (res * res) % mod;
-}
-
-void initfact() {
-  fact[0] = 1;
-  for (int i = 1; i < N; i++) {
-    fact[i] = (fact[i - 1] * i);
-    fact[i] %= MOD;
-  }
-}
-
-long long C(ll n, ll i) {
-  long long res = fact[n];
-  long long div = fact[n - i] * fact[i];
-  div %= MOD;
-  div = binpow(div, MOD - 2, MOD);
-  return (res * div) % MOD;
-}
-
-void solve() {
-  ll temp = 0, flag = 1;
-  string s;
-  cin >> s;
-  int n = 9;
-  int i;
-  ll ans = 0;
-  initfact();
-  for (i = 1; i <= 8; i++) {
-    if (i % 2)
-      ans += 8 * C(55, i);
-    else {
-      ans -= 8 * C(55, i);
+    vector<int> prefix(n, 0);
+    prefix[0] = nums[0];
+    for (int i = 1; i < n; i++) {
+        prefix[i] = nums[i] + prefix[i-1];
     }
-    deb(C(55, i));
-    deb2(i, ans);
-  }
-  deb(ans);
+
+    vector<int> numsI(n, 0);
+    for (int i = 0; i < n; i++) {
+        numsI[i] = nums[i] + prefix[i];
+    }
+
+    deque<int> dq; // Explicitly stores INDICES
+    int max_val = -1e9;
+
+    // 'i' acts as our right endpoint (j)
+    for (int i = 1; i < n; i++) {
+        int prev = i - 1; // Our new prospective left endpoint candidate
+
+        // 1. Maintain a strictly decreasing monotonic queue based on VALUES
+        while (!dq.empty() && numsI[prev] >= numsI[dq.back()]) {
+            dq.pop_back();
+        }
+        dq.push_back(prev);
+
+        // 2. Evict indices that breach the maximum size constraint K
+        // Subarray length = i - left_idx + 1. If length > K, then left_idx < i - K + 1
+        while (!dq.empty() && dq.front() < i - K + 1) {
+            dq.pop_front();
+        }
+
+        // 3. Extract the optimal value using the index at the front of the deque
+        int best_left_idx = dq.front();
+        int current_score = numsI[best_left_idx] + nums[i] - prefix[i-1];
+        
+        max_val = max(max_val, current_score);
+    }
+
+    return max_val;
 }
 
 int main() {
@@ -104,7 +99,7 @@ int main() {
   int t = 1;
   // cin >> t;
   while (t--) {
-    solve();
+    // solve();
   }
   return 0;
 }

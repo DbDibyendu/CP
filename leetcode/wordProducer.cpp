@@ -48,54 +48,24 @@ typedef vector<pll> vpll;
 const int MOD = 1'000'000'007;
 //=======================
 
-const int N = 1e6 + 100, M = N;
-//=======================
+class MyWordProducer {
 
-long long fact[N];
+  map<char, int> mp;
+  map<char, vector<string>> charToWords;
 
-long long binpow(long long val, long long deg, long long mod) {
-  if (!deg)
-    return 1 % mod;
-  if (deg & 1)
-    return binpow(val, deg - 1, mod) * val % mod;
-  long long res = binpow(val, deg >> 1, mod);
-  return (res * res) % mod;
-}
-
-void initfact() {
-  fact[0] = 1;
-  for (int i = 1; i < N; i++) {
-    fact[i] = (fact[i - 1] * i);
-    fact[i] %= MOD;
+  MyWordProducer(set<string> dictionary) {
+    // Your constructor code goes here.
   }
-}
 
-long long C(ll n, ll i) {
-  long long res = fact[n];
-  long long div = fact[n - i] * fact[i];
-  div %= MOD;
-  div = binpow(div, MOD - 2, MOD);
-  return (res * div) % MOD;
-}
+  string produceWord(char c) {
+    // Your method code goes here.
+
+    return "";
+  }
+};
 
 void solve() {
-  ll temp = 0, flag = 1;
-  string s;
-  cin >> s;
-  int n = 9;
-  int i;
-  ll ans = 0;
-  initfact();
-  for (i = 1; i <= 8; i++) {
-    if (i % 2)
-      ans += 8 * C(55, i);
-    else {
-      ans -= 8 * C(55, i);
-    }
-    deb(C(55, i));
-    deb2(i, ans);
-  }
-  deb(ans);
+
 }
 
 int main() {

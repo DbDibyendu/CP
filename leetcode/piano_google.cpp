@@ -1,3 +1,4 @@
+
 /*#include <bits/stdc++.h>*/
 #include <iostream>
 #include <unordered_map>
@@ -78,24 +79,43 @@ long long C(ll n, ll i) {
   return (res * div) % MOD;
 }
 
+vector<pair<int,int>> getSegments(vector<int>& notes) {
+    vector<pair<int,int>> segments;
+
+    int n = notes.size();
+    int start = 0;
+
+    int mn = notes[0], mx = notes[0];
+
+    for (int i = 1; i < n; i++) {
+        mn = min(mn, notes[i]);
+        mx = max(mx, notes[i]);
+
+        if (mx - mn > 4) {
+            segments.push_back({start, i - 1});
+
+            // reset
+            start = i;
+            mn = mx = notes[i];
+        }
+    }
+
+    // last segment
+    segments.push_back({start, n - 1});
+
+    return segments;
+}
+
+
 void solve() {
   ll temp = 0, flag = 1;
-  string s;
-  cin >> s;
-  int n = 9;
-  int i;
-  ll ans = 0;
-  initfact();
-  for (i = 1; i <= 8; i++) {
-    if (i % 2)
-      ans += 8 * C(55, i);
-    else {
-      ans -= 8 * C(55, i);
-    }
-    deb(C(55, i));
-    deb2(i, ans);
-  }
-  deb(ans);
+  int n;
+  int i,j;
+  cin>>n;
+  vector<int> nums(n);
+  for(i=0;i<n;i++) cin>>nums[i];
+
+
 }
 
 int main() {

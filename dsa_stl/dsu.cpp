@@ -45,6 +45,34 @@ const int MOD = 1000000007;
 const int N = 1000007, M = N;
 //=======================
 
+// Simple DSU code
+    class DSU1 {
+        int n;
+        vector<int> parent;
+        public:
+        DSU1 (int a){ // constructor
+            n = a;
+            parent.assign(n+1, 0);
+            for(int i=0;i<=n;i++){
+                parent[i]=i;
+            }
+        }
+
+        int find(int x){
+            if(x == parent[x]){
+                return x;
+            }
+            return parent[x] = find(parent[x]);
+        }
+
+        void merge(int x, int y){
+
+            int parX = find(x);
+            int parY = find(y);
+            parent[parX] = parY;
+        }
+
+    };
 // DSU or UnionFind
 // Finds total number of connected component in O(6);
 // Time Complexity: O(1) To find and merge

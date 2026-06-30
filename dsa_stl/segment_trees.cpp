@@ -50,11 +50,24 @@ ll A[100000], stree[400004];
 /*It splits the array into segments (subarrays).*/
 /**/
 /*Each node represents a segment (e.g. [l, r]) and stores some aggregate info:
- * like sum, min, max, GCD, etc.*/
-/**/
+ * like sum, min, max, GCD, etc.
+ *
+ * Visualisation
+ *                        [0-7] max=3
+ *                       /            \
+ *            [0-3] max=3            [4-7] max=2
+ *            /        \             /          \
+ *       [0-1] 3    [2-3] 2     [4-5] 2     [6-7] 0
+ *       /    \     /    \      /    \       /    \
+ *     [0] 3 [1] 0 [2] 0 [3] 2 [4] 0 [5] 2 [6] 0 [7] 0
+ *
+ *   Only 2 leaf writes → 2×log(N) parent updates. O(log N) total.
+ */
+
+
 
 void build(int si, int ss, int se) {
-  if (ss == se) {
+  if (ss == se) { // leaf node
     stree[si] = A[ss]; // Leaf node
     return;
   }

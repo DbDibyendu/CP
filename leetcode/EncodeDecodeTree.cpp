@@ -1,3 +1,4 @@
+
 /*#include <bits/stdc++.h>*/
 #include <iostream>
 #include <unordered_map>
@@ -78,25 +79,93 @@ long long C(ll n, ll i) {
   return (res * div) % MOD;
 }
 
-void solve() {
-  ll temp = 0, flag = 1;
-  string s;
-  cin >> s;
-  int n = 9;
-  int i;
-  ll ans = 0;
-  initfact();
-  for (i = 1; i <= 8; i++) {
-    if (i % 2)
-      ans += 8 * C(55, i);
-    else {
-      ans -= 8 * C(55, i);
+
+class Node {
+  public:
+  int data;
+  int ind;
+  // int index; for maintaining unique id
+  vector<Node> outEdges;
+};
+
+
+// use dfs for encoding ok, my approach, For Tree like Graph
+// index_data_neigherSize->index_data_neighbourSize-> 
+// If neigherSize > 0 -> follow with data in similar format for each neigbour branch
+//
+// For graphs and cyclic graphs
+// index_data_neigbherSize_neighbourIndices for cyclic graphs as well
+
+void encodeHelper(Node root, vector<int> nums, vector<int> vis){
+
+    int size = root.outEdges.size();
+    nums.push_back(root.ind);
+    nums.push_back(root.data);
+    nums.push_back(size);
+    vis[root.ind]++;
+
+    for(int i=0;i<size;i++){
+      if(vis[root.outEdges[i].ind]) continue;
+
+      encodeHelper(root.outEdges[i], nums,vis);
     }
-    deb(C(55, i));
-    deb2(i, ans);
-  }
-  deb(ans);
 }
+
+void dfsIndex(Node root, int ind, vector<int> nums, vector<int> vis){
+
+    int size = root.outEdges.size();
+    root.ind = ind;
+    vis[root.ind]++;
+
+    for(int i=0;i<size;i++){
+      if(vis[root.outEdges[i].ind]) continue;
+
+      dfsIndex(root.outEdges[i], ind+i, nums,vis);
+    }
+}
+
+vector<int> encode(Node root) {
+
+  vector<int> nums, vis(100005,0);
+  dfsIndex(root, 0, nums, vis);
+  vis.assign(1000005, 0);
+
+  encodeHelper(root, nums, vis);
+
+  return nums;
+};
+
+
+int decodeHelper(Node root, int index, vector<int> graph, vector<int> vis){
+
+  root.ind = graph[index];
+  root.data = graph[index+1];
+  vector<Node> temp(graph[index+2]);
+  root.outEdges = temp;
+  vis[root.ind] = 1;
+
+  int updatedIndex = index+3;
+  for(int i=0;i<graph[index+2];i++){
+
+    if(vis[updatedIndex]) continue;
+
+    updatedIndex = decodeHelper(root.outEdges[i], updatedIndex, graph, vis);
+  }
+
+  return updatedIndex;
+}
+
+
+Node decode(vector<int> graph) {
+
+  
+  vector<int> vis(100005,0);
+  Node root = Node();
+  decodeHelper(root, 0, graph, vis);
+
+  return root;
+};
+
 
 int main() {
   ios_base::sync_with_stdio(false);
@@ -104,7 +173,6 @@ int main() {
   int t = 1;
   // cin >> t;
   while (t--) {
-    solve();
   }
   return 0;
 }
