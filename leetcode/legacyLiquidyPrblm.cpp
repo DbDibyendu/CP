@@ -1,3 +1,4 @@
+
 /*#include <bits/stdc++.h>*/
 #include <iostream>
 #include <unordered_map>
@@ -21,8 +22,6 @@
 #endif
 
 using namespace std;
-#define fo(i, a, n) for (i = a; i < n; i++)
-#define ll long long
 #define deb(x) cout << #x << '=' << x << endl
 #define deb2(x, y) cout << #x << '=' << x << ',' << #y << '=' << y << endl
 #define clr(x) memset(x, 0, sizeof(x))
@@ -41,95 +40,114 @@ using namespace std;
   }
 //===========================
 typedef vector<int> vi;
-typedef vector<ll> vl;
-typedef pair<ll, ll> pll;
-typedef vector<pll> vpll;
 //=======================
 const int MOD = 1'000'000'007;
 //=======================
 
-class Cache{
 
-  int size;
-  vector<int> bits;
-  int cachedBitWidth;
-  int cachedSum;
 
-  Cache(){
-    size = 0;
-    bits.assign(65,0);
-    cachedSum = 0;
-  }
+// monotonic stack solution is beautiful here, 
+// legacy liquidity prblm 2
+int maxGapDuration(vector<int> nums){
 
-  int getBits(int x){
-    if(x<0) return 0;
+  stack<int> st;
 
-    int count = 0;
-    while(x){
-      x = x>>1; // right shift
-      count++;
-    }
+  int i, n= nums.size();
 
-    return count;
-  }
-
-  void Insert(int x){
-
-    int b = getBits(x);
-    bits[b]++;
-    size++;
-
-    if(x <= cachedBitWidth){
-      cachedSum++;
-    }
-    UpdateCache();
-  }
-
-  int LooseMedianV2(){
-    return 1<<(cachedBitWidth);
-  }
-
-  void UpdateCache(){
-
-    int i;
-    int threshold = 0.5*size;
-
-    if(threshold > cachedSum){
-
-      // move cachedSum right
-      while(threshold > cachedSum){
-        cachedBitWidth++;
-        cachedSum += bits[cachedBitWidth];
-      }
-    }else if(threshold <= cachedSum - bits[cachedBitWidth]){
-      // move cachedSum left
-      while(threshold <= cachedSum - bits[cachedBitWidth]){
-        cachedBitWidth--;
-        cachedSum -= bits[cachedBitWidth];
-      }
+  for(i=0;i<n;i++){
+    if(st.empty() || nums[i] > nums[st.top()]){
+      st.push(i);
     }
   }
 
+  int maxDist = 0;
 
-  int LooseMedian(float percentile){
-    // iterate over bits to find and print median
-    int i, ans = 0;
-    int cap = ceil(size*percentile); // median
-
-    for(i=0;i<65;i++){
-
-      if(bits[i] >= cap){
-        ans = i;
-        break;
-      }
-      cap-=bits[i];
+  for(i=n-1; i>=0; i--){
+    while(!st.empty() && nums[st.top()] > nums[i]){
+      int j = st.top();
+      st.pop();
+      maxDist = max(maxDist, j-i);
     }
+  }
+  return maxDist;
+}
 
-    return 1<<ans;
+// legacy liquidity prblm 3
+// Beautiful Divide and conquer, mergesort
+
+int merge(int L, int R, int mid, vector<int> &nums, int df){
+
+  int count = 0;
+
+  int n = nums.size();
+  int k=0;
+  int l = L, r = mid;
+  vector<int> temp = nums;
+  
+  // count inversions
+  
+
+  int i, j = mid;
+  // 2 pointers
+  for(i=l;i<mid;i++){ // for each i add j max possible value
+    while(nums[i] > nums[j]*df && j<R){
+      j++;
+    }
+    count += (j-mid);
   }
 
+  // merge O(N)
+  while(l < mid && r < R){
+    if(temp[l] < temp[r]){
+      nums[k] = temp[l];
+      l++;
+      k++;
+    }else{
+      nums[k] = temp[r];
+      r++;
+      k++;
+    }
+  }
+
+  while(l< mid){
+      nums[k] = temp[l];
+      l++;
+      k++;
+  }
+
+  while(r<R){
+      nums[k] = temp[r];
+      r++;
+      k++;
+  }
+
+  // fill either right or left remaining
+  return count;
 };
 
+int inversionCount(int l, int r, vector<int> &nums, int df){
+
+  if(l>r) return 0;
+  int mid = (l+r)/2;
+  int count = 0;
+  count += inversionCount(mid+1, r, nums, df);
+  count += inversionCount(l, mid, nums, df);
+
+  count += merge(l, r, mid, nums, df);
+
+  return count;
+}
+
+bool isLiquidityParadox(vector<int> nums, int df, int vl){
+
+  int n = nums.size();
+
+  int k = inversionCount(0, n, nums, df);
+
+  if( k >= vl)  return true;
+
+  return false;
+}
 
 
 int main() {
@@ -138,7 +156,6 @@ int main() {
   int t = 1;
   // cin >> t;
   while (t--) {
-    // solve();
   }
   return 0;
 }

@@ -1,4 +1,4 @@
-#include <climits>
+/*#include <bits/stdc++.h>*/
 #include <iostream>
 #include <unordered_map>
 #ifndef _GLIBCXX_NO_ASSERT
@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <deque>
 #include <iostream>
 #include <map>
 #include <queue>
@@ -45,54 +46,78 @@ typedef pair<ll, ll> pll;
 typedef vector<pll> vpll;
 //=======================
 const int MOD = 1'000'000'007;
-const int N = INT_MAX, M = N;
 //=======================
 
-void merge(vi &A, int l, int r, int mid) {
-  vi B = A;
-  int i = l, j = mid + 1, k = l; //! Be carefull about the starting point
-  while (i < mid+1 && j < r + 1) {
-    if (B[i] < B[j]) {
-      A[k] = B[i];
-      i++;
-      k++;
-    } else {
-      A[k] = B[j];
-      j++;
-      k++;
+
+class Node {
+
+  public:
+  int data;
+  Node* right;
+  Node* left;
+  int leftTreeCount;
+
+  Node(int v){
+    data = v;
+    right = nullptr;
+    left = nullptr;
+    leftTreeCount = 0;
+  }
+};
+
+
+class findKthLargest {
+  int size;
+  Node* root;
+
+  findKthLargest(){
+    size = 0;
+    root = nullptr;
+  }
+
+  void insertHelper(Node* curr, int x){
+
+    if(curr == nullptr){
+      curr = new Node(x);
+      return;
+    }
+
+    if(x < curr->data){
+      curr->leftTreeCount++;
+      insertHelper(curr->left, x);
+    }else{
+      insertHelper(curr->right, x);
+    }
+
+    return;
+  }
+
+  void insert(int x){
+    size++;
+    insertHelper(root, x);
+  }
+
+  int findKthElement(Node* curr, int k){
+
+    if(k == curr->leftTreeCount){
+      return curr->data;
+    } else if(k < curr->leftTreeCount){ // lies in left subtree
+      findKthElement(curr->left, k);
+    }else{
+      // go to right, this is tricky. deduct size of left tree and then continue.
+      findKthElement(curr->right, k - curr->leftTreeCount -1);
     }
   }
-  // either right or left remains
-  while (i < mid+1) {
-    A[k] = B[i];
-    i++, k++;
+
+  int findLargest(int k){
+    if(k > size || k<0) return -1;
+
+    int ans = findKthElement(root, size-k);
+    return ans;
   }
-  while (j < r + 1) {
-    A[k] = B[j];
-    k++, j++;
-  }
-}
 
-void mergesort(vi &A, int l, int r) {
-  if (l < r) {
-    int mid = (l + r) / 2;
-    mergesort(A, l, mid);
-    mergesort(A, mid + 1, r);
+};
 
-    merge(A, l, r, mid);
-  }
-}
-
-void solve() {
-
-  ll i, j, n, m, k;
-  ll temp = 0, flag = 1;
-  cin >> n;
-  vi A(n);
-  read(A);
-  mergesort(A, 0, n - 1);
-  display(A);
-}
 
 int main() {
   ios_base::sync_with_stdio(false);
@@ -100,7 +125,6 @@ int main() {
   int t = 1;
   // cin >> t;
   while (t--) {
-    solve();
   }
   return 0;
 }

@@ -1,4 +1,4 @@
-#include <climits>
+/*#include <bits/stdc++.h>*/
 #include <iostream>
 #include <unordered_map>
 #ifndef _GLIBCXX_NO_ASSERT
@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <deque>
 #include <iostream>
 #include <map>
 #include <queue>
@@ -45,53 +46,57 @@ typedef pair<ll, ll> pll;
 typedef vector<pll> vpll;
 //=======================
 const int MOD = 1'000'000'007;
-const int N = INT_MAX, M = N;
 //=======================
 
-void merge(vi &A, int l, int r, int mid) {
-  vi B = A;
-  int i = l, j = mid + 1, k = l; //! Be carefull about the starting point
-  while (i < mid+1 && j < r + 1) {
-    if (B[i] < B[j]) {
-      A[k] = B[i];
-      i++;
-      k++;
-    } else {
-      A[k] = B[j];
-      j++;
-      k++;
+
+int findMinTime(vector<int> tasks, int s, int c) {
+
+  sort(tasks.begin(), tasks.end());
+
+  int taskSize = tasks.size();
+  int i;
+
+  deque<int> dq;
+  for(i=0;i<taskSize;i++){
+    if(c>0){
+      int endTime= tasks[i] + s; // O(NlogC) or O(N+C)-> monotonic decreasing stack
+      dq.push_back(endTime);
+      c--;
+    }else{
+      int lastEndTime = dq.front();
+      dq.pop_front();
+      int newEndTime = max(tasks[i] + s, lastEndTime + s);
+      dq.push_back(newEndTime);
     }
   }
-  // either right or left remains
-  while (i < mid+1) {
-    A[k] = B[i];
-    i++, k++;
-  }
-  while (j < r + 1) {
-    A[k] = B[j];
-    k++, j++;
-  }
+
+  return dq.back();
 }
 
-void mergesort(vi &A, int l, int r) {
-  if (l < r) {
-    int mid = (l + r) / 2;
-    mergesort(A, l, mid);
-    mergesort(A, mid + 1, r);
+int findMinCPUs(vector<int> tasks, int s) {
 
-    merge(A, l, r, mid);
+  sort(tasks.begin(), tasks.end());
+
+  int taskSize = tasks.size();
+  int i;
+
+  int minTime = tasks.back() + s;
+
+  int l = 1, r = taskSize, mid, ans = taskSize;
+
+  while(l<=r){
+
+    mid = (l+r)/2;
+    int midMinTime = findMinTime(tasks, s, mid);
+    if(midMinTime <= minTime){
+      ans = mid;
+       r = mid-1;
+    }else{
+      l = mid+1;
+    }
   }
-}
 
-void solve() {
-
-  ll i, j, n, m, k;
-  ll temp = 0, flag = 1;
-  cin >> n;
-  vi A(n);
-  read(A);
-  mergesort(A, 0, n - 1);
-  display(A);
+  return ans;
 }
 
 int main() {
@@ -100,7 +105,6 @@ int main() {
   int t = 1;
   // cin >> t;
   while (t--) {
-    solve();
   }
   return 0;
 }
