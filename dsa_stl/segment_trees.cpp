@@ -66,73 +66,94 @@ ll A[100000], stree[400004];
 
 
 
-void build(int si, int ss, int se) {
-  if (ss == se) { // leaf node
-    stree[si] = A[ss]; // Leaf node
-    return;
-  }
+class SegmentTree {
+private:
+    int n;
+    std::vector<int> tree;
 
-  ll mid = (ss + se) / 2;
+    // Helper function to build the tree recursively
+    void build(const std::vector<int>& arr, int node, int start, int end) {
+        // Base case: leaf node represents a single element
+        if (start == end) {
+            tree[node] = arr[start];
+            return;
+        }
 
-  build(2 * si + 1, mid + 1, se); // Right child
-  build(2 * si, ss, mid);         // left child
+        int mid = start + (end - start) / 2;
+        int leftChild = 2 * node + 1;
+        int rightChild = 2 * node + 2;
 
-  stree[si] =
-      min(stree[2 * si + 1], stree[2 * si]); // MERGE logic of Segment Tree
-}
+        // Recursively build left and right subtrees
+        build(arr, leftChild, start, mid);
+        build(arr, rightChild, mid + 1, end);
 
-ll query(int si, int ss, int se, int qs, int qe) {
-  if (ss > qe || se < qs) // !Completely Outside
-    return MOD;
-  if (qs <= ss && qe >= se) // ! Completely Inside
-    return stree[si];
+        // Internal node stores the sum of its children
+        tree[node] = tree[leftChild] + tree[rightChild];
+    }
 
-  ll mid = (ss + se) / 2;
-  return min(query(2 * si, ss, mid, qs, qe),          // left child
-             query(2 * si + 1, mid + 1, se, qs, qe)); // right child
-  // Merge logic of segment trees
-}
+    // Helper function for point update
+    void update(int node, int start, int end, int idx, int val) {
+        // Base case: leaf node to be updated
+        if (start == end) {
+            tree[node] = val;
+            return;
+        }
 
-void update(int si, int ss, int se, int qi) {
-  if (ss == se) {
-    stree[si] = A[ss]; // leaf node
-    return;
-  }
+        int mid = start + (end - start) / 2;
+        int leftChild = 2 * node + 1;
+        int rightChild = 2 * node + 2;
 
-  ll mid = (ss + se) / 2;
+        // Decide whether to go left or right
+        if (idx <= mid) {
+            update(leftChild, start, mid, idx, val);
+        } else {
+            update(rightChild, mid + 1, end, idx, val);
+        }
 
-  if (qi <= mid)
-    update(2 * si, ss, mid, qi); // left child
-  else
-    update(2 * si + 1, mid + 1, se, qi); // right child
+        // Recalculate the current node's value after the child update
+        tree[node] = tree[leftChild] + tree[rightChild];
+    }
 
-  stree[si] =
-      min(stree[2 * si + 1], stree[2 * si]); // Merge logic of segment trees
-  // deb2(stree[si], si);
-}
+    // Helper function for range query
+    int query(int node, int start, int end, int l, int r) {
+        // Case 1: Complete overlap - current range is inside query range [l, r]
+        if (l <= start && end <= r) {
+            return tree[node];
+        }
 
-void solve() {
+        // Case 2: No overlap - current range is completely outside query range [l, r]
+        if (r < start || end < l) {
+            return 0; // Return identity element for sum (which is 0)
+        }
 
-  int i, j, m, k;
-  ll temp = 0, flag = 1;
-  cin >> n;
-  fo(i, 1, n + 1) { cin >> A[i]; }
-  build(1, 1, n);
+        // Case 3: Partial overlap - split and check both sides
+        int mid = start + (end - start) / 2;
+        int leftSum = query(2 * node + 1, start, mid, l, r);
+        int rightSum = query(2 * node + 2, mid + 1, end, l, r);
 
-  cin >> k;
-  while (k--) {
-    cin >> i >> j;
-    cout << query(1, 1, n, i + 1, j + 1) << endl;
-  }
-}
+        return leftSum + rightSum;
+    }
 
-int main() {
-  int t = 1;
-  // cin >> t;
-  while (t--) {
-    solve();
-  }
-  return 0;
-}
+public:
+    // Constructor
+    SegmentTree(const std::vector<int>& arr) {
+        n = arr.size();
+        if (n > 0) {
+            // Memory allocation: 4 * n is the safe upper bound for a segment tree size
+            tree.resize(4 * n, 0);
+            build(arr, 0, 0, n - 1);
+        }
+    }
 
-//=======================
+    // Public Update Wrapper (0-indexed)
+    void update(int idx, int val) {
+        if (idx < 0 || idx >= n) return;
+        update(0, 0, n - 1, idx, val);
+    }
+
+    // Public Query Wrapper (0-indexed, inclusive range [l, r])
+    int query(int l, int r) {
+        if (l > r || l < 0 || r >= n) return 0;
+        return query(0, 0, n - 1, l, r);
+    }
+};
