@@ -33,8 +33,11 @@ class FenwickTree {
   unordered_map<int,int> count;
   const long long MAX_LIMIT = 2000000000LL;
 
+  shared_mutex mx; 
 
   void updateSum(int index, double delta){
+
+    unique_lock<shared_mutex> lock(mx);
 
     while(index < MAX_LIMIT){
       sum[index] += delta;
@@ -43,6 +46,8 @@ class FenwickTree {
   }
 
   double querySum(int index){
+
+    shared_lock<shared_mutex> lock(mx);
 
     double totalS = 0.0;
 
@@ -114,6 +119,7 @@ class WebAnalytics{
     // store count and sum in segment tree
     // do it via maps only
 
+    shared_lock<shared_mutex> lock(rw_mutex);
     if(mp.empty()) return 0.0;
 
     auto it = mp.lower_bound(start);
@@ -133,7 +139,7 @@ class WebAnalytics{
   double averageScoreV2(int start, int end){
     // store count and sum in segment tree
     // do it via maps only
-
+    shared_lock<shared_mutex> lock(rw_mutex);
     if(start  > end) return 0;
     double s_sum = tree->querySum(start-1);
     double e_sum = tree->querySum(end);
@@ -183,3 +189,4 @@ class WebAnalytics{
  * Read -> Write
  * Write -> Read
  */
+
