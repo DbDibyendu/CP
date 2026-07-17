@@ -48,29 +48,40 @@ const int N = 1000007, M = N;
 //
 //
 // KMP Algorithm : O(n)
-// With the help of LPS (Longest common border)
+// With the help of LPS (Longest prefix suffx)
 // LPS[i] = the length of the longest proper prefix of s[0..i] which is also a
 // suffix of s[0..i]
+// Index:      0   1   2   3   4   5   6   7   8
+// Char:       A   B   A   B   C   A   B   A   B
+// LPS Value:  0   0   1   2   0   1   2   3   4
 //
-//
-void solve() {
-  ll n, i, j, m, k, start, q;
-  string s;
-  cin >> s;
-  n = s.length();
+// best explained in this : https://www.youtube.com/watch?v=q4_90fOoS-s
+// TC: O(N+M)
+// SC: O(N)
+// Hard to remember and implement in interview 
+vector<int> computeLPSArray(const string& pattern) {
+    int M = pattern.length();
+    vector<int> lps(M, 0);
+    
+    int len = 0; // Length of the previous longest prefix suffix
+    int i = 1;
 
-  vl lps(n + 1, 0);
-
-  // KMP algorithm
-  i = 0, j = -1, lps[0] = -1;
-  while (i < n) {
-    while (j != -1 && s[j] != s[i])
-      j = lps[j];
-    i++;
-    j++;
-    lps[i] = j;
-  }
-  display(lps);
+    while (i < M) {
+        if (pattern[i] == pattern[len]) {
+            len++;
+            lps[i] = len;
+            i++;
+        } else {
+            if (len != 0) {
+                // Fallback to the previous longest prefix suffix
+                len = lps[len - 1];
+            } else {
+                lps[i] = 0;
+                i++;
+            }
+        }
+    }
+    return lps;
 }
 
 int main() {
@@ -79,7 +90,6 @@ int main() {
   int t = 1;
   /*cin >> t;*/
   while (t--) {
-    solve();
   }
   return 0;
 }

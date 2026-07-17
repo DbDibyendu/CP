@@ -23,8 +23,8 @@ class AddressManager{
   AddressManager(){
     root = new Node();
   }
-  void initAddress(vector<vector<string>> address){
 
+  void initAddress(vector<vector<string>> address){
 
     int i,j;
     for(i=0;i<address.size();i++){
@@ -75,6 +75,7 @@ class AddressManager{
       // Reasoning a*b*c*d = N (uniqueue paths)
       return possible;
   }
+
   vector<string> queryAddress(vector<string> query){
 
     Node *curr = root;
@@ -82,7 +83,10 @@ class AddressManager{
     vector<string> ans;
 
     if(!queryHelper(0, query, curr, ans)) return {};
+
     reverse(ans.begin(), ans.end());
+
     return ans;
   }
+
 };

@@ -32,6 +32,7 @@ int depth[MAXN];       // depth of each node
 // leetcode prblm:
 // https://leetcode.com/problems/kth-ancestor-of-a-tree-node/description/
 //
+// IMPORTANT : Binary lifting can only be done when node has exactly one Outgoing edge (Degree-1)
 void dfs(int v, int parent) {
   up[v][0] = parent; // Immediate parent (2^0-th ancestor)
   for (int i = 1; i < LOG; i++) {

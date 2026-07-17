@@ -77,7 +77,7 @@ public:
       if (node->child[x] == NULL) {
         node->child[x] = new Node();
       }
-      node->prefix++;
+      node->prefix++; // count
       node = node->child[x];
     }
     node->wend.push_back(s);

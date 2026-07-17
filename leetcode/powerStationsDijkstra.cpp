@@ -41,7 +41,8 @@ float efficiencyRating(int n, vector<Rate> transimissions, int source, int dest)
     auto [currEf, currNode] = pq.top();
     pq.pop();
 
-    if(dist[currNode] > currEf ) continue;
+    // as it's a Max Heap solution, dist[currNode] means already found best distance for currNode
+    if(dist[currNode] > currEf ) continue; // important for pruning
 
     if(currNode == dest) return dist[currNode];
 

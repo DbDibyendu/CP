@@ -72,7 +72,7 @@ void rabinKarp(string text, string pattern) {
     int t = 0; // hash value for current text window
     int h = 1; // d^(m-1) % q, used to remove leading digit in rolling hash
 
-    // Precompute h = pow(d, m-1) % q
+    // Precompute h = pow(d, m-1) % q, this value always remains fixed
     // This helps in removing the leading character efficiently during rolling hash
     for (int i = 0; i < m - 1; i++)
         h = (h * d) % q;
@@ -99,9 +99,10 @@ void rabinKarp(string text, string pattern) {
                 cout << "Pattern found at index " << i << endl;
         }
 
-        // Rolling hash: update hash value for next window
+        // Rolling hash of size m: update hash value for next window
         if (i < n - m) {
             // Remove leading char, add trailing char
+            // As m size is fixed, hence H = d^(m-1) is also fixed
             // t = (d*(t - text[i]*h) + text[i + m]) % q
             t = (d * (t - text[i] * h) + text[i + m]) % q;
 
