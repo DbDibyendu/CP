@@ -1,0 +1,146 @@
+@startuml 06-ipv6-quic-and-tls-termination
+' References: RFC 8200, 4861, 4862, 9000, 9001, 9114; Kurose & Ross Ch. 2-5.
+' https://www.rfc-editor.org/rfc/rfc8200
+' https://www.rfc-editor.org/rfc/rfc4861
+' https://www.rfc-editor.org/rfc/rfc9000
+' https://www.rfc-editor.org/rfc/rfc9001
+' https://www.rfc-editor.org/rfc/rfc9114
+hide footbox
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam maxMessageSize 360
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBorderColor #475569
+  ParticipantFontColor #0F172A
+  GroupBackgroundColor #F8FAFC
+  GroupBorderColor #94A3B8
+  DividerBackgroundColor #E2E8F0
+  DividerBorderColor #94A3B8
+  NoteBackgroundColor #FFFBE6
+  NoteBorderColor #D4B95E
+  MessageAlign left
+}
+
+title 06 | Three independent variants of the overview journey
+participant "Client HTTP / TLS\nor HTTP/3 / QUIC library" as C #DBEAFE
+participant "Client OS\nsockets / IP / neighbors" as O #EDE9FE
+participant "Local IPv6\nrouter" as G #FFEDD5
+participant "Network path\nIP -> link -> physical" as N #FFEDD5
+participant "CDN edge / proxy\nTLS + HTTP endpoint" as P #FCE7F3
+participant "Server endpoint\ndirect server / origin" as S #DBEAFE
+
+note over C,S
+  READ FIRST: these panels are independent alternatives, not successive stages.
+  A: IPv6 changes addressing and neighbor discovery.
+  B: HTTP/3 changes transport to QUIC over UDP.
+  C: Proxy termination changes where the client's connection ends.
+  They can also be combined in a real deployment.
+end note
+
+== A | IPv6: change the network path; HTTP/TLS/TCP can remain ==
+opt Initial IPv6 autoconfiguration is needed on this link
+  O -> G: ICMPv6 Router Solicitation
+  G --> O: Router Advertisement: prefix + router lifetime\nOther options as configured
+  O -> O: Example SLAAC: form address from suitable prefix\nPerform Duplicate Address Detection as required
+end
+note over O,G #FFEDD5
+  Example client address: 2001:db8:1::10; gateway link-local: fe80::1.
+  SLAAC = stateless address autoconfiguration.
+  A default router is learned from RA; DHCPv6 does not supply a default gateway.
+  DNS configuration may come from RA options, DHCPv6, or other configuration.
+end note
+C -> O: Resolve www.example.com: request IPv6 candidates
+O --> C: Illustrative AAAA answer: 2001:db8:2::20
+C -> O: Select candidate; socket(AF_INET6, SOCK_STREAM); connect(...,443)
+O -> O: IPv6 route lookup: choose next-hop router fe80::1
+opt Next-hop neighbor mapping is absent
+  O -> G: ICMPv6 Neighbor Solicitation\nTypically solicited-node multicast for address resolution
+  G --> O: Neighbor Advertisement with link address
+end
+O -> N: TCP establishment + TLS + HTTP packets via IPv6\nEthernet / Wi-Fi frame -> physical signals
+N -> S: Routers forward; decrease Hop Limit; replace link encapsulation
+S --> N: Response IPv6 packets toward client
+N --> O: Receive through physical -> link -> IPv6 -> TCP
+O --> C: Socket -> TLS -> HTTP response
+note over O,S #FFEDD5
+  Neighbor Discovery uses ICMPv6, not ARP broadcast.
+  Off-link packets use the router's link address, not a remote server's MAC.
+  IPv6 has no base-header checksum; routers do not fragment packets.
+  Packet too large: ICMPv6 Packet Too Big; sender adapts packet sizes.
+  Dual-stack clients can race/stagger IPv6 and IPv4 candidates (Happy Eyeballs).
+end note
+
+== B | HTTP/3: HTTP semantics over QUIC, carried in UDP ==
+C -> C: Discover HTTP/3 support, e.g. Alt-Svc / HTTPS DNS record\nChoose QUIC endpoint; fresh handshake in this example
+C -> O: Create UDP socket; send QUIC datagrams\nUsually destination UDP port 443
+note over C,O #EDE9FE
+  HTTP/3 -> QUIC streams + integrated TLS handshake -> UDP -> IP -> link -> physical.
+  A QUIC library commonly manages transport above a UDP socket.
+  UDP provides datagrams; QUIC provides reliability, ordering within streams,
+  congestion/flow control, packet protection, and connection IDs.
+end note
+C -> S: QUIC Initial packet: CRYPTO frames carry TLS ClientHello\nLogical exchange via UDP and all lower layers
+S --> C: Initial: TLS ServerHello\nHandshake: encrypted TLS authentication messages + Finished
+C -> C: Validate server identity; derive traffic secrets\nNegotiate ALPN h3
+C -> S: Handshake packet carrying client Finished
+C -> S: Protected 1-RTT packet(s): HTTP/3 HEADERS / DATA\non a QUIC request stream
+S -> S: Parse HTTP/3; dispatch /hello handler
+S --> C: Protected HTTP/3 response on request stream
+note over C,S #FCE7F3
+  QUIC carries TLS handshake messages in CRYPTO frames, not TLS records.
+  Application data uses QUIC packet protection, not the TCP/TLS record path.
+  Initial keys are publicly derivable: Initial protection is not secret authentication.
+  QUIC ACKs acknowledge packets; lost stream data can be sent in new packets.
+  Independent streams avoid TCP's cross-stream loss-induced ordering blockage;
+  they still share connection resources and congestion effects.
+  No TCP SYN handshake occurs. Resumed 0-RTT is optional and has replay constraints.
+  QUIC CONNECTION_CLOSE ends the connection; there is no TCP FIN sequence.
+end note
+note over O,N #FFEDD5
+  IPv4 or IPv6 still routes UDP packets, with hop-by-hop link/physical transmission.
+  If HTTP/3 cannot connect and the service supports it, a client may try HTTP/2 or HTTP/1.1.
+  Those attempts create TCP connections rather than turning QUIC into TCP.
+end note
+
+== C | CDN / reverse proxy: two separate connections and trust boundaries ==
+C -> C: DNS / service routing selects a CDN edge or proxy address
+C -> P: Connection A: TCP + TLS authenticated for www.example.com
+C -> P: Encrypted HTTP request on connection A
+P -> P: Terminate TLS; decrypt; apply HTTP routing / cache policy
+alt CDN can serve the request from cache
+  P --> C: Encrypt cached HTTP response on connection A
+else Origin work is needed
+  P -> S: Connection B: separate TCP + TLS to configured origin\nCreate or reuse origin connection; validate origin identity
+  P -> S: Forward HTTP request protected by connection B
+  S -> S: Handle request; create origin response
+  S --> P: Response protected by connection B
+  P -> P: Receive/decrypt origin response; apply response/cache policy
+  P --> C: Encrypt client response with connection A's traffic keys
+end
+note over C,S #FCE7F3
+  Connection A and B have independent sockets, keys, sequence spaces, and lifecycles.
+  The proxy is a TLS endpoint and sees plaintext HTTP while processing it.
+  The origin's transport peer is the proxy; client identity needs trusted metadata if required.
+  Forwarded / X-Forwarded-* headers require an explicit trusted-proxy policy.
+  Example B uses TLS; deployments can instead use plaintext or mutual TLS to the origin.
+  TLS passthrough is another design: a proxy forwards bytes without terminating client TLS.
+  A cache hit needs no origin request for this response.
+end note
+legend left
+  |= Color |= Role |
+  |<#DBEAFE> Application | HTTP, DNS, application logic |
+  |<#FCE7F3> Security | TLS above TCP; SSL is the historical name |
+  |<#EDE9FE> Transport | TCP; sockets are a local API boundary |
+  |<#FFEDD5> Network | IP addressing and router forwarding |
+  |<#DCFCE7> Link | Ethernet / Wi-Fi framing and local delivery |
+  |<#FEF3C7> Physical | Electrical, optical, or radio signals |
+  Solid arrows: actions / exchanges. Dashed arrows: replies / completions.
+  Arrow style does not imply a different delivery guarantee.
+endlegend
+
+@enduml

@@ -1,0 +1,93 @@
+@startuml 04a-layer-stack
+' Original companion to 04: layer placement and bidirectional encapsulation.
+' https://gaia.cs.umass.edu/kurose_ross/videos/1/
+' https://gaia.cs.umass.edu/kurose_ross/videos/6/
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam packageStyle rectangle
+skinparam nodesep 35
+skinparam ranksep 25
+skinparam ArrowColor #334155
+skinparam rectangleBorderColor #475569
+skinparam packageBorderColor #94A3B8
+skinparam NoteBackgroundColor #FFFBE6
+skinparam NoteBorderColor #D4B95E
+title 04a | The layer stack: request DOWN at client, UP at server; response reverses it
+
+package "CLIENT HOST" #F8FAFC {
+  rectangle "APPLICATION\nHTTP request / response bytes" as CA #DBEAFE
+  rectangle "SECURITY ABOVE TCP\nTLS record protection / decryption" as CT #FCE7F3
+  rectangle "LOCAL SOCKET API\nsend / recv byte-stream service" as CS #F1F5F9
+  rectangle "TRANSPORT\nTCP segments / ordered byte stream" as CC #EDE9FE
+  rectangle "NETWORK\nIP packet; remote destination IP" as CI #FFEDD5
+  rectangle "LINK\nEthernet / Wi-Fi frame; next-hop address" as CL #DCFCE7
+  rectangle "PHYSICAL\nNIC PHY: bits <-> electrical / radio signals" as CP #FEF3C7
+  CA <-down-> CT
+  CT <-down-> CS
+  CS <-down-> CC
+  CC <-down-> CI
+  CI <-down-> CL
+  CL <-down-> CP
+}
+
+package "SERVER HOST" #F8FAFC {
+  rectangle "APPLICATION\nHTTP parser / handler / response" as SA #DBEAFE
+  rectangle "SECURITY ABOVE TCP\nTLS verification / record protection" as ST #FCE7F3
+  rectangle "LOCAL SOCKET API\nrecv / send byte-stream service" as SS #F1F5F9
+  rectangle "TRANSPORT\nTCP byte-stream delivery / segmentation" as SC #EDE9FE
+  rectangle "NETWORK\nLocal IP delivery / response route" as SI #FFEDD5
+  rectangle "LINK\nAccept local frame / create next-hop frame" as SL #DCFCE7
+  rectangle "PHYSICAL\nNIC PHY: electrical / optical signals <-> bits" as SP #FEF3C7
+  SA <-down-> ST
+  ST <-down-> SS
+  SS <-down-> SC
+  SC <-down-> SI
+  SI <-down-> SL
+  SL <-down-> SP
+}
+
+CA -[hidden]right-> SA
+CP -[hidden]right-> SP
+
+rectangle "ACCESS SWITCH / AP\nLink + Physical\nReceive and forward / bridge local frames" as SW #DCFCE7
+rectangle "GATEWAY / ISP / EDGE ROUTERS\nNetwork + Link + Physical\nRx PHY -> link -> IP forwarding\n-> new link encapsulation -> Tx PHY" as RT #FFEDD5
+
+CP <-down-> SW : Copper / radio signals\nLocal frame carries IP packet
+SW <-right-> RT : Next link's transmission
+RT <-up-> SP : Last link's transmission\nDifferent return route is possible
+
+note left of CA
+  READ FIRST: HTTP, TCP, IP, Link, Physical
+  are the five Internet-model layers.
+  TLS and socket API are shown separately
+  to explain the real implementation path.
+  Setup / DNS / handshakes: 02 and 03.
+end note
+note right of SA
+  Request: client encodes downward;
+  server decodes upward, then processes it.
+  Response: server encodes downward;
+  client decodes upward and consumes it.
+  Every double arrow supports both directions.
+end note
+note bottom of RT
+  Example on a data-carrying Ethernet link:
+  Ethernet header [ IP header [ TCP header [ encrypted TLS bytes ] ] ] FCS
+  TCP segments and TLS records need not share boundaries.
+  Switches preserve IP TTL; routers decrease TTL / Hop Limit.
+  Router boundaries replace link encapsulation; NAT may rewrite IP/ports.
+  Transit devices forward ciphertext; TLS terminates at endpoints [06 for proxy variant].
+  Trace concrete addresses, frames, and PHY operations in 04.
+end note
+
+legend bottom
+  Typical implementation: HTTP/TLS in user space; TCP/IP in the OS;
+  link/physical work in drivers, NICs, and transceivers. Offload can move work.
+  Color key: blue application; pink TLS; purple transport;
+  orange network; green link; yellow physical; gray socket API.
+endlegend
+@enduml

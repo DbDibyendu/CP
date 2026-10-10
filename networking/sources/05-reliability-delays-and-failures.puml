@@ -1,0 +1,156 @@
+@startuml 05-reliability-delays-and-failures
+' References: Kurose & Ross Ch. 1 / 3; RFC 9293, 5681, 1191, 9110.
+' https://gaia.cs.umass.edu/kurose_ross/videos/3/
+' https://www.rfc-editor.org/rfc/rfc9293
+' https://www.rfc-editor.org/rfc/rfc5681
+hide footbox
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam maxMessageSize 360
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBorderColor #475569
+  ParticipantFontColor #0F172A
+  GroupBackgroundColor #F8FAFC
+  GroupBorderColor #94A3B8
+  DividerBackgroundColor #E2E8F0
+  DividerBorderColor #94A3B8
+  NoteBackgroundColor #FFFBE6
+  NoteBorderColor #D4B95E
+  MessageAlign left
+}
+
+title 05 | Delivery, delay, and failure [overview stages 5-8]
+participant "Client HTTP\n+ TLS process" as C #DBEAFE
+participant "Client OS\nTCP sender / receiver" as CT #EDE9FE
+participant "Intermediate router\ninput -> queue -> output" as R #FFEDD5
+participant "Server OS\nTCP receiver / sender" as ST #EDE9FE
+participant "Server TLS\n+ HTTP handler" as S #DBEAFE
+
+note over C,S
+  READ FIRST: the connection is already established; these are illustrative byte ranges.
+  TCP sequence numbers count stream bytes, including encrypted TLS data in this example.
+  SYN/FIN each consume a sequence number. ACK-only segments do not consume stream bytes.
+  Network arrows summarize link and physical transmission detailed in 04.
+end note
+
+== 5 | Queueing and physical transmission occur at every hop ==
+C -> CT: Write request ciphertext into socket send buffer
+CT -> CT: Respect available send-buffer space,\ncongestion window, advertised receive window, and pacing
+CT -> R: TCP segment carrying encrypted request bytes
+R -> R: Receive bits/frame; extract IP packet;\nprocessing and forwarding-table lookup
+R -> R: Wait in egress queue behind other packets
+R -> R: Transmit packet in outgoing frame\nSerialization time = L / R_link
+R -> ST: Signals propagate along the outgoing medium\nPropagation time = distance / signal_speed
+note over R #FEF3C7
+  Per-hop delay = processing + queueing + transmission + propagation.
+  L is transmitted size in bits; R_link is outgoing bit rate in bits/second.
+  Higher bit rate reduces transmission time, not propagation distance.
+  Queueing varies with competing traffic; a full queue can drop arrivals.
+  Throughput is constrained by bottlenecks and sharing along the path.
+end note
+
+== 5-6 | Loss and ordering: an independent worked TCP example ==
+note over CT,ST #EDE9FE
+  For this example, server next expected byte is 1000.
+  Each illustrated segment carries 1000 stream bytes.
+end note
+CT -> ST: Seq=1000, payload bytes 1000..1999
+ST --> CT: Cumulative ACK=2000 (next expected byte)
+CT -> R: Seq=2000, payload bytes 2000..2999
+R -> R: Segment dropped: output queue full
+CT -> ST: Seq=3000, payload bytes 3000..3999
+ST -> ST: Buffer out-of-order bytes 3000..3999\nDo not deliver across missing byte range
+ST --> CT: Duplicate ACK=2000; optional SACK for 3000..3999
+note over CT,ST
+  Enough duplicate ACKs or another loss detector can trigger earlier recovery.
+  One duplicate ACK alone does not imply classic fast retransmit.
+  Here we illustrate retransmission on timeout instead.
+end note
+CT -> CT: Retransmission timer expires\nReduce congestion window according to sender's algorithm
+CT -> ST: Retransmit Seq=2000, bytes 2000..2999
+ST -> ST: Gap filled; stream now contiguous through byte 3999
+ST --> CT: ACK=4000
+ST --> S: Socket read provides newly contiguous ciphertext bytes
+S -> S: Assemble/verify TLS records; decrypt;\nparse complete HTTP request; run handler
+note over ST,S
+  ACK=4000 says bytes before 4000 reached TCP in order.
+  It does not say TLS accepted them, the handler ran, or a database commit succeeded.
+  Late duplicates are recognized by sequence numbers and not delivered twice by TCP.
+end note
+
+== 7 | Server response is also a reliable byte stream ==
+S -> ST: Encrypt HTTP response; write ciphertext bytes
+ST -> CT: Response segments on the same full-duplex connection
+CT --> ST: ACKs; advertise receive-buffer capacity
+CT --> C: Ordered stream bytes -> TLS -> HTTP response
+
+== Flow control and congestion control operate together ==
+note over CT,ST #EDE9FE
+  FLOW CONTROL: peer's receive window (rwnd) protects its receive buffers.
+  CONGESTION CONTROL: sender's congestion window (cwnd) limits network load.
+  Outstanding bytes are bounded approximately by min(rwnd, cwnd);
+  allowance for new data also subtracts bytes already in flight.
+  A slow-reading application can shrink rwnd and cause backpressure.
+  cwnd changes with ACK progress, detected loss, and algorithm-specific signals.
+  TCP checksum detects many accidental errors; TLS supplies cryptographic integrity.
+end note
+note over R,ST #DCFCE7
+  Corrupt link frame: FCS failure usually drops it before TCP sees it.
+  Wi-Fi may retry locally; ordinary full-duplex Ethernet has no equivalent per-frame ACK.
+  IP offers best-effort delivery; eventual TCP recovery is performed by endpoints.
+  Recovery is not guaranteed forever: connection or application deadlines can expire.
+end note
+
+== Failure scenarios | Separate examples, not additional successful stages ==
+group Before HTTP data can be exchanged
+  note over C,S
+    DNS NXDOMAIN / timeout / SERVFAIL: fail or retry resolution [02].
+    TCP refusal: remote RST; silent filtering/path failure: connect timeout.
+    TLS identity or handshake failure: abort the secure connection [03].
+  end note
+end
+group During packet forwarding
+  note over CT,R #FFEDD5
+    No usable route: drop; ICMP unreachable may be returned when permitted.
+    TTL expires: drop; ICMP Time Exceeded may be returned.
+    IPv4 DF packet exceeds MTU: drop; ICMP fragmentation-needed may be returned.
+    Sender adapts with path MTU discovery; blocked ICMP can cause a black hole.
+    Probe-based discovery can provide another way to find usable packet sizes.
+  end note
+end
+group After request transmission
+  note over C,S
+    TLS authentication-tag failure: terminate the secure connection.
+    HTTP 4xx/5xx: networking can succeed while the application reports an error.
+    Timeout/reset after sending: the client may not know whether the handler committed work.
+    Application retries need suitable semantics / idempotency to avoid duplicate side effects.
+  end note
+end
+
+== 8 | Reuse saves setup; a timing model explains first-byte latency ==
+note over C,S
+  Cold, simplified first-byte time:
+  DNS time + 1 RTT for TCP + 1 RTT for full TLS 1.3 + 1 RTT for HTTP + server processing.
+  Assumes immediate handshake progress, no loss/retry, and a small request/first response bytes.
+  Network configuration may add earlier delay; full response transfer adds further time.
+  Reused TCP/TLS connections avoid those connection-establishment round trips.
+  RTT = round-trip time. Close/reuse sequencing is in 03; HTTP/3 differs in 06.
+end note
+legend left
+  |= Color |= Role |
+  |<#DBEAFE> Application | HTTP, DNS, application logic |
+  |<#FCE7F3> Security | TLS above TCP; SSL is the historical name |
+  |<#EDE9FE> Transport | TCP; sockets are a local API boundary |
+  |<#FFEDD5> Network | IP addressing and router forwarding |
+  |<#DCFCE7> Link | Ethernet / Wi-Fi framing and local delivery |
+  |<#FEF3C7> Physical | Electrical, optical, or radio signals |
+  Solid arrows: actions / exchanges. Dashed arrows: replies / completions.
+  Arrow style does not imply a different delivery guarantee.
+endlegend
+
+@enduml

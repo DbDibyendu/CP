@@ -65,14 +65,13 @@ ll A[100000], stree[400004];
  */
 
 
-
 class SegmentTree {
 private:
     int n;
     std::vector<int> tree;
 
     // Helper function to build the tree recursively
-    void build(const std::vector<int>& arr, int node, int start, int end) {
+    void build(const vector<int>& arr, int node, int start, int end) {
         // Base case: leaf node represents a single element
         if (start == end) {
             tree[node] = arr[start];
@@ -80,6 +79,8 @@ private:
         }
 
         int mid = start + (end - start) / 2;
+        // 0 based indexing hence +1 and +2
+        // for 1 based indexing it can be +0 and +1
         int leftChild = 2 * node + 1;
         int rightChild = 2 * node + 2;
 

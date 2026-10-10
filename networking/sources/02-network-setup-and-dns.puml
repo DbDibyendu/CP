@@ -1,0 +1,126 @@
+@startuml 02-network-setup-and-dns
+' References: Kurose & Ross Ch. 2 / Ch. 6; RFC 2131, 2132, 1034, 1035.
+' https://gaia.cs.umass.edu/kurose_ross/videos/2/
+' https://www.rfc-editor.org/rfc/rfc2131
+' https://www.rfc-editor.org/rfc/rfc1034
+hide footbox
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam maxMessageSize 360
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBorderColor #475569
+  ParticipantFontColor #0F172A
+  GroupBackgroundColor #F8FAFC
+  GroupBorderColor #94A3B8
+  DividerBackgroundColor #E2E8F0
+  DividerBorderColor #94A3B8
+  NoteBackgroundColor #FFFBE6
+  NoteBorderColor #D4B95E
+  MessageAlign left
+}
+
+title 02 | Before HTTPS: network readiness and name resolution [overview stages 1-2]
+participant "Client HTTP\napplication" as C #DBEAFE
+participant "OS / network\nconfiguration + resolver" as O #DBEAFE
+participant "DHCP\nserver" as H #DBEAFE
+participant "Recursive\nDNS resolver" as D #DBEAFE
+participant "Root DNS\nserver" as R #DBEAFE
+participant ".com TLD\nDNS server" as T #DBEAFE
+participant "Authoritative DNS\nfor example.com" as A #DBEAFE
+
+note over C,A
+  READ FIRST: setup is conditional; DNS is its own network conversation.
+  DNS returns addresses. The HTTPS request later uses a different connection.
+  All shown network exchanges descend through transport, IP, link, physical.
+end note
+
+== 1a | Establish the access link, if necessary ==
+O -> O: Ethernet: link negotiation / link up\nWi-Fi: discover AP, authenticate/associate;\ncomplete link security exchange when required
+note over O,H #DCFCE7
+  Link readiness comes before ordinary IP traffic.
+  A combined home box can act as AP, switch, router, DHCP server, and NAT.
+  These are separate functions even when housed in the same device.
+end note
+
+== 1b | Obtain IPv4 configuration, if absent ==
+opt No usable static / leased configuration
+  O -> H: DHCPDISCOVER: initial broadcast\nUDP 68 -> 67; 0.0.0.0 -> 255.255.255.255
+  H --> O: DHCPOFFER: offered address + options\nDelivery may be broadcast or unicast
+  O -> H: DHCPREQUEST: broadcast chosen offer
+  H --> O: DHCPACK: lease + configuration options
+  O -> O: Configure 192.168.1.10/24\ngateway 192.168.1.1; resolver address; lease timers
+end
+note over O,H #FFEDD5
+  Initial broadcasts stay local unless a DHCP relay forwards them.
+  DHCP renewals differ from this initial four-message example.
+  A host with valid configuration skips this stage.
+end note
+
+== 2a | Check local name sources and caches ==
+C -> C: Parse URL: scheme https, host www.example.com,\nport 443, path /hello
+C -> O: Resolve hostname (getaddrinfo-like API)
+O -> O: Check configured name sources / local DNS cache
+alt Usable local result exists
+  O --> C: Return cached address(es)
+else Local DNS lookup needed
+  note over O,D #DCFCE7
+    To reach an off-subnet resolver, use a route and the gateway's MAC.
+    ARP resolves the next hop if its cache entry is missing [see 04].
+    Never ARP across the Internet for the DNS server's remote MAC.
+  end note
+  O -> D: Recursive query: www.example.com, type A\nOrdinary DNS: UDP ephemeral port -> 53
+  alt Resolver has a usable cached answer
+    D -> D: Use cached answer and remaining TTL
+  else Answer / necessary delegations are not cached
+    D -> R: Iterative query for www.example.com
+    R --> D: Referral: .com nameservers\n+ address glue where needed
+    D -> T: Iterative query for www.example.com
+    T --> D: Referral: example.com nameservers\n+ address glue where needed
+    D -> A: Query authoritative server for A record
+    A --> D: Answer + record TTL\nIllustrative A = 203.0.113.20
+    D -> D: Cache answer and usable referrals
+  end
+  D --> O: DNS response: address + remaining TTL
+  O --> C: Address candidates for a connection attempt
+end
+
+== 2b | Practical alternatives and failure branches ==
+note over D,A
+  A recursive resolver performs the upstream work in this example.
+  Cached delegations can skip root/TLD queries; CNAME aliases require follow-up.
+  Authoritative NXDOMAIN means the name does not exist; it may be cached.
+  Timeout / SERVFAIL is a different failure and can cause retry or fallback.
+end note
+note over O,D #EDE9FE
+  AAAA queries obtain IPv6 candidates; A and AAAA can be requested in parallel.
+  Traditional DNS also supports TCP 53; truncation can trigger TCP retry.
+  DoT: DNS over TLS, typically TCP 853.
+  DoH: DNS messages carried in HTTPS, typically port 443.
+  A browser may use its own resolver / DoH rather than this OS path.
+  Encrypted resolver access still needs a bootstrap address / configuration.
+end note
+note over C,D #FCE7F3
+  A DNS answer does not establish HTTPS server identity.
+  TLS later checks the certificate against www.example.com [03].
+  DNSSEC can authenticate DNS data; it does not encrypt ordinary DNS traffic.
+end note
+
+C -> C: Select an address; start socket / connection setup [03]
+legend left
+  |= Color |= Role |
+  |<#DBEAFE> Application | HTTP, DNS, application logic |
+  |<#FCE7F3> Security | TLS above TCP; SSL is the historical name |
+  |<#EDE9FE> Transport | TCP; sockets are a local API boundary |
+  |<#FFEDD5> Network | IP addressing and router forwarding |
+  |<#DCFCE7> Link | Ethernet / Wi-Fi framing and local delivery |
+  |<#FEF3C7> Physical | Electrical, optical, or radio signals |
+  Solid arrows: actions / exchanges. Dashed arrows: replies / completions.
+  Arrow style does not imply a different delivery guarantee.
+endlegend
+
+@enduml

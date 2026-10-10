@@ -71,7 +71,6 @@ void dfs(int x, int col) {
 void solve() {
 
   ll i, j, k, start, count;
-
   ll l, r;
   cin >> n >> m;
   adj.assign(n + 1, vector<ll>());
@@ -95,6 +94,7 @@ void solve() {
     return;
   }
   fo(i, 1, n + 1) { cout << vis[i] << " "; }
+
 }
 
 int main() {

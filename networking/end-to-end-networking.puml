@@ -1,0 +1,1020 @@
+' END-TO-END NETWORKING: six views + one layer-stack companion
+' Each @startuml block is a standalone named diagram.
+' Render as SVG for zooming; see README.md for reading order and references.
+
+@startuml 01-overview
+' Original teaching diagram based on Kurose & Ross, Chapters 1-6.
+' https://gaia.cs.umass.edu/kurose_ross/videos/6/
+hide footbox
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam maxMessageSize 360
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBorderColor #475569
+  ParticipantFontColor #0F172A
+  GroupBackgroundColor #F8FAFC
+  GroupBorderColor #94A3B8
+  DividerBackgroundColor #E2E8F0
+  DividerBorderColor #94A3B8
+  NoteBackgroundColor #FFFBE6
+  NoteBorderColor #D4B95E
+  MessageAlign left
+}
+
+title 01 | The complete journey: https://www.example.com/hello
+participant "Client\nHTTP application" as C #DBEAFE
+participant "DNS\nrecursive resolver" as D #DBEAFE
+participant "Network path\nLAN -> gateway -> Internet" as N #FFEDD5
+participant "Server\nHTTPS application" as S #DBEAFE
+
+note over C,S
+  READ FIRST: follow stages 1-8 downward; the other sources expand them.
+  Example: HTTP/1.1 + TLS 1.3 + TCP + IPv4; a new connection.
+  The addresses are illustrative, not the real DNS answer for this hostname.
+  Client 192.168.1.10:51514; server 203.0.113.20:443.
+end note
+
+== 1 | Get a usable network [detail: 02] ==
+C -> C: Link ready; IP address, subnet,\ndefault gateway, DNS resolver available
+note right of C
+  DHCP is optional setup when configuration is absent.
+  Existing configuration skips this work.
+end note
+
+== 2 | Find the server address [detail: 02] ==
+C -> D: DNS lookup: www.example.com\n(separate application exchange; if cache misses)
+D --> C: A / AAAA answer + cache lifetime
+
+== 3 | Open a reliable connection [detail: 03] ==
+note over S #EDE9FE
+  Server already has a listening socket on TCP port 443.
+end note
+C -> S: socket + connect; TCP SYN / SYN-ACK / ACK\nLogical exchange through the network path
+S --> C: TCP connection established; server accepts socket
+
+== 4 | Authenticate and secure the connection [detail: 03] ==
+C -> S: TLS handshake over this TCP connection
+S --> C: Server authenticated; traffic keys established
+note over C,S #FCE7F3
+  HTTP plaintext is visible at TLS endpoints.
+  Transit devices normally forward encrypted payloads.
+end note
+
+== 5 | Send the request through every layer [detail: 04] ==
+note over C #DBEAFE
+  APPLICATION: GET /hello + Host header
+  SECURITY: TLS encrypts into records
+  SOCKET API: TLS writes bytes to the TCP socket
+  TRANSPORT: TCP sends segments
+  NETWORK: IP wraps segments into packets
+  LINK: NIC builds local delivery frames
+  PHYSICAL: NIC transmits encoded signals
+end note
+C -> N: Physical transmission on the first link
+N -> N: Switch / AP: local frame forwarding\nRouters: IP forwarding + new outgoing link frames\nSignals are received and transmitted on each link
+N -> S: Last link delivers signals to server NIC
+
+== 6 | Receive and process [details: 03, 04] ==
+note over S #DBEAFE
+  PHYSICAL -> LINK -> IP -> TCP -> socket -> TLS -> HTTP
+  Recover bits; validate frame; extract packet; reassemble bytes;
+  verify/decrypt TLS; parse HTTP; call application handler.
+end note
+S -> S: Process /hello; prepare HTTP status, headers, body
+
+== 7 | Send the response back [detail: 04] ==
+S -> N: HTTP -> TLS -> socket -> TCP -> IP -> frame -> signals
+N -> N: Forward toward client; reverse NAT if present\nThe return route can differ from the request route
+N --> C: Signals -> frame -> IP -> TCP -> socket -> TLS -> HTTP
+C -> C: Consume the response body\nA browser may now parse, render, and fetch more resources
+
+== 8 | Reuse or close; handle delays and loss [detail: 05] ==
+note over C,S #EDE9FE
+  TCP ACKs and loss recovery run throughout data transfer.
+  An ACK confirms transport receipt, not successful application processing.
+  Reuse an established connection, or close TLS and then TCP gracefully.
+end note
+
+note over N
+  [06] Alternatives: IPv6 / Neighbor Discovery; HTTP/3 / QUIC;
+  CDN or reverse proxy termination with a separate origin connection.
+  Every DNS, TCP, and TLS packet also uses network, link, and physical layers.
+end note
+legend left
+  |= Color |= Role |
+  |<#DBEAFE> Application | HTTP, DNS, application logic |
+  |<#FCE7F3> Security | TLS above TCP; SSL is the historical name |
+  |<#EDE9FE> Transport | TCP; sockets are a local API boundary |
+  |<#FFEDD5> Network | IP addressing and router forwarding |
+  |<#DCFCE7> Link | Ethernet / Wi-Fi framing and local delivery |
+  |<#FEF3C7> Physical | Electrical, optical, or radio signals |
+  Solid arrows: actions / exchanges. Dashed arrows: replies / completions.
+  Arrow style does not imply a different delivery guarantee.
+endlegend
+
+@enduml
+
+@startuml 02-network-setup-and-dns
+' References: Kurose & Ross Ch. 2 / Ch. 6; RFC 2131, 2132, 1034, 1035.
+' https://gaia.cs.umass.edu/kurose_ross/videos/2/
+' https://www.rfc-editor.org/rfc/rfc2131
+' https://www.rfc-editor.org/rfc/rfc1034
+hide footbox
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam maxMessageSize 360
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBorderColor #475569
+  ParticipantFontColor #0F172A
+  GroupBackgroundColor #F8FAFC
+  GroupBorderColor #94A3B8
+  DividerBackgroundColor #E2E8F0
+  DividerBorderColor #94A3B8
+  NoteBackgroundColor #FFFBE6
+  NoteBorderColor #D4B95E
+  MessageAlign left
+}
+
+title 02 | Before HTTPS: network readiness and name resolution [overview stages 1-2]
+participant "Client HTTP\napplication" as C #DBEAFE
+participant "OS / network\nconfiguration + resolver" as O #DBEAFE
+participant "DHCP\nserver" as H #DBEAFE
+participant "Recursive\nDNS resolver" as D #DBEAFE
+participant "Root DNS\nserver" as R #DBEAFE
+participant ".com TLD\nDNS server" as T #DBEAFE
+participant "Authoritative DNS\nfor example.com" as A #DBEAFE
+
+note over C,A
+  READ FIRST: setup is conditional; DNS is its own network conversation.
+  DNS returns addresses. The HTTPS request later uses a different connection.
+  All shown network exchanges descend through transport, IP, link, physical.
+end note
+
+== 1a | Establish the access link, if necessary ==
+O -> O: Ethernet: link negotiation / link up\nWi-Fi: discover AP, authenticate/associate;\ncomplete link security exchange when required
+note over O,H #DCFCE7
+  Link readiness comes before ordinary IP traffic.
+  A combined home box can act as AP, switch, router, DHCP server, and NAT.
+  These are separate functions even when housed in the same device.
+end note
+
+== 1b | Obtain IPv4 configuration, if absent ==
+opt No usable static / leased configuration
+  O -> H: DHCPDISCOVER: initial broadcast\nUDP 68 -> 67; 0.0.0.0 -> 255.255.255.255
+  H --> O: DHCPOFFER: offered address + options\nDelivery may be broadcast or unicast
+  O -> H: DHCPREQUEST: broadcast chosen offer
+  H --> O: DHCPACK: lease + configuration options
+  O -> O: Configure 192.168.1.10/24\ngateway 192.168.1.1; resolver address; lease timers
+end
+note over O,H #FFEDD5
+  Initial broadcasts stay local unless a DHCP relay forwards them.
+  DHCP renewals differ from this initial four-message example.
+  A host with valid configuration skips this stage.
+end note
+
+== 2a | Check local name sources and caches ==
+C -> C: Parse URL: scheme https, host www.example.com,\nport 443, path /hello
+C -> O: Resolve hostname (getaddrinfo-like API)
+O -> O: Check configured name sources / local DNS cache
+alt Usable local result exists
+  O --> C: Return cached address(es)
+else Local DNS lookup needed
+  note over O,D #DCFCE7
+    To reach an off-subnet resolver, use a route and the gateway's MAC.
+    ARP resolves the next hop if its cache entry is missing [see 04].
+    Never ARP across the Internet for the DNS server's remote MAC.
+  end note
+  O -> D: Recursive query: www.example.com, type A\nOrdinary DNS: UDP ephemeral port -> 53
+  alt Resolver has a usable cached answer
+    D -> D: Use cached answer and remaining TTL
+  else Answer / necessary delegations are not cached
+    D -> R: Iterative query for www.example.com
+    R --> D: Referral: .com nameservers\n+ address glue where needed
+    D -> T: Iterative query for www.example.com
+    T --> D: Referral: example.com nameservers\n+ address glue where needed
+    D -> A: Query authoritative server for A record
+    A --> D: Answer + record TTL\nIllustrative A = 203.0.113.20
+    D -> D: Cache answer and usable referrals
+  end
+  D --> O: DNS response: address + remaining TTL
+  O --> C: Address candidates for a connection attempt
+end
+
+== 2b | Practical alternatives and failure branches ==
+note over D,A
+  A recursive resolver performs the upstream work in this example.
+  Cached delegations can skip root/TLD queries; CNAME aliases require follow-up.
+  Authoritative NXDOMAIN means the name does not exist; it may be cached.
+  Timeout / SERVFAIL is a different failure and can cause retry or fallback.
+end note
+note over O,D #EDE9FE
+  AAAA queries obtain IPv6 candidates; A and AAAA can be requested in parallel.
+  Traditional DNS also supports TCP 53; truncation can trigger TCP retry.
+  DoT: DNS over TLS, typically TCP 853.
+  DoH: DNS messages carried in HTTPS, typically port 443.
+  A browser may use its own resolver / DoH rather than this OS path.
+  Encrypted resolver access still needs a bootstrap address / configuration.
+end note
+note over C,D #FCE7F3
+  A DNS answer does not establish HTTPS server identity.
+  TLS later checks the certificate against www.example.com [03].
+  DNSSEC can authenticate DNS data; it does not encrypt ordinary DNS traffic.
+end note
+
+C -> C: Select an address; start socket / connection setup [03]
+legend left
+  |= Color |= Role |
+  |<#DBEAFE> Application | HTTP, DNS, application logic |
+  |<#FCE7F3> Security | TLS above TCP; SSL is the historical name |
+  |<#EDE9FE> Transport | TCP; sockets are a local API boundary |
+  |<#FFEDD5> Network | IP addressing and router forwarding |
+  |<#DCFCE7> Link | Ethernet / Wi-Fi framing and local delivery |
+  |<#FEF3C7> Physical | Electrical, optical, or radio signals |
+  Solid arrows: actions / exchanges. Dashed arrows: replies / completions.
+  Arrow style does not imply a different delivery guarantee.
+endlegend
+
+@enduml
+
+@startuml 03-sockets-tcp-and-tls
+' References: Kurose & Ross Ch. 2-3; RFC 9293, 8446, 9525, 9112.
+' https://gaia.cs.umass.edu/kurose_ross/videos/2/
+' https://www.rfc-editor.org/rfc/rfc9293
+' https://www.rfc-editor.org/rfc/rfc8446
+hide footbox
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam maxMessageSize 360
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBorderColor #475569
+  ParticipantFontColor #0F172A
+  GroupBackgroundColor #F8FAFC
+  GroupBorderColor #94A3B8
+  DividerBackgroundColor #E2E8F0
+  DividerBorderColor #94A3B8
+  NoteBackgroundColor #FFFBE6
+  NoteBorderColor #D4B95E
+  MessageAlign left
+}
+
+title 03 | Socket APIs, TCP, TLS, HTTP, and closure [overview stages 3-4, 6, 8]
+participant "Client HTTP\napplication" as C #DBEAFE
+participant "Client TLS\nlibrary" as CT #FCE7F3
+participant "Client socket API\n+ OS TCP" as CS #EDE9FE
+participant "Server socket API\n+ OS TCP" as SS #EDE9FE
+participant "Server TLS\nlibrary" as ST #FCE7F3
+participant "Server HTTP\napplication" as S #DBEAFE
+
+note over C,S
+  READ FIRST: local arrows are API calls; TCP arrows are wire exchanges.
+  TLS handshake arrows between libraries are logical exchanges:
+  they ALL traverse sockets -> TCP -> IP -> link -> physical [04].
+  This is a blocking-style teaching model; real servers often use event loops.
+  Baseline: full TLS 1.3 handshake, no resumption, no client certificate.
+end note
+
+== 3a | Server establishes a listening endpoint ==
+S -> SS: socket(AF_INET, SOCK_STREAM)
+SS --> S: Listening socket descriptor
+S -> SS: bind(local-address, 443); listen(backlog)
+S -> SS: accept(): wait for a connection
+note over SS,S #EDE9FE
+  Listening socket accepts connections.
+  Each accepted socket represents one connected TCP endpoint;
+  the listener remains available for other clients.
+end note
+
+== 3b | Client establishes a TCP connection ==
+C -> CS: socket(AF_INET, SOCK_STREAM)
+CS --> C: Socket descriptor
+C -> CS: connect(203.0.113.20, 443)
+CS -> CS: Choose local address + ephemeral port 51514\nCreate connection state; determine route / next hop
+CS -> SS: SYN: Seq=x; MSS / window options\nVia all lower layers; optional NAT [04]
+SS --> CS: SYN + ACK: Seq=y, Ack=x+1
+CS -> SS: ACK: Seq=x+1, Ack=y+1
+CS --> C: connect() completes successfully
+SS --> S: accept() returns connected socket + peer endpoint
+note over CS,SS #EDE9FE
+  Connection identity: source IP/port + destination IP/port, within TCP.
+  Client sees 192.168.1.10:51514 -> 203.0.113.20:443.
+  With example NAT, server sees peer 198.51.100.10:62000.
+  TCP exposes a byte stream; SYN consumes one sequence number.
+end note
+
+== 4 | TLS 1.3 secures this connection ==
+C -> CT: Attach connected socket; start TLS client handshake
+S -> ST: Attach accepted socket; start TLS server handshake
+CT -> ST: ClientHello (unencrypted in this baseline)\nversions, cipher suites, key share;\nSNI=www.example.com; ALPN offers
+ST --> CT: ServerHello: selected version/cipher + key share
+CT -> CT: Derive handshake keys from\nephemeral shared secret + transcript
+ST -> ST: Derive handshake keys
+ST --> CT: EncryptedExtensions (selected ALPN: http/1.1)\nCertificate; CertificateVerify; Finished\nProtected with server handshake keys
+CT -> CT: Validate trusted certificate chain, validity, hostname;\nverify CertificateVerify signature and Finished
+note over CT,ST #FCE7F3
+  Certificate validation failure aborts the secure connection.
+  Shared traffic secrets are derived; a session key is not simply sent.
+  Use separate directional application traffic keys.
+  No ECH is illustrated: ordinary SNI is visible in ClientHello.
+  HTTP Host/path/body are protected after encryption.
+end note
+CT -> ST: Client Finished, protected with client handshake keys
+ST -> ST: Verify client Finished
+CT --> C: Secure connection ready
+ST --> S: Secure connection ready
+
+== 5-6 | Encrypted HTTP request and server processing ==
+C -> CT: Write HTTP bytes:\nGET /hello HTTP/1.1\nHost: www.example.com
+CT -> CT: Frame TLS records; AEAD encrypt + authenticate
+CT -> CS: send()/write() encrypted bytes to socket
+CS -> SS: TCP byte stream carried in IP packets,\nlink frames, physical signals [04]
+SS --> ST: recv()/read() supplies encrypted stream bytes
+ST -> ST: Assemble records; verify tag; decrypt
+ST --> S: Deliver plaintext HTTP bytes
+S -> S: Parse HTTP framing; route /hello;\nrun handler; prepare response
+
+== 7 | Response uses the same full-duplex connection ==
+S -> ST: HTTP/1.1 200 OK\nContent-Length: 5; body: Hello
+ST -> ST: Encrypt/authenticate response records
+ST -> SS: send()/write() encrypted bytes
+SS --> CS: Response byte stream; lower-layer path [04]
+CS --> CT: recv()/read() encrypted bytes
+CT -> CT: Authenticate/decrypt; reconstruct plaintext
+CT --> C: HTTP response bytes
+C -> C: Parse status, headers, body framing; consume Hello
+note over C,S
+  Libraries may buffer and perform partial reads/writes.
+  One HTTP message can span many TLS records and TCP segments.
+  HTTP/2 can multiplex streams on one TLS/TCP connection;
+  it uses HTTP/2 framing after ALPN selects h2.
+end note
+
+== 8 | Reuse, or one possible orderly shutdown ==
+alt Keep connection for more requests
+  C -> C: Reuse the established connection\nSkip DNS/TCP/TLS setup while applicable
+else Client initiates graceful shutdown
+  C -> CT: Finish application work; initiate TLS shutdown
+  CT -> ST: Encrypted close_notify alert
+  ST --> CT: Encrypted close_notify alert\nExample peer responds orderly
+  C -> CS: close() / shutdown write side after TLS shutdown
+  CS -> SS: FIN + ACK (after prior data)
+  SS --> CS: ACK
+  S -> SS: close() / shutdown write side
+  SS --> CS: FIN + ACK
+  CS -> SS: ACK
+  CS -> CS: Active closer enters TIME_WAIT\nRetire connection state after wait
+end
+note over CS,SS
+  Each TCP direction closes independently; ACK/FIN can be combined.
+  Abrupt resets and timeouts follow different paths [05].
+  Exact TLS shutdown API behavior depends on the library.
+end note
+legend left
+  |= Color |= Role |
+  |<#DBEAFE> Application | HTTP, DNS, application logic |
+  |<#FCE7F3> Security | TLS above TCP; SSL is the historical name |
+  |<#EDE9FE> Transport | TCP; sockets are a local API boundary |
+  |<#FFEDD5> Network | IP addressing and router forwarding |
+  |<#DCFCE7> Link | Ethernet / Wi-Fi framing and local delivery |
+  |<#FEF3C7> Physical | Electrical, optical, or radio signals |
+  Solid arrows: actions / exchanges. Dashed arrows: replies / completions.
+  Arrow style does not imply a different delivery guarantee.
+endlegend
+
+@enduml
+
+@startuml 04-all-layers-and-network-hops
+' References: Kurose & Ross Ch. 1, 4-7; RFC 791, 826, 1191, 3022, 9293.
+' https://gaia.cs.umass.edu/kurose_ross/videos/1/
+' https://gaia.cs.umass.edu/kurose_ross/videos/4/
+' https://gaia.cs.umass.edu/kurose_ross/videos/5/
+' https://gaia.cs.umass.edu/kurose_ross/videos/6/
+' https://www.rfc-editor.org/rfc/rfc826
+' https://www.rfc-editor.org/rfc/rfc3022
+hide footbox
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam maxMessageSize 360
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBorderColor #475569
+  ParticipantFontColor #0F172A
+  GroupBackgroundColor #F8FAFC
+  GroupBorderColor #94A3B8
+  DividerBackgroundColor #E2E8F0
+  DividerBorderColor #94A3B8
+  NoteBackgroundColor #FFFBE6
+  NoteBorderColor #D4B95E
+  MessageAlign left
+}
+
+title 04 | Every layer, every kind of hop, and the return journey [overview stages 5-7]
+box "CLIENT HOST" #F8FAFC
+  participant "HTTP + TLS\nclient process" as C #DBEAFE
+  participant "Socket API\nOS TCP + IP" as O #EDE9FE
+  participant "Client NIC\nlink MAC + physical PHY" as CN #DCFCE7
+end box
+participant "Local Ethernet\nswitch / optional Wi-Fi AP" as L #DCFCE7
+participant "Gateway G\nLAN and WAN interfaces" as G #FFEDD5
+participant "ISP / transit\nrouter R1 ... Rn" as R #FFEDD5
+participant "Destination\nedge router E" as E #FFEDD5
+box "SERVER HOST" #F8FAFC
+  participant "Server NIC\nlink MAC + physical PHY" as SN #DCFCE7
+  participant "OS IP + TCP\nsocket API" as SO #EDE9FE
+  participant "TLS + HTTP\nserver process" as S #DBEAFE
+end box
+
+note over C,S
+  READ FIRST: handshake is already complete [03]. Follow one request packet, then its response.
+  Many packets may be needed; this trace simplifies their repetition, not the layers.
+  Baseline access: Ethernet via a switch. Wi-Fi differences are in a separate note below.
+  C=192.168.1.10:51514; gateway LAN=192.168.1.1; server=203.0.113.20:443.
+  Example optional NAT: gateway public endpoint=198.51.100.10:62000.
+  MAC_C, MAC_G_LAN, etc. are symbolic link addresses. Remote IPs use documentation ranges.
+end note
+
+== 5a | Application, security, socket, and transport ==
+C -> C: [Application] Serialize GET /hello HTTP/1.1\nHost: www.example.com; header terminator
+C -> C: [TLS above TCP] Encrypt/authenticate plaintext\nTLS record = header + protected content + tag
+C -> O: [Socket API] send/write encrypted bytes\nLocal API boundary: application -> transport service
+O -> O: [Transport] Buffer bytes; segment within MSS / path limit\nTCP header: ports, sequence/ACK, window, checksum
+note over C,O #EDE9FE
+  Buffering, offload, segmentation, and scheduling are implementation dependent.
+  A TLS record can span TCP segments; a segment can contain record pieces.
+  TCP receive reconstructs a stream, not application message boundaries.
+end note
+
+== 5b | Network layer chooses the next hop ==
+O -> O: [Network] Construct IP packet carrying a TCP segment\nSrc=192.168.1.10; Dst=203.0.113.20; example TTL=64
+O -> O: Route lookup: destination is outside 192.168.1.0/24\nChoose gateway 192.168.1.1 and outgoing NIC
+note over O,G #FFEDD5
+  Destination IP stays the remote server's IP.
+  Next hop is a local forwarding decision; it is not the HTTP destination.
+  More specific routes can override the default gateway.
+end note
+
+== 5c | Link layer resolves the local next-hop address ==
+opt Gateway neighbor entry absent from ARP cache
+  O -> CN: ARP request for gateway 192.168.1.1
+  CN -> L: [Physical] Transmit frame as encoded electrical signals\n[Link] Ethernet broadcast destination FF:FF:FF:FF:FF:FF
+  L -> L: Recover bits; learn source MAC_C -> ingress port\nFlood broadcast to other eligible ports in the VLAN
+  L -> G: Broadcast ARP request: who has 192.168.1.1?
+  G --> L: ARP reply: 192.168.1.1 is MAC_G_LAN
+  L --> CN: Unicast reply toward MAC_C
+  CN --> O: Cache gateway IP -> MAC_G_LAN
+end
+note over CN,G #DCFCE7
+  ARP is local link traffic, not an IP packet forwarded across routers.
+  For an on-subnet server, resolve that server's MAC instead.
+end note
+
+== 5d | First link: frame, bits, and physical signals ==
+O -> CN: [Network -> Link] Queue IP packet for MAC_G_LAN
+CN -> CN: [Link] Build Ethernet frame:\nDst MAC_G_LAN | Src MAC_C | EtherType IPv4\nIP packet | padding if needed | FCS
+note over C,CN #DBEAFE
+  Conceptual nesting for this data packet:
+  Ethernet header [ IP header [ TCP header [ TLS ciphertext bytes ] ] ] FCS
+  Original HTTP bytes are inside authenticated encryption.
+  Headers shown do not imply one whole HTTP message fits in one frame.
+end note
+CN -> CN: [Physical] Serialize frame transmission;\nPHY encodes symbols for negotiated Ethernet link
+CN -> L: Copper: electrical signal waveform over the cable\nPreamble / synchronization precede frame bits
+L -> L: [Physical Rx] Recover timing, symbols, bits\n[Link Rx] Validate frame FCS; reject corrupt frame
+L -> L: Learn source MAC; look up destination MAC\nKnown unicast -> chosen port; unknown unicast -> flood
+L -> G: [Physical Tx] New electrical transmission on egress cable\nEthernet Src=MAC_C, Dst=MAC_G_LAN
+note over L #DCFCE7
+  A normal switch bridges frames within the VLAN.
+  It preserves these endpoint MAC addresses and the IP packet;
+  it does not decrement IP TTL for ordinary switching.
+  Physical transmission restarts on the outgoing port.
+end note
+
+== 5e | Gateway: physical receive -> link receive -> IP forward ==
+G -> G: Ingress PHY recovers bits; MAC checks FCS\nRemove incoming Ethernet header/trailer; inspect IP header
+G -> G: [Network] Longest-prefix lookup -> WAN next hop\nDecrement TTL 64 -> 63; update IPv4 header checksum
+opt Gateway performs example outbound NAT / port translation
+  G -> G: Map 192.168.1.10:51514 -> 198.51.100.10:62000\nRewrite source IP/port; adjust affected IP/TCP checksums\nKeep mapping for matching return traffic
+end
+G -> G: [Link] Obtain WAN next-hop link address if needed\nBuild new frame: Src=MAC_G_WAN; Dst=MAC_R1_IN\n[Physical] Outgoing PHY generates link signals
+G -> R: Example fiber link: encoded optical transmission\nCarries IP/TCP packet containing TLS ciphertext
+
+== 5f | Repeat forwarding across the Internet ==
+loop Each illustrated ISP / transit router along the selected path
+  R -> R: Rx PHY -> recover bits; Rx link -> validate/extract IP\nIP: longest-prefix lookup, decrease TTL, check MTU\nSwitching fabric -> egress queue -> new link frame -> Tx PHY
+end
+note over R #FFEDD5
+  ROUTING CONTROL PLANE: OSPF / other IGP inside an AS;
+  BGP between ASes advertises reachability and policy.
+  Selected routes populate forwarding tables in advance.
+  DATA PLANE: each arriving packet uses the current table;
+  it does not run BGP negotiation for every HTTP request.
+  AS = autonomous system; IGP = interior gateway protocol.
+end note
+note over G,E #FFEDD5
+  At each routed boundary: discard incoming link encapsulation and create outgoing encapsulation.
+  Link technology can change: Ethernet, provider links, radio, etc.; not every link uses MAC/ARP.
+  NAT aside, IP endpoints stay constant; TTL decreases and IPv4 checksum changes.
+  Ordinary transit forwarding does not decrypt TLS or reconstruct HTTP.
+end note
+R -> E: Last transit link: packet toward 203.0.113.20
+
+== 5g | Destination edge and last link ==
+E -> E: Rx PHY -> Link -> IP; find directly attached server subnet\nDecrease TTL; resolve server neighbor if cache misses
+E -> E: Build final Ethernet frame:\nSrc=MAC_E_LAN; Dst=MAC_SERVER; unchanged IP destination
+E -> SN: Example last copper link: encoded electrical signals
+SN -> SN: PHY recovers symbols/bits; MAC validates FCS\nAccept local destination frame; extract IP packet
+SN -> SO: [Link -> Network] Deliver IP packet to host stack
+
+== 6 | Server receives upward through all layers ==
+SO -> SO: [IP] Validate header / destination / protocol;\nreassemble IP fragments if this example path produced any
+SO -> SO: [TCP] Verify checksum; identify connection;\nreorder/deduplicate bytes; update receive state and ACKs
+SO --> S: [Socket] recv/read supplies available ordered ciphertext bytes
+S -> S: [TLS] Assemble records; authenticate/decrypt\n[HTTP] Parse framing; dispatch /hello handler
+S -> S: Prepare HTTP/1.1 200 OK; Content-Length: 5; body Hello
+note over SO,S #EDE9FE
+  TCP ACK generation can occur before TLS decryption or handler execution.
+  A receive call can return fewer bytes than a TLS record or HTTP message.
+end note
+
+== 7 | Response descends the server stack and returns ==
+S -> S: HTTP serialize -> TLS record protection
+S -> SO: Socket send/write: response ciphertext
+SO -> SO: TCP segment: Src port=443, Dst port=62000 with NAT\nIP: Src=203.0.113.20, Dst=198.51.100.10\nChoose response route and next hop
+SO -> SN: IP packet -> Ethernet frame toward MAC_E_LAN
+SN --> E: Physical response transmission; Link -> IP at E
+E -> E: IP lookup; TTL decrement; new outgoing link encapsulation
+E --> R: Outgoing response signals carrying frame/packet
+R -> R: Repeat Rx PHY -> Link -> IP -> Link -> Tx PHY\nReturn path may use different routers
+R --> G: Response packet addressed to gateway public IP
+opt The request used NAT and the return mapping exists
+  G -> G: Reverse mapping of destination endpoint:\n198.51.100.10:62000 -> 192.168.1.10:51514\nAdjust affected checksums
+end
+G -> G: Route to client LAN; decrease TTL; use cached / resolved MAC_C\nNew Ethernet frame: Src=MAC_G_LAN, Dst=MAC_C
+G --> L: Physical transmission on LAN cable
+L --> CN: Bridge response frame; new physical transmission to client
+CN -> CN: PHY recover bits -> Link validate/extract IP
+CN --> O: Deliver IP packet to host stack
+O -> O: IP -> TCP checksum/demux/reorder -> socket buffer
+O --> C: Socket recv -> TLS verify/decrypt -> HTTP response parse
+C -> C: Application consumes Hello
+note over SO,G #FFEDD5
+  Without NAT: response destination is 192.168.1.10:51514 in this private routed example.
+  Addresses must be routable within that chosen network; skip both translation steps.
+  The pictured return uses the same device roles only to keep the drawing readable.
+end note
+
+== Depth notes | Wi-Fi, physical media, MTU, and packet loss ==
+note over CN,L #DCFCE7
+  WI-FI ACCESS ALTERNATIVE:
+  Associate with AP; use 802.11 MAC frames and radio PHY.
+  In a typical infrastructure uplink, receiver address is the AP/BSSID;
+  other address fields identify the original source and bridged destination.
+  AP bridges payload into Ethernet; it does not route merely because it is an AP.
+  Shared radio access: CSMA/CA contention/backoff; many unicast frames get link ACK/retry.
+  A Wi-Fi link ACK is local and is different from an end-to-end TCP ACK.
+end note
+note over CN,E #FEF3C7
+  PHYSICAL LAYER ON EACH LINK:
+  Tx: frame bits -> encoding/modulation -> electrical / optical / radio signal.
+  Rx: synchronization, symbol recovery, decoding -> frame bits for the MAC.
+  Copper: voltage/current signaling; fiber: modulated light; Wi-Fi: radio modulation, often OFDM.
+  Bit rate controls serialization time; distance and medium control propagation time.
+  Link checks and optional local retries do not guarantee end-to-end application delivery.
+  NIC = network interface controller; MAC = media access control; PHY = physical transceiver.
+end note
+note over O,E #FFEDD5
+  MTU bounds an outgoing IP packet's size; TCP MSS bounds segment payload.
+  IPv4 DF=1 + packet too large: discard and report ICMP fragmentation-needed when allowed.
+  Path MTU discovery lets the sender reduce packet sizes; IPv4 DF=0 may allow fragmentation.
+  IPv6 routers do not fragment; ICMPv6 Packet Too Big informs the sender [06].
+  Corrupt frames, expired TTL, queue overflow, or unreachable routes may drop packets [05].
+end note
+legend left
+  |= Color |= Role |
+  |<#DBEAFE> Application | HTTP, DNS, application logic |
+  |<#FCE7F3> Security | TLS above TCP; SSL is the historical name |
+  |<#EDE9FE> Transport | TCP; sockets are a local API boundary |
+  |<#FFEDD5> Network | IP addressing and router forwarding |
+  |<#DCFCE7> Link | Ethernet / Wi-Fi framing and local delivery |
+  |<#FEF3C7> Physical | Electrical, optical, or radio signals |
+  Solid arrows: actions / exchanges. Dashed arrows: replies / completions.
+  Arrow style does not imply a different delivery guarantee.
+endlegend
+
+@enduml
+
+@startuml 04a-layer-stack
+' Original companion to 04: layer placement and bidirectional encapsulation.
+' https://gaia.cs.umass.edu/kurose_ross/videos/1/
+' https://gaia.cs.umass.edu/kurose_ross/videos/6/
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam packageStyle rectangle
+skinparam nodesep 35
+skinparam ranksep 25
+skinparam ArrowColor #334155
+skinparam rectangleBorderColor #475569
+skinparam packageBorderColor #94A3B8
+skinparam NoteBackgroundColor #FFFBE6
+skinparam NoteBorderColor #D4B95E
+title 04a | The layer stack: request DOWN at client, UP at server; response reverses it
+
+package "CLIENT HOST" #F8FAFC {
+  rectangle "APPLICATION\nHTTP request / response bytes" as CA #DBEAFE
+  rectangle "SECURITY ABOVE TCP\nTLS record protection / decryption" as CT #FCE7F3
+  rectangle "LOCAL SOCKET API\nsend / recv byte-stream service" as CS #F1F5F9
+  rectangle "TRANSPORT\nTCP segments / ordered byte stream" as CC #EDE9FE
+  rectangle "NETWORK\nIP packet; remote destination IP" as CI #FFEDD5
+  rectangle "LINK\nEthernet / Wi-Fi frame; next-hop address" as CL #DCFCE7
+  rectangle "PHYSICAL\nNIC PHY: bits <-> electrical / radio signals" as CP #FEF3C7
+  CA <-down-> CT
+  CT <-down-> CS
+  CS <-down-> CC
+  CC <-down-> CI
+  CI <-down-> CL
+  CL <-down-> CP
+}
+
+package "SERVER HOST" #F8FAFC {
+  rectangle "APPLICATION\nHTTP parser / handler / response" as SA #DBEAFE
+  rectangle "SECURITY ABOVE TCP\nTLS verification / record protection" as ST #FCE7F3
+  rectangle "LOCAL SOCKET API\nrecv / send byte-stream service" as SS #F1F5F9
+  rectangle "TRANSPORT\nTCP byte-stream delivery / segmentation" as SC #EDE9FE
+  rectangle "NETWORK\nLocal IP delivery / response route" as SI #FFEDD5
+  rectangle "LINK\nAccept local frame / create next-hop frame" as SL #DCFCE7
+  rectangle "PHYSICAL\nNIC PHY: electrical / optical signals <-> bits" as SP #FEF3C7
+  SA <-down-> ST
+  ST <-down-> SS
+  SS <-down-> SC
+  SC <-down-> SI
+  SI <-down-> SL
+  SL <-down-> SP
+}
+
+CA -[hidden]right-> SA
+CP -[hidden]right-> SP
+
+rectangle "ACCESS SWITCH / AP\nLink + Physical\nReceive and forward / bridge local frames" as SW #DCFCE7
+rectangle "GATEWAY / ISP / EDGE ROUTERS\nNetwork + Link + Physical\nRx PHY -> link -> IP forwarding\n-> new link encapsulation -> Tx PHY" as RT #FFEDD5
+
+CP <-down-> SW : Copper / radio signals\nLocal frame carries IP packet
+SW <-right-> RT : Next link's transmission
+RT <-up-> SP : Last link's transmission\nDifferent return route is possible
+
+note left of CA
+  READ FIRST: HTTP, TCP, IP, Link, Physical
+  are the five Internet-model layers.
+  TLS and socket API are shown separately
+  to explain the real implementation path.
+  Setup / DNS / handshakes: 02 and 03.
+end note
+note right of SA
+  Request: client encodes downward;
+  server decodes upward, then processes it.
+  Response: server encodes downward;
+  client decodes upward and consumes it.
+  Every double arrow supports both directions.
+end note
+note bottom of RT
+  Example on a data-carrying Ethernet link:
+  Ethernet header [ IP header [ TCP header [ encrypted TLS bytes ] ] ] FCS
+  TCP segments and TLS records need not share boundaries.
+  Switches preserve IP TTL; routers decrease TTL / Hop Limit.
+  Router boundaries replace link encapsulation; NAT may rewrite IP/ports.
+  Transit devices forward ciphertext; TLS terminates at endpoints [06 for proxy variant].
+  Trace concrete addresses, frames, and PHY operations in 04.
+end note
+
+legend bottom
+  Typical implementation: HTTP/TLS in user space; TCP/IP in the OS;
+  link/physical work in drivers, NICs, and transceivers. Offload can move work.
+  Color key: blue application; pink TLS; purple transport;
+  orange network; green link; yellow physical; gray socket API.
+endlegend
+@enduml
+
+@startuml 05-reliability-delays-and-failures
+' References: Kurose & Ross Ch. 1 / 3; RFC 9293, 5681, 1191, 9110.
+' https://gaia.cs.umass.edu/kurose_ross/videos/3/
+' https://www.rfc-editor.org/rfc/rfc9293
+' https://www.rfc-editor.org/rfc/rfc5681
+hide footbox
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam maxMessageSize 360
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBorderColor #475569
+  ParticipantFontColor #0F172A
+  GroupBackgroundColor #F8FAFC
+  GroupBorderColor #94A3B8
+  DividerBackgroundColor #E2E8F0
+  DividerBorderColor #94A3B8
+  NoteBackgroundColor #FFFBE6
+  NoteBorderColor #D4B95E
+  MessageAlign left
+}
+
+title 05 | Delivery, delay, and failure [overview stages 5-8]
+participant "Client HTTP\n+ TLS process" as C #DBEAFE
+participant "Client OS\nTCP sender / receiver" as CT #EDE9FE
+participant "Intermediate router\ninput -> queue -> output" as R #FFEDD5
+participant "Server OS\nTCP receiver / sender" as ST #EDE9FE
+participant "Server TLS\n+ HTTP handler" as S #DBEAFE
+
+note over C,S
+  READ FIRST: the connection is already established; these are illustrative byte ranges.
+  TCP sequence numbers count stream bytes, including encrypted TLS data in this example.
+  SYN/FIN each consume a sequence number. ACK-only segments do not consume stream bytes.
+  Network arrows summarize link and physical transmission detailed in 04.
+end note
+
+== 5 | Queueing and physical transmission occur at every hop ==
+C -> CT: Write request ciphertext into socket send buffer
+CT -> CT: Respect available send-buffer space,\ncongestion window, advertised receive window, and pacing
+CT -> R: TCP segment carrying encrypted request bytes
+R -> R: Receive bits/frame; extract IP packet;\nprocessing and forwarding-table lookup
+R -> R: Wait in egress queue behind other packets
+R -> R: Transmit packet in outgoing frame\nSerialization time = L / R_link
+R -> ST: Signals propagate along the outgoing medium\nPropagation time = distance / signal_speed
+note over R #FEF3C7
+  Per-hop delay = processing + queueing + transmission + propagation.
+  L is transmitted size in bits; R_link is outgoing bit rate in bits/second.
+  Higher bit rate reduces transmission time, not propagation distance.
+  Queueing varies with competing traffic; a full queue can drop arrivals.
+  Throughput is constrained by bottlenecks and sharing along the path.
+end note
+
+== 5-6 | Loss and ordering: an independent worked TCP example ==
+note over CT,ST #EDE9FE
+  For this example, server next expected byte is 1000.
+  Each illustrated segment carries 1000 stream bytes.
+end note
+CT -> ST: Seq=1000, payload bytes 1000..1999
+ST --> CT: Cumulative ACK=2000 (next expected byte)
+CT -> R: Seq=2000, payload bytes 2000..2999
+R -> R: Segment dropped: output queue full
+CT -> ST: Seq=3000, payload bytes 3000..3999
+ST -> ST: Buffer out-of-order bytes 3000..3999\nDo not deliver across missing byte range
+ST --> CT: Duplicate ACK=2000; optional SACK for 3000..3999
+note over CT,ST
+  Enough duplicate ACKs or another loss detector can trigger earlier recovery.
+  One duplicate ACK alone does not imply classic fast retransmit.
+  Here we illustrate retransmission on timeout instead.
+end note
+CT -> CT: Retransmission timer expires\nReduce congestion window according to sender's algorithm
+CT -> ST: Retransmit Seq=2000, bytes 2000..2999
+ST -> ST: Gap filled; stream now contiguous through byte 3999
+ST --> CT: ACK=4000
+ST --> S: Socket read provides newly contiguous ciphertext bytes
+S -> S: Assemble/verify TLS records; decrypt;\nparse complete HTTP request; run handler
+note over ST,S
+  ACK=4000 says bytes before 4000 reached TCP in order.
+  It does not say TLS accepted them, the handler ran, or a database commit succeeded.
+  Late duplicates are recognized by sequence numbers and not delivered twice by TCP.
+end note
+
+== 7 | Server response is also a reliable byte stream ==
+S -> ST: Encrypt HTTP response; write ciphertext bytes
+ST -> CT: Response segments on the same full-duplex connection
+CT --> ST: ACKs; advertise receive-buffer capacity
+CT --> C: Ordered stream bytes -> TLS -> HTTP response
+
+== Flow control and congestion control operate together ==
+note over CT,ST #EDE9FE
+  FLOW CONTROL: peer's receive window (rwnd) protects its receive buffers.
+  CONGESTION CONTROL: sender's congestion window (cwnd) limits network load.
+  Outstanding bytes are bounded approximately by min(rwnd, cwnd);
+  allowance for new data also subtracts bytes already in flight.
+  A slow-reading application can shrink rwnd and cause backpressure.
+  cwnd changes with ACK progress, detected loss, and algorithm-specific signals.
+  TCP checksum detects many accidental errors; TLS supplies cryptographic integrity.
+end note
+note over R,ST #DCFCE7
+  Corrupt link frame: FCS failure usually drops it before TCP sees it.
+  Wi-Fi may retry locally; ordinary full-duplex Ethernet has no equivalent per-frame ACK.
+  IP offers best-effort delivery; eventual TCP recovery is performed by endpoints.
+  Recovery is not guaranteed forever: connection or application deadlines can expire.
+end note
+
+== Failure scenarios | Separate examples, not additional successful stages ==
+group Before HTTP data can be exchanged
+  note over C,S
+    DNS NXDOMAIN / timeout / SERVFAIL: fail or retry resolution [02].
+    TCP refusal: remote RST; silent filtering/path failure: connect timeout.
+    TLS identity or handshake failure: abort the secure connection [03].
+  end note
+end
+group During packet forwarding
+  note over CT,R #FFEDD5
+    No usable route: drop; ICMP unreachable may be returned when permitted.
+    TTL expires: drop; ICMP Time Exceeded may be returned.
+    IPv4 DF packet exceeds MTU: drop; ICMP fragmentation-needed may be returned.
+    Sender adapts with path MTU discovery; blocked ICMP can cause a black hole.
+    Probe-based discovery can provide another way to find usable packet sizes.
+  end note
+end
+group After request transmission
+  note over C,S
+    TLS authentication-tag failure: terminate the secure connection.
+    HTTP 4xx/5xx: networking can succeed while the application reports an error.
+    Timeout/reset after sending: the client may not know whether the handler committed work.
+    Application retries need suitable semantics / idempotency to avoid duplicate side effects.
+  end note
+end
+
+== 8 | Reuse saves setup; a timing model explains first-byte latency ==
+note over C,S
+  Cold, simplified first-byte time:
+  DNS time + 1 RTT for TCP + 1 RTT for full TLS 1.3 + 1 RTT for HTTP + server processing.
+  Assumes immediate handshake progress, no loss/retry, and a small request/first response bytes.
+  Network configuration may add earlier delay; full response transfer adds further time.
+  Reused TCP/TLS connections avoid those connection-establishment round trips.
+  RTT = round-trip time. Close/reuse sequencing is in 03; HTTP/3 differs in 06.
+end note
+legend left
+  |= Color |= Role |
+  |<#DBEAFE> Application | HTTP, DNS, application logic |
+  |<#FCE7F3> Security | TLS above TCP; SSL is the historical name |
+  |<#EDE9FE> Transport | TCP; sockets are a local API boundary |
+  |<#FFEDD5> Network | IP addressing and router forwarding |
+  |<#DCFCE7> Link | Ethernet / Wi-Fi framing and local delivery |
+  |<#FEF3C7> Physical | Electrical, optical, or radio signals |
+  Solid arrows: actions / exchanges. Dashed arrows: replies / completions.
+  Arrow style does not imply a different delivery guarantee.
+endlegend
+
+@enduml
+
+@startuml 06-ipv6-quic-and-tls-termination
+' References: RFC 8200, 4861, 4862, 9000, 9001, 9114; Kurose & Ross Ch. 2-5.
+' https://www.rfc-editor.org/rfc/rfc8200
+' https://www.rfc-editor.org/rfc/rfc4861
+' https://www.rfc-editor.org/rfc/rfc9000
+' https://www.rfc-editor.org/rfc/rfc9001
+' https://www.rfc-editor.org/rfc/rfc9114
+hide footbox
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam maxMessageSize 360
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBorderColor #475569
+  ParticipantFontColor #0F172A
+  GroupBackgroundColor #F8FAFC
+  GroupBorderColor #94A3B8
+  DividerBackgroundColor #E2E8F0
+  DividerBorderColor #94A3B8
+  NoteBackgroundColor #FFFBE6
+  NoteBorderColor #D4B95E
+  MessageAlign left
+}
+
+title 06 | Three independent variants of the overview journey
+participant "Client HTTP / TLS\nor HTTP/3 / QUIC library" as C #DBEAFE
+participant "Client OS\nsockets / IP / neighbors" as O #EDE9FE
+participant "Local IPv6\nrouter" as G #FFEDD5
+participant "Network path\nIP -> link -> physical" as N #FFEDD5
+participant "CDN edge / proxy\nTLS + HTTP endpoint" as P #FCE7F3
+participant "Server endpoint\ndirect server / origin" as S #DBEAFE
+
+note over C,S
+  READ FIRST: these panels are independent alternatives, not successive stages.
+  A: IPv6 changes addressing and neighbor discovery.
+  B: HTTP/3 changes transport to QUIC over UDP.
+  C: Proxy termination changes where the client's connection ends.
+  They can also be combined in a real deployment.
+end note
+
+== A | IPv6: change the network path; HTTP/TLS/TCP can remain ==
+opt Initial IPv6 autoconfiguration is needed on this link
+  O -> G: ICMPv6 Router Solicitation
+  G --> O: Router Advertisement: prefix + router lifetime\nOther options as configured
+  O -> O: Example SLAAC: form address from suitable prefix\nPerform Duplicate Address Detection as required
+end
+note over O,G #FFEDD5
+  Example client address: 2001:db8:1::10; gateway link-local: fe80::1.
+  SLAAC = stateless address autoconfiguration.
+  A default router is learned from RA; DHCPv6 does not supply a default gateway.
+  DNS configuration may come from RA options, DHCPv6, or other configuration.
+end note
+C -> O: Resolve www.example.com: request IPv6 candidates
+O --> C: Illustrative AAAA answer: 2001:db8:2::20
+C -> O: Select candidate; socket(AF_INET6, SOCK_STREAM); connect(...,443)
+O -> O: IPv6 route lookup: choose next-hop router fe80::1
+opt Next-hop neighbor mapping is absent
+  O -> G: ICMPv6 Neighbor Solicitation\nTypically solicited-node multicast for address resolution
+  G --> O: Neighbor Advertisement with link address
+end
+O -> N: TCP establishment + TLS + HTTP packets via IPv6\nEthernet / Wi-Fi frame -> physical signals
+N -> S: Routers forward; decrease Hop Limit; replace link encapsulation
+S --> N: Response IPv6 packets toward client
+N --> O: Receive through physical -> link -> IPv6 -> TCP
+O --> C: Socket -> TLS -> HTTP response
+note over O,S #FFEDD5
+  Neighbor Discovery uses ICMPv6, not ARP broadcast.
+  Off-link packets use the router's link address, not a remote server's MAC.
+  IPv6 has no base-header checksum; routers do not fragment packets.
+  Packet too large: ICMPv6 Packet Too Big; sender adapts packet sizes.
+  Dual-stack clients can race/stagger IPv6 and IPv4 candidates (Happy Eyeballs).
+end note
+
+== B | HTTP/3: HTTP semantics over QUIC, carried in UDP ==
+C -> C: Discover HTTP/3 support, e.g. Alt-Svc / HTTPS DNS record\nChoose QUIC endpoint; fresh handshake in this example
+C -> O: Create UDP socket; send QUIC datagrams\nUsually destination UDP port 443
+note over C,O #EDE9FE
+  HTTP/3 -> QUIC streams + integrated TLS handshake -> UDP -> IP -> link -> physical.
+  A QUIC library commonly manages transport above a UDP socket.
+  UDP provides datagrams; QUIC provides reliability, ordering within streams,
+  congestion/flow control, packet protection, and connection IDs.
+end note
+C -> S: QUIC Initial packet: CRYPTO frames carry TLS ClientHello\nLogical exchange via UDP and all lower layers
+S --> C: Initial: TLS ServerHello\nHandshake: encrypted TLS authentication messages + Finished
+C -> C: Validate server identity; derive traffic secrets\nNegotiate ALPN h3
+C -> S: Handshake packet carrying client Finished
+C -> S: Protected 1-RTT packet(s): HTTP/3 HEADERS / DATA\non a QUIC request stream
+S -> S: Parse HTTP/3; dispatch /hello handler
+S --> C: Protected HTTP/3 response on request stream
+note over C,S #FCE7F3
+  QUIC carries TLS handshake messages in CRYPTO frames, not TLS records.
+  Application data uses QUIC packet protection, not the TCP/TLS record path.
+  Initial keys are publicly derivable: Initial protection is not secret authentication.
+  QUIC ACKs acknowledge packets; lost stream data can be sent in new packets.
+  Independent streams avoid TCP's cross-stream loss-induced ordering blockage;
+  they still share connection resources and congestion effects.
+  No TCP SYN handshake occurs. Resumed 0-RTT is optional and has replay constraints.
+  QUIC CONNECTION_CLOSE ends the connection; there is no TCP FIN sequence.
+end note
+note over O,N #FFEDD5
+  IPv4 or IPv6 still routes UDP packets, with hop-by-hop link/physical transmission.
+  If HTTP/3 cannot connect and the service supports it, a client may try HTTP/2 or HTTP/1.1.
+  Those attempts create TCP connections rather than turning QUIC into TCP.
+end note
+
+== C | CDN / reverse proxy: two separate connections and trust boundaries ==
+C -> C: DNS / service routing selects a CDN edge or proxy address
+C -> P: Connection A: TCP + TLS authenticated for www.example.com
+C -> P: Encrypted HTTP request on connection A
+P -> P: Terminate TLS; decrypt; apply HTTP routing / cache policy
+alt CDN can serve the request from cache
+  P --> C: Encrypt cached HTTP response on connection A
+else Origin work is needed
+  P -> S: Connection B: separate TCP + TLS to configured origin\nCreate or reuse origin connection; validate origin identity
+  P -> S: Forward HTTP request protected by connection B
+  S -> S: Handle request; create origin response
+  S --> P: Response protected by connection B
+  P -> P: Receive/decrypt origin response; apply response/cache policy
+  P --> C: Encrypt client response with connection A's traffic keys
+end
+note over C,S #FCE7F3
+  Connection A and B have independent sockets, keys, sequence spaces, and lifecycles.
+  The proxy is a TLS endpoint and sees plaintext HTTP while processing it.
+  The origin's transport peer is the proxy; client identity needs trusted metadata if required.
+  Forwarded / X-Forwarded-* headers require an explicit trusted-proxy policy.
+  Example B uses TLS; deployments can instead use plaintext or mutual TLS to the origin.
+  TLS passthrough is another design: a proxy forwards bytes without terminating client TLS.
+  A cache hit needs no origin request for this response.
+end note
+legend left
+  |= Color |= Role |
+  |<#DBEAFE> Application | HTTP, DNS, application logic |
+  |<#FCE7F3> Security | TLS above TCP; SSL is the historical name |
+  |<#EDE9FE> Transport | TCP; sockets are a local API boundary |
+  |<#FFEDD5> Network | IP addressing and router forwarding |
+  |<#DCFCE7> Link | Ethernet / Wi-Fi framing and local delivery |
+  |<#FEF3C7> Physical | Electrical, optical, or radio signals |
+  Solid arrows: actions / exchanges. Dashed arrows: replies / completions.
+  Arrow style does not imply a different delivery guarantee.
+endlegend
+
+@enduml

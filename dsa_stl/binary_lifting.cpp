@@ -52,9 +52,9 @@ void dfs(int v, int parent) {
 
 // Lifts node u up by k levels in the tree
 int lift_node(int u, int k) {
-  for (int i = 0; i < LOG; i++) {
-    if (k & (1 << i)) {
-      u = up[u][i];
+  for (int i = 0; i < LOG; i++) { // 0 to LOG or LOG to 0 doesn't matters here
+    if (k & (1 << i)) { // this matters only
+      u = up[u][i]; // lift to same
       if (u == -1)
         break; // Went past root
     }

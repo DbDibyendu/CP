@@ -73,6 +73,7 @@ void merge(vi &A, int l, int r, int mid) {
   }
 }
 
+// Concept is divide and conquer, important in some questions
 void mergesort(vi &A, int l, int r) {
   if (l < r) {
     int mid = (l + r) / 2;

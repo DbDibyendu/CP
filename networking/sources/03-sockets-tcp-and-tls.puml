@@ -1,0 +1,150 @@
+@startuml 03-sockets-tcp-and-tls
+' References: Kurose & Ross Ch. 2-3; RFC 9293, 8446, 9525, 9112.
+' https://gaia.cs.umass.edu/kurose_ross/videos/2/
+' https://www.rfc-editor.org/rfc/rfc9293
+' https://www.rfc-editor.org/rfc/rfc8446
+hide footbox
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam maxMessageSize 360
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBorderColor #475569
+  ParticipantFontColor #0F172A
+  GroupBackgroundColor #F8FAFC
+  GroupBorderColor #94A3B8
+  DividerBackgroundColor #E2E8F0
+  DividerBorderColor #94A3B8
+  NoteBackgroundColor #FFFBE6
+  NoteBorderColor #D4B95E
+  MessageAlign left
+}
+
+title 03 | Socket APIs, TCP, TLS, HTTP, and closure [overview stages 3-4, 6, 8]
+participant "Client HTTP\napplication" as C #DBEAFE
+participant "Client TLS\nlibrary" as CT #FCE7F3
+participant "Client socket API\n+ OS TCP" as CS #EDE9FE
+participant "Server socket API\n+ OS TCP" as SS #EDE9FE
+participant "Server TLS\nlibrary" as ST #FCE7F3
+participant "Server HTTP\napplication" as S #DBEAFE
+
+note over C,S
+  READ FIRST: local arrows are API calls; TCP arrows are wire exchanges.
+  TLS handshake arrows between libraries are logical exchanges:
+  they ALL traverse sockets -> TCP -> IP -> link -> physical [04].
+  This is a blocking-style teaching model; real servers often use event loops.
+  Baseline: full TLS 1.3 handshake, no resumption, no client certificate.
+end note
+
+== 3a | Server establishes a listening endpoint ==
+S -> SS: socket(AF_INET, SOCK_STREAM)
+SS --> S: Listening socket descriptor
+S -> SS: bind(local-address, 443); listen(backlog)
+S -> SS: accept(): wait for a connection
+note over SS,S #EDE9FE
+  Listening socket accepts connections.
+  Each accepted socket represents one connected TCP endpoint;
+  the listener remains available for other clients.
+end note
+
+== 3b | Client establishes a TCP connection ==
+C -> CS: socket(AF_INET, SOCK_STREAM)
+CS --> C: Socket descriptor
+C -> CS: connect(203.0.113.20, 443)
+CS -> CS: Choose local address + ephemeral port 51514\nCreate connection state; determine route / next hop
+CS -> SS: SYN: Seq=x; MSS / window options\nVia all lower layers; optional NAT [04]
+SS --> CS: SYN + ACK: Seq=y, Ack=x+1
+CS -> SS: ACK: Seq=x+1, Ack=y+1
+CS --> C: connect() completes successfully
+SS --> S: accept() returns connected socket + peer endpoint
+note over CS,SS #EDE9FE
+  Connection identity: source IP/port + destination IP/port, within TCP.
+  Client sees 192.168.1.10:51514 -> 203.0.113.20:443.
+  With example NAT, server sees peer 198.51.100.10:62000.
+  TCP exposes a byte stream; SYN consumes one sequence number.
+end note
+
+== 4 | TLS 1.3 secures this connection ==
+C -> CT: Attach connected socket; start TLS client handshake
+S -> ST: Attach accepted socket; start TLS server handshake
+CT -> ST: ClientHello (unencrypted in this baseline)\nversions, cipher suites, key share;\nSNI=www.example.com; ALPN offers
+ST --> CT: ServerHello: selected version/cipher + key share
+CT -> CT: Derive handshake keys from\nephemeral shared secret + transcript
+ST -> ST: Derive handshake keys
+ST --> CT: EncryptedExtensions (selected ALPN: http/1.1)\nCertificate; CertificateVerify; Finished\nProtected with server handshake keys
+CT -> CT: Validate trusted certificate chain, validity, hostname;\nverify CertificateVerify signature and Finished
+note over CT,ST #FCE7F3
+  Certificate validation failure aborts the secure connection.
+  Shared traffic secrets are derived; a session key is not simply sent.
+  Use separate directional application traffic keys.
+  No ECH is illustrated: ordinary SNI is visible in ClientHello.
+  HTTP Host/path/body are protected after encryption.
+end note
+CT -> ST: Client Finished, protected with client handshake keys
+ST -> ST: Verify client Finished
+CT --> C: Secure connection ready
+ST --> S: Secure connection ready
+
+== 5-6 | Encrypted HTTP request and server processing ==
+C -> CT: Write HTTP bytes:\nGET /hello HTTP/1.1\nHost: www.example.com
+CT -> CT: Frame TLS records; AEAD encrypt + authenticate
+CT -> CS: send()/write() encrypted bytes to socket
+CS -> SS: TCP byte stream carried in IP packets,\nlink frames, physical signals [04]
+SS --> ST: recv()/read() supplies encrypted stream bytes
+ST -> ST: Assemble records; verify tag; decrypt
+ST --> S: Deliver plaintext HTTP bytes
+S -> S: Parse HTTP framing; route /hello;\nrun handler; prepare response
+
+== 7 | Response uses the same full-duplex connection ==
+S -> ST: HTTP/1.1 200 OK\nContent-Length: 5; body: Hello
+ST -> ST: Encrypt/authenticate response records
+ST -> SS: send()/write() encrypted bytes
+SS --> CS: Response byte stream; lower-layer path [04]
+CS --> CT: recv()/read() encrypted bytes
+CT -> CT: Authenticate/decrypt; reconstruct plaintext
+CT --> C: HTTP response bytes
+C -> C: Parse status, headers, body framing; consume Hello
+note over C,S
+  Libraries may buffer and perform partial reads/writes.
+  One HTTP message can span many TLS records and TCP segments.
+  HTTP/2 can multiplex streams on one TLS/TCP connection;
+  it uses HTTP/2 framing after ALPN selects h2.
+end note
+
+== 8 | Reuse, or one possible orderly shutdown ==
+alt Keep connection for more requests
+  C -> C: Reuse the established connection\nSkip DNS/TCP/TLS setup while applicable
+else Client initiates graceful shutdown
+  C -> CT: Finish application work; initiate TLS shutdown
+  CT -> ST: Encrypted close_notify alert
+  ST --> CT: Encrypted close_notify alert\nExample peer responds orderly
+  C -> CS: close() / shutdown write side after TLS shutdown
+  CS -> SS: FIN + ACK (after prior data)
+  SS --> CS: ACK
+  S -> SS: close() / shutdown write side
+  SS --> CS: FIN + ACK
+  CS -> SS: ACK
+  CS -> CS: Active closer enters TIME_WAIT\nRetire connection state after wait
+end
+note over CS,SS
+  Each TCP direction closes independently; ACK/FIN can be combined.
+  Abrupt resets and timeouts follow different paths [05].
+  Exact TLS shutdown API behavior depends on the library.
+end note
+legend left
+  |= Color |= Role |
+  |<#DBEAFE> Application | HTTP, DNS, application logic |
+  |<#FCE7F3> Security | TLS above TCP; SSL is the historical name |
+  |<#EDE9FE> Transport | TCP; sockets are a local API boundary |
+  |<#FFEDD5> Network | IP addressing and router forwarding |
+  |<#DCFCE7> Link | Ethernet / Wi-Fi framing and local delivery |
+  |<#FEF3C7> Physical | Electrical, optical, or radio signals |
+  Solid arrows: actions / exchanges. Dashed arrows: replies / completions.
+  Arrow style does not imply a different delivery guarantee.
+endlegend
+
+@enduml

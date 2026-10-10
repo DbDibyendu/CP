@@ -16,6 +16,7 @@
 #include <set>
 #include <stack>
 #include <string>
+#include<list>
 #include <unordered_set>
 #include <vector>
 #endif
@@ -48,21 +49,11 @@ typedef vector<pll> vpll;
 const int MOD = 1'000'000'007;
 //=======================
 
-void solve() {
-  ll temp = 0, flag = 1;
-  string s;
-  cin >> s;
-  int n = 9;
-}
+
 
 int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
-  int t = 1;
-  // cin >> t;
-  while (t--) {
-    solve();
-  }
   return 0;
 }
 

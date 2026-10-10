@@ -1,0 +1,223 @@
+@startuml 04-all-layers-and-network-hops
+' References: Kurose & Ross Ch. 1, 4-7; RFC 791, 826, 1191, 3022, 9293.
+' https://gaia.cs.umass.edu/kurose_ross/videos/1/
+' https://gaia.cs.umass.edu/kurose_ross/videos/4/
+' https://gaia.cs.umass.edu/kurose_ross/videos/5/
+' https://gaia.cs.umass.edu/kurose_ross/videos/6/
+' https://www.rfc-editor.org/rfc/rfc826
+' https://www.rfc-editor.org/rfc/rfc3022
+hide footbox
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam maxMessageSize 360
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBorderColor #475569
+  ParticipantFontColor #0F172A
+  GroupBackgroundColor #F8FAFC
+  GroupBorderColor #94A3B8
+  DividerBackgroundColor #E2E8F0
+  DividerBorderColor #94A3B8
+  NoteBackgroundColor #FFFBE6
+  NoteBorderColor #D4B95E
+  MessageAlign left
+}
+
+title 04 | Every layer, every kind of hop, and the return journey [overview stages 5-7]
+box "CLIENT HOST" #F8FAFC
+  participant "HTTP + TLS\nclient process" as C #DBEAFE
+  participant "Socket API\nOS TCP + IP" as O #EDE9FE
+  participant "Client NIC\nlink MAC + physical PHY" as CN #DCFCE7
+end box
+participant "Local Ethernet\nswitch / optional Wi-Fi AP" as L #DCFCE7
+participant "Gateway G\nLAN and WAN interfaces" as G #FFEDD5
+participant "ISP / transit\nrouter R1 ... Rn" as R #FFEDD5
+participant "Destination\nedge router E" as E #FFEDD5
+box "SERVER HOST" #F8FAFC
+  participant "Server NIC\nlink MAC + physical PHY" as SN #DCFCE7
+  participant "OS IP + TCP\nsocket API" as SO #EDE9FE
+  participant "TLS + HTTP\nserver process" as S #DBEAFE
+end box
+
+note over C,S
+  READ FIRST: handshake is already complete [03]. Follow one request packet, then its response.
+  Many packets may be needed; this trace simplifies their repetition, not the layers.
+  Baseline access: Ethernet via a switch. Wi-Fi differences are in a separate note below.
+  C=192.168.1.10:51514; gateway LAN=192.168.1.1; server=203.0.113.20:443.
+  Example optional NAT: gateway public endpoint=198.51.100.10:62000.
+  MAC_C, MAC_G_LAN, etc. are symbolic link addresses. Remote IPs use documentation ranges.
+end note
+
+== 5a | Application, security, socket, and transport ==
+C -> C: [Application] Serialize GET /hello HTTP/1.1\nHost: www.example.com; header terminator
+C -> C: [TLS above TCP] Encrypt/authenticate plaintext\nTLS record = header + protected content + tag
+C -> O: [Socket API] send/write encrypted bytes\nLocal API boundary: application -> transport service
+O -> O: [Transport] Buffer bytes; segment within MSS / path limit\nTCP header: ports, sequence/ACK, window, checksum
+note over C,O #EDE9FE
+  Buffering, offload, segmentation, and scheduling are implementation dependent.
+  A TLS record can span TCP segments; a segment can contain record pieces.
+  TCP receive reconstructs a stream, not application message boundaries.
+end note
+
+== 5b | Network layer chooses the next hop ==
+O -> O: [Network] Construct IP packet carrying a TCP segment\nSrc=192.168.1.10; Dst=203.0.113.20; example TTL=64
+O -> O: Route lookup: destination is outside 192.168.1.0/24\nChoose gateway 192.168.1.1 and outgoing NIC
+note over O,G #FFEDD5
+  Destination IP stays the remote server's IP.
+  Next hop is a local forwarding decision; it is not the HTTP destination.
+  More specific routes can override the default gateway.
+end note
+
+== 5c | Link layer resolves the local next-hop address ==
+opt Gateway neighbor entry absent from ARP cache
+  O -> CN: ARP request for gateway 192.168.1.1
+  CN -> L: [Physical] Transmit frame as encoded electrical signals\n[Link] Ethernet broadcast destination FF:FF:FF:FF:FF:FF
+  L -> L: Recover bits; learn source MAC_C -> ingress port\nFlood broadcast to other eligible ports in the VLAN
+  L -> G: Broadcast ARP request: who has 192.168.1.1?
+  G --> L: ARP reply: 192.168.1.1 is MAC_G_LAN
+  L --> CN: Unicast reply toward MAC_C
+  CN --> O: Cache gateway IP -> MAC_G_LAN
+end
+note over CN,G #DCFCE7
+  ARP is local link traffic, not an IP packet forwarded across routers.
+  For an on-subnet server, resolve that server's MAC instead.
+end note
+
+== 5d | First link: frame, bits, and physical signals ==
+O -> CN: [Network -> Link] Queue IP packet for MAC_G_LAN
+CN -> CN: [Link] Build Ethernet frame:\nDst MAC_G_LAN | Src MAC_C | EtherType IPv4\nIP packet | padding if needed | FCS
+note over C,CN #DBEAFE
+  Conceptual nesting for this data packet:
+  Ethernet header [ IP header [ TCP header [ TLS ciphertext bytes ] ] ] FCS
+  Original HTTP bytes are inside authenticated encryption.
+  Headers shown do not imply one whole HTTP message fits in one frame.
+end note
+CN -> CN: [Physical] Serialize frame transmission;\nPHY encodes symbols for negotiated Ethernet link
+CN -> L: Copper: electrical signal waveform over the cable\nPreamble / synchronization precede frame bits
+L -> L: [Physical Rx] Recover timing, symbols, bits\n[Link Rx] Validate frame FCS; reject corrupt frame
+L -> L: Learn source MAC; look up destination MAC\nKnown unicast -> chosen port; unknown unicast -> flood
+L -> G: [Physical Tx] New electrical transmission on egress cable\nEthernet Src=MAC_C, Dst=MAC_G_LAN
+note over L #DCFCE7
+  A normal switch bridges frames within the VLAN.
+  It preserves these endpoint MAC addresses and the IP packet;
+  it does not decrement IP TTL for ordinary switching.
+  Physical transmission restarts on the outgoing port.
+end note
+
+== 5e | Gateway: physical receive -> link receive -> IP forward ==
+G -> G: Ingress PHY recovers bits; MAC checks FCS\nRemove incoming Ethernet header/trailer; inspect IP header
+G -> G: [Network] Longest-prefix lookup -> WAN next hop\nDecrement TTL 64 -> 63; update IPv4 header checksum
+opt Gateway performs example outbound NAT / port translation
+  G -> G: Map 192.168.1.10:51514 -> 198.51.100.10:62000\nRewrite source IP/port; adjust affected IP/TCP checksums\nKeep mapping for matching return traffic
+end
+G -> G: [Link] Obtain WAN next-hop link address if needed\nBuild new frame: Src=MAC_G_WAN; Dst=MAC_R1_IN\n[Physical] Outgoing PHY generates link signals
+G -> R: Example fiber link: encoded optical transmission\nCarries IP/TCP packet containing TLS ciphertext
+
+== 5f | Repeat forwarding across the Internet ==
+loop Each illustrated ISP / transit router along the selected path
+  R -> R: Rx PHY -> recover bits; Rx link -> validate/extract IP\nIP: longest-prefix lookup, decrease TTL, check MTU\nSwitching fabric -> egress queue -> new link frame -> Tx PHY
+end
+note over R #FFEDD5
+  ROUTING CONTROL PLANE: OSPF / other IGP inside an AS;
+  BGP between ASes advertises reachability and policy.
+  Selected routes populate forwarding tables in advance.
+  DATA PLANE: each arriving packet uses the current table;
+  it does not run BGP negotiation for every HTTP request.
+  AS = autonomous system; IGP = interior gateway protocol.
+end note
+note over G,E #FFEDD5
+  At each routed boundary: discard incoming link encapsulation and create outgoing encapsulation.
+  Link technology can change: Ethernet, provider links, radio, etc.; not every link uses MAC/ARP.
+  NAT aside, IP endpoints stay constant; TTL decreases and IPv4 checksum changes.
+  Ordinary transit forwarding does not decrypt TLS or reconstruct HTTP.
+end note
+R -> E: Last transit link: packet toward 203.0.113.20
+
+== 5g | Destination edge and last link ==
+E -> E: Rx PHY -> Link -> IP; find directly attached server subnet\nDecrease TTL; resolve server neighbor if cache misses
+E -> E: Build final Ethernet frame:\nSrc=MAC_E_LAN; Dst=MAC_SERVER; unchanged IP destination
+E -> SN: Example last copper link: encoded electrical signals
+SN -> SN: PHY recovers symbols/bits; MAC validates FCS\nAccept local destination frame; extract IP packet
+SN -> SO: [Link -> Network] Deliver IP packet to host stack
+
+== 6 | Server receives upward through all layers ==
+SO -> SO: [IP] Validate header / destination / protocol;\nreassemble IP fragments if this example path produced any
+SO -> SO: [TCP] Verify checksum; identify connection;\nreorder/deduplicate bytes; update receive state and ACKs
+SO --> S: [Socket] recv/read supplies available ordered ciphertext bytes
+S -> S: [TLS] Assemble records; authenticate/decrypt\n[HTTP] Parse framing; dispatch /hello handler
+S -> S: Prepare HTTP/1.1 200 OK; Content-Length: 5; body Hello
+note over SO,S #EDE9FE
+  TCP ACK generation can occur before TLS decryption or handler execution.
+  A receive call can return fewer bytes than a TLS record or HTTP message.
+end note
+
+== 7 | Response descends the server stack and returns ==
+S -> S: HTTP serialize -> TLS record protection
+S -> SO: Socket send/write: response ciphertext
+SO -> SO: TCP segment: Src port=443, Dst port=62000 with NAT\nIP: Src=203.0.113.20, Dst=198.51.100.10\nChoose response route and next hop
+SO -> SN: IP packet -> Ethernet frame toward MAC_E_LAN
+SN --> E: Physical response transmission; Link -> IP at E
+E -> E: IP lookup; TTL decrement; new outgoing link encapsulation
+E --> R: Outgoing response signals carrying frame/packet
+R -> R: Repeat Rx PHY -> Link -> IP -> Link -> Tx PHY\nReturn path may use different routers
+R --> G: Response packet addressed to gateway public IP
+opt The request used NAT and the return mapping exists
+  G -> G: Reverse mapping of destination endpoint:\n198.51.100.10:62000 -> 192.168.1.10:51514\nAdjust affected checksums
+end
+G -> G: Route to client LAN; decrease TTL; use cached / resolved MAC_C\nNew Ethernet frame: Src=MAC_G_LAN, Dst=MAC_C
+G --> L: Physical transmission on LAN cable
+L --> CN: Bridge response frame; new physical transmission to client
+CN -> CN: PHY recover bits -> Link validate/extract IP
+CN --> O: Deliver IP packet to host stack
+O -> O: IP -> TCP checksum/demux/reorder -> socket buffer
+O --> C: Socket recv -> TLS verify/decrypt -> HTTP response parse
+C -> C: Application consumes Hello
+note over SO,G #FFEDD5
+  Without NAT: response destination is 192.168.1.10:51514 in this private routed example.
+  Addresses must be routable within that chosen network; skip both translation steps.
+  The pictured return uses the same device roles only to keep the drawing readable.
+end note
+
+== Depth notes | Wi-Fi, physical media, MTU, and packet loss ==
+note over CN,L #DCFCE7
+  WI-FI ACCESS ALTERNATIVE:
+  Associate with AP; use 802.11 MAC frames and radio PHY.
+  In a typical infrastructure uplink, receiver address is the AP/BSSID;
+  other address fields identify the original source and bridged destination.
+  AP bridges payload into Ethernet; it does not route merely because it is an AP.
+  Shared radio access: CSMA/CA contention/backoff; many unicast frames get link ACK/retry.
+  A Wi-Fi link ACK is local and is different from an end-to-end TCP ACK.
+end note
+note over CN,E #FEF3C7
+  PHYSICAL LAYER ON EACH LINK:
+  Tx: frame bits -> encoding/modulation -> electrical / optical / radio signal.
+  Rx: synchronization, symbol recovery, decoding -> frame bits for the MAC.
+  Copper: voltage/current signaling; fiber: modulated light; Wi-Fi: radio modulation, often OFDM.
+  Bit rate controls serialization time; distance and medium control propagation time.
+  Link checks and optional local retries do not guarantee end-to-end application delivery.
+  NIC = network interface controller; MAC = media access control; PHY = physical transceiver.
+end note
+note over O,E #FFEDD5
+  MTU bounds an outgoing IP packet's size; TCP MSS bounds segment payload.
+  IPv4 DF=1 + packet too large: discard and report ICMP fragmentation-needed when allowed.
+  Path MTU discovery lets the sender reduce packet sizes; IPv4 DF=0 may allow fragmentation.
+  IPv6 routers do not fragment; ICMPv6 Packet Too Big informs the sender [06].
+  Corrupt frames, expired TTL, queue overflow, or unreachable routes may drop packets [05].
+end note
+legend left
+  |= Color |= Role |
+  |<#DBEAFE> Application | HTTP, DNS, application logic |
+  |<#FCE7F3> Security | TLS above TCP; SSL is the historical name |
+  |<#EDE9FE> Transport | TCP; sockets are a local API boundary |
+  |<#FFEDD5> Network | IP addressing and router forwarding |
+  |<#DCFCE7> Link | Ethernet / Wi-Fi framing and local delivery |
+  |<#FEF3C7> Physical | Electrical, optical, or radio signals |
+  Solid arrows: actions / exchanges. Dashed arrows: replies / completions.
+  Arrow style does not imply a different delivery guarantee.
+endlegend
+
+@enduml

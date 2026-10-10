@@ -78,7 +78,7 @@ const int N = 1000007, M = N;
  *
  * 🧙‍♂️ THE BITWISE MAGIC TRICK: (idx & -idx)
  *
- * How do we know how big an index's block is? We isolate its lowest set bit.
+ * How do we know how big an index's block is? We isolate its lowest set bit (LSB)
  * In computer math (Two's Complement), doing a bitwise AND between a number 
  * and its negative equivalent isolates that exact lowest '1'.
  *

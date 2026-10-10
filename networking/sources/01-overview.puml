@@ -1,0 +1,116 @@
+@startuml 01-overview
+' Original teaching diagram based on Kurose & Ross, Chapters 1-6.
+' https://gaia.cs.umass.edu/kurose_ross/videos/6/
+hide footbox
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam maxMessageSize 360
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBorderColor #475569
+  ParticipantFontColor #0F172A
+  GroupBackgroundColor #F8FAFC
+  GroupBorderColor #94A3B8
+  DividerBackgroundColor #E2E8F0
+  DividerBorderColor #94A3B8
+  NoteBackgroundColor #FFFBE6
+  NoteBorderColor #D4B95E
+  MessageAlign left
+}
+
+title 01 | The complete journey: https://www.example.com/hello
+participant "Client\nHTTP application" as C #DBEAFE
+participant "DNS\nrecursive resolver" as D #DBEAFE
+participant "Network path\nLAN -> gateway -> Internet" as N #FFEDD5
+participant "Server\nHTTPS application" as S #DBEAFE
+
+note over C,S
+  READ FIRST: follow stages 1-8 downward; the other sources expand them.
+  Example: HTTP/1.1 + TLS 1.3 + TCP + IPv4; a new connection.
+  The addresses are illustrative, not the real DNS answer for this hostname.
+  Client 192.168.1.10:51514; server 203.0.113.20:443.
+end note
+
+== 1 | Get a usable network [detail: 02] ==
+C -> C: Link ready; IP address, subnet,\ndefault gateway, DNS resolver available
+note right of C
+  DHCP is optional setup when configuration is absent.
+  Existing configuration skips this work.
+end note
+
+== 2 | Find the server address [detail: 02] ==
+C -> D: DNS lookup: www.example.com\n(separate application exchange; if cache misses)
+D --> C: A / AAAA answer + cache lifetime
+
+== 3 | Open a reliable connection [detail: 03] ==
+note over S #EDE9FE
+  Server already has a listening socket on TCP port 443.
+end note
+C -> S: socket + connect; TCP SYN / SYN-ACK / ACK\nLogical exchange through the network path
+S --> C: TCP connection established; server accepts socket
+
+== 4 | Authenticate and secure the connection [detail: 03] ==
+C -> S: TLS handshake over this TCP connection
+S --> C: Server authenticated; traffic keys established
+note over C,S #FCE7F3
+  HTTP plaintext is visible at TLS endpoints.
+  Transit devices normally forward encrypted payloads.
+end note
+
+== 5 | Send the request through every layer [detail: 04] ==
+note over C #DBEAFE
+  APPLICATION: GET /hello + Host header
+  SECURITY: TLS encrypts into records
+  SOCKET API: TLS writes bytes to the TCP socket
+  TRANSPORT: TCP sends segments
+  NETWORK: IP wraps segments into packets
+  LINK: NIC builds local delivery frames
+  PHYSICAL: NIC transmits encoded signals
+end note
+C -> N: Physical transmission on the first link
+N -> N: Switch / AP: local frame forwarding\nRouters: IP forwarding + new outgoing link frames\nSignals are received and transmitted on each link
+N -> S: Last link delivers signals to server NIC
+
+== 6 | Receive and process [details: 03, 04] ==
+note over S #DBEAFE
+  PHYSICAL -> LINK -> IP -> TCP -> socket -> TLS -> HTTP
+  Recover bits; validate frame; extract packet; reassemble bytes;
+  verify/decrypt TLS; parse HTTP; call application handler.
+end note
+S -> S: Process /hello; prepare HTTP status, headers, body
+
+== 7 | Send the response back [detail: 04] ==
+S -> N: HTTP -> TLS -> socket -> TCP -> IP -> frame -> signals
+N -> N: Forward toward client; reverse NAT if present\nThe return route can differ from the request route
+N --> C: Signals -> frame -> IP -> TCP -> socket -> TLS -> HTTP
+C -> C: Consume the response body\nA browser may now parse, render, and fetch more resources
+
+== 8 | Reuse or close; handle delays and loss [detail: 05] ==
+note over C,S #EDE9FE
+  TCP ACKs and loss recovery run throughout data transfer.
+  An ACK confirms transport receipt, not successful application processing.
+  Reuse an established connection, or close TLS and then TCP gracefully.
+end note
+
+note over N
+  [06] Alternatives: IPv6 / Neighbor Discovery; HTTP/3 / QUIC;
+  CDN or reverse proxy termination with a separate origin connection.
+  Every DNS, TCP, and TLS packet also uses network, link, and physical layers.
+end note
+legend left
+  |= Color |= Role |
+  |<#DBEAFE> Application | HTTP, DNS, application logic |
+  |<#FCE7F3> Security | TLS above TCP; SSL is the historical name |
+  |<#EDE9FE> Transport | TCP; sockets are a local API boundary |
+  |<#FFEDD5> Network | IP addressing and router forwarding |
+  |<#DCFCE7> Link | Ethernet / Wi-Fi framing and local delivery |
+  |<#FEF3C7> Physical | Electrical, optical, or radio signals |
+  Solid arrows: actions / exchanges. Dashed arrows: replies / completions.
+  Arrow style does not imply a different delivery guarantee.
+endlegend
+
+@enduml
