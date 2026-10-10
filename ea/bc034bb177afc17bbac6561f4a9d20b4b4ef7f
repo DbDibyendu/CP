@@ -1,0 +1,37 @@
+networking/.gitignore
+  s_472952afef0ff5::t_d3ce3fc39d8945 1-2
+networking/README.md
+  s_472952afef0ff5::t_ea60037e42aaf6 1-122
+networking/end-to-end-networking.puml
+  s_472952afef0ff5::t_5fbc5534c73139 1-1020
+networking/sources/01-overview.puml
+  s_472952afef0ff5::t_d89b88e0b54362 1-116
+networking/sources/02-network-setup-and-dns.puml
+  s_472952afef0ff5::t_b67528d5baf6cd 1-126
+networking/sources/03-sockets-tcp-and-tls.puml
+  s_472952afef0ff5::t_778e65f43db857 1-150
+networking/sources/04-all-layers-and-network-hops.puml
+  s_472952afef0ff5::t_019fbf40d4243a 1-223
+networking/sources/04a-layer-stack.puml
+  s_472952afef0ff5::t_6bcd073aebdcb3 1-93
+networking/sources/05-reliability-delays-and-failures.puml
+  s_472952afef0ff5::t_8aaa115ae10f95 1-156
+networking/sources/06-ipv6-quic-and-tls-termination.puml
+  s_472952afef0ff5::t_b5f24935a03cd5 1-146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "eabc034bb177afc17bbac6561f4a9d20b4b4ef7f",
+  "prompts": {},
+  "sessions": {
+    "s_472952afef0ff5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a12492-02bc-7702-9742-2d485844fc47",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Dibi07 <dibyendu.biswas@jiostar.com>"
+    }
+  }
+}
